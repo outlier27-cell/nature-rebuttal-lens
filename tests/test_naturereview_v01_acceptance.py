@@ -335,6 +335,16 @@ def test_legacy_model_assisted_training_seed_export_is_optional_not_core():
     assert "unsupported_commitment_detection" in rows[0]["learning_tasks"]
 
 
+def test_generated_readme_uses_nature_rebuttal_lens_public_name():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert readme.startswith("# Nature RebuttalLens")
+    assert "Nature RebuttalLens is a manuscript-aware" in readme
+    assert "not affiliated with, endorsed by, or operated by Nature Portfolio or Springer Nature" in readme
+    assert "run-rebuttal-lens" in readme
+    assert "NatureReview-Interact is a non-training" not in readme
+
+
 def test_open_source_completion_status_summarizes_core_framework():
     status = (ROOT / "docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
