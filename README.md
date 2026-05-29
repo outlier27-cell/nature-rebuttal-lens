@@ -1,29 +1,25 @@
 # Nature RebuttalLens
 
-**A manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow built from Nature transparent peer-review interaction cases.**
+**Nature RebuttalLens is a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow built from Nature transparent peer-review interaction cases.**
 
-Nature RebuttalLens helps authors and researchers inspect reviewer comments as structured scholarly interactions: explicit concern, tacit risk, manuscript evidence, historical Nature case analogy, author stance, tone/commitment, and integrity boundary.
+It helps authors interpret reviewer comments with structure: what the reviewer explicitly asks for, what risk may sit behind the comment, what evidence in the manuscript is already usable, what still needs author confirmation, and how similar Nature review interactions can be used as bounded historical analogies.
 
 This is an independent open-source research project. It is not affiliated with, endorsed by, or operated by Nature Portfolio or Springer Nature.
 
-## Why This Project Exists
+## What The System Does
 
-Most rebuttal tools treat review comments as ordinary text-generation prompts. Nature RebuttalLens treats peer review as an interaction among scientific claims, manuscript evidence, reviewer concerns, journal norms, author agency, editor-readable signals, and responsible-use boundaries.
+Nature RebuttalLens turns a reviewer comment, optional manuscript text, optional draft response, and optional retrieved Nature peer-review cases into a traceable assistant workflow.
 
-The project is therefore not a RAG demo and not an automatic rebuttal writer. Retrieval is only support infrastructure. The core contribution is a **recordable and evaluable review-interaction workflow** grounded in:
+The system is designed to:
 
-- reviewer concern understanding;
-- tacit risk interpretation from observable text;
-- manuscript evidence location;
-- bounded analogy to Nature transparent peer-review cases;
-- evidence action planning;
-- author positioning and tone/commitment calibration;
-- actor-network and cross-disciplinary interpretation;
-- integrity, provenance, and author-confirmation checks.
+- identify explicit reviewer concerns and possible tacit risks;
+- connect reviewer concerns back to manuscript evidence when manuscript text is provided;
+- interpret institutional and editor-facing signals without claiming access to hidden reviewer intent;
+- retrieve and interpret similar Nature review-response cases as historical analogies;
+- plan evidence actions, response structure, tone, author positioning, and integrity checks;
+- produce a recorded workflow trace that can be inspected, evaluated, and improved.
 
-## What It Does
-
-Nature RebuttalLens turns a reviewer comment, optional manuscript text, optional draft response, optional editor letter, and optional retrieved Nature case analogies into a structured workflow trace.
+It is not a final rebuttal generator, acceptance predictor, reviewer replacement, or tool for inventing experiments, fabricating evidence, or making commitments the authors cannot support.
 
 | Capability | Output |
 | --- | --- |
@@ -38,9 +34,15 @@ Nature RebuttalLens turns a reviewer comment, optional manuscript text, optional
 | Cross-disciplinary lensing | Tacit knowledge, institutional dependence, actor-network alignment, fast/slow correction, tone/commitment, author agency |
 | Integrity checking | Adequacy, provenance, and responsible-use warnings |
 
-It does **not** generate submission-ready final rebuttals by default, predict acceptance probability, replace author judgment, or invent experiments, data, citations, or commitments.
+## Why It Exists
 
-## System Workflow
+Most rebuttal tools treat reviewer comments as plain text tasks. This project treats peer review as an interaction among scientific claims, evidence standards, institutional expectations, author agency, editor-readable signals, and tone/commitment choices.
+
+This is not a RAG system. Retrieval is support infrastructure; the core contribution is a cross-disciplinary workflow that turns tacit concern, institutional signal, actor-network alignment, fast/slow cognitive correction, tone/commitment calibration, and author agency into recordable and evaluable traces.
+
+The core value is therefore not a single RAG pipeline or a single technical recipe. The current non-training release focuses on the workflow and evaluation scaffold. Training and fine-tuning are outside the v0.1 core scope.
+
+## Workflow
 
 Nature RebuttalLens runs a 12-agent manuscript-aware workflow:
 
@@ -88,6 +90,8 @@ Trace output
   rebuttal_lens_summary.json
 ```
 
+Each agent is an independent model-assisted reasoning unit. The final output is a structured workflow trace, not a hidden one-shot answer.
+
 For a visual local diagram, open:
 
 ```text
@@ -112,7 +116,7 @@ $env:PYTHONPATH="src"
 
 ## Quick Start
 
-Nature RebuttalLens uses an OpenAI-compatible chat completion API. The default examples use a DeepSeek-compatible endpoint, but any compatible provider can be configured.
+Set an OpenAI-compatible API endpoint and model. For example:
 
 ```powershell
 $env:PEER_REVIEW_API_BASE_URL="https://xh.v1api.cc"
@@ -123,6 +127,7 @@ $env:PEER_REVIEW_API_MODEL="deepseek-v3"
 Run the included example:
 
 ```powershell
+$env:PYTHONPATH="src"
 python -m peer_review_skills.cli.main run-rebuttal-lens `
   --review-file examples/rebuttal_lens/reviewer_comment.txt `
   --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
@@ -147,49 +152,50 @@ The workflow writes:
 - `data/evaluation/rebuttal_lens_demo/rebuttal_lens_trace.json`
 - `data/evaluation/rebuttal_lens_demo/rebuttal_lens_summary.json`
 
-The legacy alias `run-reviewweaver` is kept only for compatibility. The public project name is **Nature RebuttalLens**.
+The legacy alias `run-reviewweaver` is kept only for compatibility. The public project name is Nature RebuttalLens.
 
 ## Example Inputs
 
-The minimal demo lives in `examples/rebuttal_lens/`:
+The demo files are under `examples/rebuttal_lens/`:
 
-| File | Purpose |
-| --- | --- |
-| `reviewer_comment.txt` | Reviewer critique or review excerpt |
-| `manuscript_excerpt.md` | Author-supplied manuscript excerpt |
-| `author_draft_response.txt` | Optional draft author response |
-| `retrieved_cases.json` | Optional retrieved Nature case analogies |
+- `reviewer_comment.txt`: reviewer critique or review excerpt
+- `manuscript_excerpt.md`: manuscript excerpt supplied by the author
+- `author_draft_response.txt`: optional draft author response
+- `retrieved_cases.json`: optional retrieved Nature case analogies
 
-Current manuscript loading supports text, Markdown, and LaTeX-like plain text. PDF/DOCX parsing is intentionally not claimed in this release.
+Current manuscript loading supports text, Markdown, and LaTeX-like plain text files. PDF/DOCX parsing is intentionally not claimed in this release.
 
 ## Current Status
 
-This is an alpha research-software release focused on the non-training workflow and evaluation scaffold.
-
-Current release artifacts include:
-
-- release-safe schema and taxonomy files;
-- derived KB summaries and validation reports;
-- retrieval and workflow evaluation scaffolds;
-- model-assisted seed review results;
-- 12-agent Nature RebuttalLens workflow;
-- responsible-use, data-boundary, and agent-card documentation.
-
-Known status boundaries:
+This repository currently contains candidate data, schema, taxonomy, retrieval baselines, workflow traces, reviewer-author-editor simulation/evaluation traces, cross-disciplinary lens maps, evaluation protocols, and API-assisted seed review results.
 
 - API seed review has been executed for 200 / 200 seed requests.
-- Current seed and KB labels are model-assisted, not human gold.
-- Human-confirmed labels are future work, not a v0.1 release blocker.
+- The current seed and KB labels are model-assisted, not human gold.
+- System-side workflow traces include case explanations, evidence action plans, author confirmation questions, response adequacy checks, and not-real-peer-review simulation roles.
+- Human-confirmed labels are a future extension, not a v0.1 release blocker.
 - Training and fine-tuning are outside the v0.1 core scope.
-- The system does not prove acceptance-rate improvement or causal outcome effects.
 
 ## Data Boundary
 
-This repository contains a release-safe subset of derived schemas, taxonomies, summaries, documentation, examples, and evaluation scaffolds.
+This repository contains a release-safe subset of derived schemas, taxonomies, summaries, documentation, and evaluation scaffolds. Large scraped data, local caches, API outputs, PDFs, and private working files are excluded by `.gitignore`.
 
-Large scraped data, local caches, API outputs, PDFs, private working files, and full raw peer-review corpora are excluded by `.gitignore`.
+Current labels and traces are model-assisted research artifacts, not human gold annotations. They are suitable for workflow development, auditing, and evaluation design, but should not be presented as expert-labeled ground truth.
 
-Current labels and traces are model-assisted research artifacts. They are useful for workflow development, auditing, and evaluation design, but should not be presented as expert-labeled ground truth.
+## Key Documents
+
+- `docs/2026-05-26-open-source-review-interaction-agent-full-plan-zh.md`: full cross-disciplinary open-source plan
+- `docs/REBUTTAL_LENS_WORKFLOW_zh.md`: final Nature RebuttalLens workflow explanation
+- `docs/INTERDISCIPLINARY_SYSTEM_FRAME_zh.md`: interdisciplinary system frame
+- `docs/PDF_DERIVED_DESIGN_LENSES_zh.md`: design lenses derived from the project PDFs
+- `docs/RESPONSIBLE_USE_zh.md`: responsible-use boundaries
+- `docs/DATA_CARD_zh.md`: data card
+- `docs/AGENT_CARD_zh.md`: agent card
+- `docs/EVALUATION_PROTOCOL_zh.md`: evaluation protocol
+- `docs/DATA_RELEASE_BOUNDARY_zh.md`: data release boundary
+- `docs/MODEL_AND_AGENT_LIMITATIONS_zh.md`: model and agent limitations
+- `docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md`: current release completion status
+- `docs/rebuttal_lens_system_flow.html`: local visual workflow diagram
+- `codex.md`: current Chinese project overview for future coding sessions
 
 ## Verification
 
@@ -205,30 +211,7 @@ python -m pip install --dry-run -e .
 
 The validation command checks the release-safe NatureReview v0.1 artifacts that support the Nature RebuttalLens workflow.
 
-Latest local release-readiness check recorded in `UPGRADE.md`:
-
-- full pytest: `80 passed`;
-- compileall: pass;
-- v0.1 artifact validation: `PASS`;
-- package dry-run: would install `nature-rebuttal-lens-0.1.0`;
-- secret scan: no persisted real API keys or bearer tokens found.
-
-## Key Documents
-
-| Document | Purpose |
-| --- | --- |
-| `docs/2026-05-26-open-source-review-interaction-agent-full-plan-zh.md` | Full cross-disciplinary open-source research plan |
-| `docs/REBUTTAL_LENS_WORKFLOW_zh.md` | Final workflow explanation |
-| `docs/INTERDISCIPLINARY_SYSTEM_FRAME_zh.md` | Interdisciplinary system frame |
-| `docs/PDF_DERIVED_DESIGN_LENSES_zh.md` | Design lenses derived from project PDFs |
-| `docs/RESPONSIBLE_USE_zh.md` | Responsible-use boundaries |
-| `docs/DATA_CARD_zh.md` | Data card |
-| `docs/AGENT_CARD_zh.md` | Agent card |
-| `docs/EVALUATION_PROTOCOL_zh.md` | Evaluation protocol |
-| `docs/DATA_RELEASE_BOUNDARY_zh.md` | Data release boundary |
-| `docs/MODEL_AND_AGENT_LIMITATIONS_zh.md` | Model and agent limitations |
-| `docs/rebuttal_lens_system_flow.html` | Local visual workflow diagram |
-| `codex.md` | Current Chinese project overview for future coding sessions |
+Latest local release-readiness checks are recorded in `UPGRADE.md`. The release gate includes full pytest, compileall, v0.1 artifact validation, package dry-run, CLI smoke tests, public documentation scans, and secret scans.
 
 ## Responsible Use
 
@@ -241,7 +224,7 @@ Nature RebuttalLens is intended to help authors think, organize, and check their
 - manipulate reviewers or evade real scientific problems;
 - upload confidential manuscript material to an external API without policy and author approval.
 
-When the supplied manuscript does not support a response, the system should state the gap and require author confirmation rather than inventing a claim.
+When the manuscript does not support a response, the system should state the gap and require author confirmation rather than inventing a claim.
 
 ## License
 

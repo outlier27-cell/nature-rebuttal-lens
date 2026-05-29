@@ -86,6 +86,20 @@
 - Rollback: remove `pyproject.toml`, restore prior config and audit docs, and remove release-readiness regression tests.
 - Status: Completed.
 
+### Phase 12: Final Delivery Sprint Release Gate
+
+- Goal: perform a final whole-repository delivery sprint before publication and close any release-surface regressions found by maintainer-style review.
+- Changes:
+  - Add README release-quality regression coverage so installation, console scripts, visual workflow, key documents, verification commands, responsible-use boundaries, and Apache license wording cannot be accidentally removed.
+  - Add core Chinese public-document readability coverage for the workflow, responsible-use, data-card, agent-card, data-release-boundary, limitation, and completion-status documents.
+  - Restore the generated README template and checked-in README to a complete open-source release shape after an over-compressed local edit removed installation, verification, key-document, and safety-boundary details.
+  - Re-run targeted, full, compile, validator, packaging, CLI, documentation, HTML, and secret-scan checks as the release gate.
+- Affected files/modules: `README.md`, `src/peer_review_skills/execution/build_naturereview_v01.py`, `tests/test_rebuttal_lens_workflow.py`, `UPGRADE.md`.
+- Risks: documentation tests intentionally check release-critical strings; future README rewrites should preserve the same release information even if section wording changes.
+- Verification: targeted README/document tests, full Nature RebuttalLens tests, full pytest, compileall, v0.1 validator, package dry-run, CLI smoke, HTML parse, README path check, public mojibake/stale wording scan, secret scan, git diff check.
+- Rollback: revert the README/test additions and restore the previous Phase 11 release state.
+- Status: Completed.
+
 ### Phase 1: Acceptance Tests
 
 - Goal: encode the non-training, cross-disciplinary acceptance criteria before implementation.
@@ -246,6 +260,8 @@
 | Phase 9 final review | Taxonomy-aware agents could fail when external callers passed `taxonomies=None`; direct-run and public release scans needed fresh verification after the fix | Fixed with shared taxonomy-context normalization, regression tests, direct test runner verification, full pytest, compileall, validator, secret scan, and rule/legacy wording scans |
 | Phase 10 review | Final user workflow lacked manuscript context, original-manuscript evidence grounding, bounded case interpretation, clean project naming, and a GitHub release boundary | Fixed with Nature RebuttalLens 12-agent workflow, manuscript-aware evidence map, case interpreter, CLI, examples, docs, local git initialization, and release blocker documentation |
 | Phase 11 initial review | Release docs/config still had stale architecture state: no installable Python metadata, config listed only 9 legacy agents, audit docs still described a pre-upgrade rule-assembly system | Fixed with `pyproject.toml`, 12-agent config, current audit docs, and release-readiness regression tests |
+| Phase 12 initial review | README had been shortened and no longer documented installation, installed console scripts, full verification, key release docs, visual workflow, and detailed responsible-use/license boundaries | Fixed README release surface and added regression tests for README and core public Chinese-doc readability |
+| Phase 12 final review | Release record initially listed the checked-in README but not the README generator as an affected source-of-truth file | Fixed Phase 12 affected-file record; no remaining actionable findings after full verification, CLI smoke, documentation scans, package dry-run, and diff check |
 
 ## Verification Log
 
@@ -308,6 +324,15 @@
 | Phase 11 CLI smoke | PASS | `peer_review_skills.cli.main --help` lists `run-rebuttal-lens`; missing API-key run exits 2 with a clear parser error and no traceback |
 | Phase 11 secret scan | PASS | No persisted real API keys or bearer tokens found in README, codex, UPGRADE, LICENSE, pyproject, src, tests, docs, examples, or release data paths |
 | Phase 11 stale/mojibake scan | PASS | Core public agent prompt, workflow docs, responsible-use docs, and audit docs contain no stale rule-assembly findings or corrupted lens-name markers |
+| Phase 12 full pytest | PASS | `$env:PYTHONPATH='src'; python -m pytest -q`: 82 passed |
+| Phase 12 compileall | PASS | `$env:PYTHONPATH='src'; python -m compileall -q src tests`: no compile errors |
+| Phase 12 official validation | PASS | `validate-naturereview-v01`: `PASS`; counts include 245 interaction units, 100 retrieval predictions, 50 workflow traces, 50 simulation traces, 50 cross-disciplinary lens traces, and 200 API handoff rows |
+| Phase 12 package dry-run | PASS | `python -m pip install --dry-run -e .` would install `nature-rebuttal-lens-0.1.0`; generated editable `egg-info` was removed and is ignored by `.gitignore` |
+| Phase 12 CLI smoke | PASS | CLI help lists `run-rebuttal-lens`; missing API-key run exits 2 with a clear parser error and no traceback |
+| Phase 12 docs smoke | PASS | Local HTML flow diagram parses; README referenced release paths exist |
+| Phase 12 secret scan | PASS | No persisted real API keys or bearer tokens found in README, codex, UPGRADE, LICENSE, pyproject, source, tests, docs, examples, or release data paths |
+| Phase 12 stale/mojibake scan | PASS | Core public docs and audit docs contain no stale rule-assembly findings or corrupted Chinese markers |
+| Phase 12 diff check | PASS | `git diff --check` exit 0; output contains only line-ending normalization warnings |
 
 ## Residual Risks
 
@@ -336,3 +361,4 @@
 - [x] Phase 9 final pre-release review hardening completed.
 - [x] Phase 10 Nature RebuttalLens manuscript-aware final workflow completed locally.
 - [x] Phase 11 pre-release readiness hardening completed.
+- [x] Phase 12 final delivery sprint release gate completed.

@@ -542,3 +542,53 @@ def test_run_rebuttal_lens_cli_reports_missing_api_without_traceback(monkeypatch
     assert exc_info.value.code == 2
     assert "missing PEER_REVIEW_API_KEY" in captured.err
     assert "Traceback" not in captured.err
+
+
+def test_readme_keeps_release_critical_open_source_sections():
+    readme = (Path.cwd() / "README.md").read_text(encoding="utf-8")
+
+    for required in [
+        "## Installation",
+        "python -m pip install -e .",
+        "run-rebuttal-lens",
+        "docs/rebuttal_lens_system_flow.html",
+        "docs/DATA_CARD_zh.md",
+        "docs/AGENT_CARD_zh.md",
+        "docs/DATA_RELEASE_BOUNDARY_zh.md",
+        "python -m compileall -q src tests",
+        "python -m pip install --dry-run -e .",
+        "upload confidential manuscript material to an external API",
+        "Apache License 2.0",
+        "| Capability | Output |",
+        "Layer 0: Manuscript context",
+        "Layer 5: Integrity gate",
+    ]:
+        assert required in readme
+
+
+def test_core_public_chinese_docs_are_readable_not_mojibake():
+    public_docs = [
+        Path.cwd() / "docs/REBUTTAL_LENS_WORKFLOW_zh.md",
+        Path.cwd() / "docs/RESPONSIBLE_USE_zh.md",
+        Path.cwd() / "docs/DATA_CARD_zh.md",
+        Path.cwd() / "docs/AGENT_CARD_zh.md",
+        Path.cwd() / "docs/DATA_RELEASE_BOUNDARY_zh.md",
+        Path.cwd() / "docs/MODEL_AND_AGENT_LIMITATIONS_zh.md",
+        Path.cwd() / "docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md",
+    ]
+    mojibake_markers = [
+        "绯荤粺",
+        "瀹＄",
+        "浣滆",
+        "杈撳",
+        "鍙戝",
+        "鎺ユ",
+        "鐨",
+        "榛樹細",
+    ]
+
+    for path in public_docs:
+        text = path.read_text(encoding="utf-8")
+        assert len(text.strip()) > 100, f"{path} unexpectedly short"
+        for marker in mojibake_markers:
+            assert marker not in text, f"{path} contains mojibake marker {marker!r}"

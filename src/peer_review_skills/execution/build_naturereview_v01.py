@@ -2817,6 +2817,19 @@ The system is designed to:
 
 It is not a final rebuttal generator, acceptance predictor, reviewer replacement, or tool for inventing experiments, fabricating evidence, or making commitments the authors cannot support.
 
+| Capability | Output |
+| --- | --- |
+| Reviewer understanding | Concern map and observable textual evidence |
+| Tacit risk interpretation | Risk notes without claiming private reviewer psychology |
+| Manuscript evidence location | Supported / partial / missing evidence map over supplied manuscript text |
+| Nature case interpretation | Historical case analogies with transfer boundaries |
+| Evidence action planning | Required artifacts and author-confirmation questions |
+| Author positioning | Response stance options, not forced concessions |
+| Tone and commitment calibration | Defensive tone, overclaim, and unsupported commitment warnings |
+| Actor-network mapping | Evidence carriers such as figures, datasets, code, tables, supplements |
+| Cross-disciplinary lensing | Tacit knowledge, institutional dependence, actor-network alignment, fast/slow correction, tone/commitment, author agency |
+| Integrity checking | Adequacy, provenance, and responsible-use warnings |
+
 ## Why It Exists
 
 Most rebuttal tools treat reviewer comments as plain text tasks. This project treats peer review as an interaction among scientific claims, evidence standards, institutional expectations, author agency, editor-readable signals, and tone/commitment choices.
@@ -2827,22 +2840,75 @@ The core value is therefore not a single RAG pipeline or a single technical reci
 
 ## Workflow
 
-Nature RebuttalLens runs a manuscript-aware multi-agent workflow:
+Nature RebuttalLens runs a 12-agent manuscript-aware workflow:
 
-1. Manuscript context extraction
-2. Manuscript evidence location
-3. Nature case retrieval interpretation
-4. Reviewer understanding
-5. Tacit concern interpretation
-6. Institutional signal interpretation
-7. Evidence action planning
-8. Author positioning
-9. Tone and commitment calibration
-10. Actor-network mapping
-11. Cross-disciplinary lens interpretation
-12. Integrity and adequacy checking
+```text
+User inputs
+  reviewer comment
+  manuscript text / Markdown / LaTeX-like text
+  optional draft response
+  optional editor letter
+  optional retrieved Nature cases
+        |
+        v
+Layer 0: Manuscript context
+  1. manuscript_context_extractor
+        |
+        v
+Layer 1: Review understanding
+  2. reviewer_understanding_agent
+  3. tacit_concern_interpreter
+  4. manuscript_evidence_locator
+        |
+        v
+Layer 2: Strategy and evidence
+  5. institutional_signal_interpreter
+  6. case_retrieval_interpreter
+  7. evidence_action_planner
+        |
+        v
+Layer 3: Author response planning
+  8. author_positioning_agent
+  9. tone_commitment_calibrator
+        |
+        v
+Layer 4: Cross-disciplinary interpretation
+  10. actor_network_mapper
+  11. cross_disciplinary_lens_interpreter
+        |
+        v
+Layer 5: Integrity gate
+  12. integrity_adequacy_checker
+        |
+        v
+Trace output
+  rebuttal_lens_trace.json
+  rebuttal_lens_summary.json
+```
 
 Each agent is an independent model-assisted reasoning unit. The final output is a structured workflow trace, not a hidden one-shot answer.
+
+For a visual local diagram, open:
+
+```text
+docs/rebuttal_lens_system_flow.html
+```
+
+## Installation
+
+The repository uses a standard Python `src/` layout and requires Python 3.10+.
+
+```powershell
+git clone https://github.com/outlier27-cell/nature-rebuttal-lens.git
+cd nature-rebuttal-lens
+python -m pip install -e .
+```
+
+For local development without installing:
+
+```powershell
+$env:PYTHONPATH="src"
+```
 
 ## Quick Start
 
@@ -2859,6 +2925,17 @@ Run the included example:
 ```powershell
 $env:PYTHONPATH="src"
 python -m peer_review_skills.cli.main run-rebuttal-lens `
+  --review-file examples/rebuttal_lens/reviewer_comment.txt `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
+  --response-file examples/rebuttal_lens/author_draft_response.txt `
+  --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --output-dir data/evaluation/rebuttal_lens_demo
+```
+
+Installed console scripts are also available after `pip install -e .`:
+
+```powershell
+run-rebuttal-lens `
   --review-file examples/rebuttal_lens/reviewer_comment.txt `
   --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
@@ -2907,8 +2984,13 @@ Current labels and traces are model-assisted research artifacts, not human gold 
 - `docs/INTERDISCIPLINARY_SYSTEM_FRAME_zh.md`: interdisciplinary system frame
 - `docs/PDF_DERIVED_DESIGN_LENSES_zh.md`: design lenses derived from the project PDFs
 - `docs/RESPONSIBLE_USE_zh.md`: responsible-use boundaries
+- `docs/DATA_CARD_zh.md`: data card
+- `docs/AGENT_CARD_zh.md`: agent card
 - `docs/EVALUATION_PROTOCOL_zh.md`: evaluation protocol
+- `docs/DATA_RELEASE_BOUNDARY_zh.md`: data release boundary
+- `docs/MODEL_AND_AGENT_LIMITATIONS_zh.md`: model and agent limitations
 - `docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md`: current release completion status
+- `docs/rebuttal_lens_system_flow.html`: local visual workflow diagram
 - `codex.md`: current Chinese project overview for future coding sessions
 
 ## Verification
@@ -2918,20 +3000,31 @@ Recommended local checks:
 ```powershell
 $env:PYTHONPATH="src"
 python -m pytest -q
+python -m compileall -q src tests
 python -m peer_review_skills.cli.main validate-naturereview-v01
+python -m pip install --dry-run -e .
 ```
 
 The validation command checks the release-safe NatureReview v0.1 artifacts that support the Nature RebuttalLens workflow.
 
+Latest local release-readiness checks are recorded in `UPGRADE.md`. The release gate includes full pytest, compileall, v0.1 artifact validation, package dry-run, CLI smoke tests, public documentation scans, and secret scans.
+
 ## Responsible Use
 
-Nature RebuttalLens should be used to help authors think, organize, and check their rebuttal work. It must not be used to fabricate evidence, overstate manuscript support, impersonate reviewers or editors, or replace human scholarly judgment.
+Nature RebuttalLens is intended to help authors think, organize, and check their rebuttal work. It must not be used to:
+
+- fabricate experiments, data, citations, figures, analyses, or commitments;
+- overstate what the manuscript supports;
+- impersonate reviewers, editors, or authors;
+- predict acceptance probability;
+- manipulate reviewers or evade real scientific problems;
+- upload confidential manuscript material to an external API without policy and author approval.
 
 When the manuscript does not support a response, the system should state the gap and require author confirmation rather than inventing a claim.
 
 ## License
 
-See `LICENSE`.
+Apache License 2.0. See `LICENSE`.
 """
     (PROJECT_ROOT / "README.md").write_text(readme, encoding="utf-8")
 
