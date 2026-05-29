@@ -1,0 +1,431 @@
+import json
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+from peer_review_skills.agents.manuscript_context import (
+    build_reviewweaver_unit,
+    load_manuscript_context,
+)
+from peer_review_skills.agents.reviewweaver_agents import (
+    CaseRetrievalInterpreterAgent,
+    ManuscriptContextExtractorAgent,
+    ManuscriptEvidenceLocatorAgent,
+    create_reviewweaver_frontend_agents,
+)
+from peer_review_skills.agents.reviewweaver_workflow import (
+    run_reviewweaver_workflow,
+)
+from peer_review_skills.agents.specialized_agents import EvidenceActionPlannerAgent
+from peer_review_skills.agents.specialized_agents_part2 import IntegrityAdequacyCheckerAgent
+from peer_review_skills.cli.main import build_parser
+
+
+class ReviewWeaverMockLLMClient:
+    def __init__(self):
+        self.model_name = "mock-deepseek-v3"
+        self.call_count = 0
+
+    def create_chat_completion(
+        self,
+        messages: list[dict[str, str]],
+        response_format: dict[str, str] | None = None,
+        temperature: float = 0.0,
+    ) -> dict[str, Any]:
+        self.call_count += 1
+        system_prompt = messages[0]["content"].lower()
+        if "cross-disciplinary" in system_prompt:
+            content = {
+                "lens_interpretations": {
+                    "tacit_knowledge_boundary": {"observable_trace": "review text"},
+                    "institutional_dependence": {"observable_trace": "transparency norm"},
+                    "actor_network_alignment": {"observable_trace": "dataset split"},
+                    "fast_slow_cognitive_correction": {"observable_trace": "plan-first workflow"},
+                    "emotion_tone_commitment_calibration": {"observable_trace": "calibrated commitment"},
+                    "author_agency_gate": {"observable_trace": "author confirmation required"},
+                },
+                "reasoning": "Cross-disciplinary lenses are grounded in observable traces.",
+            }
+        elif "manuscript context extractor" in system_prompt:
+            content = {
+                "manuscript_context_note": {
+                    "mode": "manuscript_aware",
+                    "usable_sections": ["section_002"],
+                    "limits": ["text-only extraction"],
+                },
+                "section_inventory": [
+                    {
+                        "section_id": "section_002",
+                        "heading": "Methods",
+                        "evidence_role": "method transparency",
+                    }
+                ],
+                "author_confirmation_questions": [
+                    "Does the methods section describe the exact dataset split?"
+                ],
+                "reasoning": "The supplied manuscript context includes a Methods section.",
+            }
+        elif "manuscript evidence locator" in system_prompt:
+            content = {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "status": "partially_supported",
+                        "section_id": "section_002",
+                        "text_evidence": "80/10/10 dataset split",
+                        "gap": "random seed and stratification need confirmation",
+                    }
+                ],
+                "evidence_gaps": [
+                    "random seed and stratification need author confirmation"
+                ],
+                "author_confirmation_questions": [
+                    "Can you confirm the random seed and stratification protocol?"
+                ],
+                "reasoning": "The manuscript text supports the split but not every protocol detail.",
+            }
+        elif "case retrieval interpreter" in system_prompt:
+            content = {
+                "case_interpretation": [
+                    {
+                        "case_id": "case_001",
+                        "analogy": "method transparency concern",
+                        "transferable_strategy": "clarify existing method and add missing protocol detail",
+                        "boundary": "case analogy only; not outcome prediction",
+                    }
+                ],
+                "case_use_boundary": "Retrieved Nature cases support analogy, not automatic recommendations.",
+                "reasoning": "The retrieved case has a similar methods-transparency issue.",
+            }
+        elif "reviewer understanding" in system_prompt:
+            content = {
+                "concern_map": [{
+                    "concern_type": "methodological_transparency",
+                    "surface_request": "clarify dataset split",
+                    "text_evidence": "dataset split is unclear",
+                    "confidence": "high",
+                }],
+                "reasoning": "Reviewer explicitly asks for clarification.",
+            }
+        elif "tacit concern" in system_prompt:
+            content = {
+                "risk_interpretation": [{
+                    "risk_type": "reproducibility_risk",
+                    "tacit_concern": "insufficient_method_transparency",
+                    "observable_trace": "dataset split is unclear",
+                    "boundary": "Observable textual trace only; not reviewer psychology.",
+                }],
+                "reasoning": "The concern is tied to reproducibility.",
+            }
+        elif "institutional signal" in system_prompt:
+            content = {
+                "institutional_signal_note": [{
+                    "institutional_signal": "transparency_norm",
+                    "action_link": "make dataset split auditable",
+                    "boundary": "Not an acceptance prediction; author judgment required.",
+                }],
+                "reasoning": "Transparency is institutionally relevant.",
+            }
+        elif "evidence action" in system_prompt:
+            content = {
+                "evidence_action_plan": [{
+                    "action_type": "clarify_existing_method",
+                    "required_artifact": "dataset split protocol and random seed",
+                    "supporting_case_ids": ["case_001"],
+                    "requires_author_confirmation": True,
+                }],
+                "author_confirmation_questions": [
+                    "Can you confirm the random seed and stratification protocol?"
+                ],
+                "reasoning": "The manuscript evidence is partial and case analogy supports clarification.",
+            }
+        elif "author positioning" in system_prompt:
+            content = {
+                "author_positioning": [{
+                    "position": "acknowledge_and_clarify",
+                    "stance_boundary": "Offer options for author judgment; do not force concession.",
+                    "alternative_positions": ["clarify_existing_evidence"],
+                }],
+                "reasoning": "Acknowledge the ambiguity and clarify the method.",
+            }
+        elif "tone and commitment" in system_prompt:
+            content = {
+                "tone_commitment_warnings": [{
+                    "tone": "professional_specific",
+                    "commitment_level": "requires_author_confirmation",
+                    "risk_flags": ["avoid promising unavailable robustness checks"],
+                    "boundary": "Not a psychological diagnosis; observable text only.",
+                }],
+                "reasoning": "Commitment must match available evidence.",
+            }
+        elif "actor network" in system_prompt:
+            content = {
+                "actor_network_note": [{
+                    "actor_type": "dataset",
+                    "actor_id": "dataset split",
+                    "role": "carries reproducibility evidence",
+                    "evidence_link": "Methods section and author confirmation",
+                }],
+                "retrieved_case_ids": ["case_001"],
+                "boundary": "Observable alignment only; not causal claims.",
+                "reasoning": "Dataset split is a non-human evidence carrier.",
+            }
+        elif "integrity and adequacy" in system_prompt:
+            content = {
+                "adequacy_report": ["The plan is adequate if author confirms missing protocol details."],
+                "response_adequacy": {
+                    "is_adequate": True,
+                    "missing_elements": [],
+                    "strengths": ["manuscript evidence and case analogy are separated"],
+                },
+                "provenance_checks": [{
+                    "claim": "dataset split appears in Methods",
+                    "source": "section_002",
+                    "traceable": True,
+                }],
+                "responsible_use_warnings": [
+                    "assistant_only",
+                    "author_must_verify_all_claims",
+                    "not_final_rebuttal_text",
+                    "no_acceptance_prediction",
+                ],
+                "issues": [],
+                "reasoning": "No unsupported final rebuttal claim is made.",
+            }
+        else:
+            content = {"unexpected": system_prompt}
+        return {
+            "choices": [{"message": {"content": json.dumps(content)}}],
+            "usage": {"prompt_tokens": 10, "completion_tokens": 10},
+        }
+
+
+def test_load_manuscript_context_splits_markdown_sections(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text(
+        "# Title\n\n"
+        "ReviewWeaver example.\n\n"
+        "## Methods\n\n"
+        "We used an 80/10/10 dataset split with a fixed random seed.\n\n"
+        "## Results\n\n"
+        "Table 1 reports the robustness check.\n",
+        encoding="utf-8",
+    )
+
+    context = load_manuscript_context(manuscript)
+
+    assert context["mode"] == "manuscript_aware"
+    assert context["source_path"].endswith("manuscript.md")
+    assert [section["heading"] for section in context["sections"]] == [
+        "Title",
+        "Methods",
+        "Results",
+    ]
+    assert context["sections"][1]["section_id"] == "section_002"
+    assert "80/10/10 dataset split" in context["sections"][1]["text"]
+    assert context["evidence_boundary"]["can_locate_textual_evidence"] is True
+    assert context["evidence_boundary"]["requires_author_confirmation"] is True
+
+
+def test_load_manuscript_context_without_file_returns_review_only_boundary():
+    context = load_manuscript_context(None)
+
+    assert context["mode"] == "review_only"
+    assert context["sections"] == []
+    assert context["evidence_boundary"]["can_locate_textual_evidence"] is False
+    assert context["evidence_boundary"]["missing_manuscript_warning"]
+
+
+def test_build_reviewweaver_unit_preserves_inputs_and_manuscript_context(tmp_path):
+    manuscript = tmp_path / "manuscript.txt"
+    manuscript.write_text("Methods\nWe describe the control experiment.", encoding="utf-8")
+
+    unit = build_reviewweaver_unit(
+        review_text="The control experiment is unclear.",
+        response_text="We will clarify this point.",
+        manuscript_path=manuscript,
+        editor_text="Major revision requested.",
+        unit_id="user_case_001",
+    )
+
+    assert unit["unit_id"] == "user_case_001"
+    assert unit["review_text"] == "The control experiment is unclear."
+    assert unit["response_text"] == "We will clarify this point."
+    assert unit["editor_text"] == "Major revision requested."
+    assert unit["manuscript_context"]["mode"] == "manuscript_aware"
+    assert unit["provenance"]["input_source"] == "user_supplied"
+
+
+@pytest.mark.parametrize(
+    ("agent_cls", "expected_field", "inputs"),
+    [
+        (
+            ManuscriptContextExtractorAgent,
+            "manuscript_context_note",
+            {
+                "manuscript_context": {
+                    "mode": "manuscript_aware",
+                    "sections": [{"section_id": "section_002", "heading": "Methods"}],
+                }
+            },
+        ),
+        (
+            ManuscriptEvidenceLocatorAgent,
+            "manuscript_evidence_map",
+            {
+                "review_text": "The dataset split is unclear.",
+                "concern_map": {"concern_map": []},
+                "manuscript_context_note": {"mode": "manuscript_aware"},
+                "manuscript_context": {
+                    "mode": "manuscript_aware",
+                    "sections": [{"section_id": "section_002", "text": "80/10/10 dataset split"}],
+                },
+            },
+        ),
+        (
+            CaseRetrievalInterpreterAgent,
+            "case_interpretation",
+            {
+                "review_text": "The dataset split is unclear.",
+                "concern_map": {"concern_map": []},
+                "risk_interpretation": {"risk_interpretation": []},
+                "retrieved_cases": [{"unit_id": "case_001", "score": 0.8}],
+            },
+        ),
+    ],
+)
+def test_reviewweaver_frontend_agents_are_independent_llm_units(agent_cls, expected_field, inputs):
+    client = ReviewWeaverMockLLMClient()
+    agent = agent_cls(agent_cls.__name__, client)
+
+    message = agent.execute(inputs)
+
+    assert message.message_type == "output"
+    assert expected_field in message.content
+    assert client.call_count == 1
+
+
+def test_create_reviewweaver_frontend_agents_returns_three_agents():
+    agents = create_reviewweaver_frontend_agents(ReviewWeaverMockLLMClient())
+
+    assert set(agents) == {
+        "manuscript_context_extractor",
+        "manuscript_evidence_locator",
+        "case_retrieval_interpreter",
+    }
+
+
+def test_run_reviewweaver_workflow_returns_manuscript_aware_trace(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text(
+        "## Methods\n\nWe used an 80/10/10 dataset split.\n",
+        encoding="utf-8",
+    )
+    output_dir = tmp_path / "reviewweaver_output"
+
+    summary = run_reviewweaver_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        response_text="We will clarify the dataset split.",
+        manuscript_path=manuscript,
+        model_client=ReviewWeaverMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir},
+    )
+
+    assert summary["system_name"] == "ReviewWeaver"
+    assert summary["total_traces"] == 1
+    assert summary["total_llm_calls"] == 12
+    trace_path = output_dir / "reviewweaver_trace.json"
+    trace = json.loads(trace_path.read_text(encoding="utf-8"))
+    assert trace["workflow_version"] == "reviewweaver_v1"
+    assert trace["manuscript_context"]["mode"] == "manuscript_aware"
+    outputs = trace["agent_intermediate_outputs"]
+    assert "manuscript_context_extractor" in outputs
+    assert "manuscript_evidence_locator" in outputs
+    assert "case_retrieval_interpreter" in outputs
+    assert "integrity_adequacy_checker" in outputs
+    assert outputs["manuscript_evidence_locator"]["manuscript_evidence_map"][0]["section_id"] == "section_002"
+    assert "author_must_verify_all_claims" in outputs["integrity_adequacy_checker"]["responsible_use_warnings"]
+
+
+def test_reviewweaver_refinement_flag_fails_fast_until_supported(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="ReviewWeaver refinement is not yet supported"):
+        run_reviewweaver_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=ReviewWeaverMockLLMClient(),
+            taxonomies={},
+            config={"enable_refinement": True},
+        )
+
+
+def test_evidence_action_planner_prompt_uses_manuscript_evidence_and_case_interpretation():
+    agent = EvidenceActionPlannerAgent("evidence_action_planner", ReviewWeaverMockLLMClient())
+
+    prompt = agent.build_prompt({
+        "concern_map": {"concern_map": []},
+        "risk_interpretation": {"risk_interpretation": []},
+        "retrieved_cases": [{"unit_id": "case_001"}],
+        "manuscript_evidence": {"evidence_gaps": ["random seed missing"]},
+        "case_interpretation": {"case_use_boundary": "case analogy only"},
+    })
+    user_payload = json.loads(prompt[1]["content"])
+
+    assert user_payload["manuscript_evidence"]["evidence_gaps"] == ["random seed missing"]
+    assert user_payload["case_interpretation"]["case_use_boundary"] == "case analogy only"
+
+
+def test_integrity_prompt_receives_manuscript_context_boundary():
+    agent = IntegrityAdequacyCheckerAgent("integrity_adequacy_checker", ReviewWeaverMockLLMClient())
+
+    prompt = agent.build_prompt({
+        "all_agent_outputs": {},
+        "unit": {
+            "unit_id": "reviewweaver_user_case",
+            "review_text": "Dataset split is unclear",
+            "response_text": "We will clarify.",
+            "provenance": {"input_source": "user_supplied"},
+            "manuscript_context": {
+                "mode": "review_only",
+                "evidence_boundary": {"can_locate_textual_evidence": False},
+            },
+        },
+    })
+    user_payload = json.loads(prompt[1]["content"])
+
+    assert user_payload["unit"]["manuscript_context"]["mode"] == "review_only"
+    assert user_payload["unit"]["manuscript_context"]["evidence_boundary"]["can_locate_textual_evidence"] is False
+
+
+def test_cli_parser_accepts_run_reviewweaver_file_inputs():
+    parser = build_parser()
+
+    args = parser.parse_args([
+        "run-reviewweaver",
+        "--review-file",
+        "examples/reviewweaver/reviewer_comment.txt",
+        "--manuscript-file",
+        "examples/reviewweaver/manuscript_excerpt.md",
+        "--response-file",
+        "examples/reviewweaver/author_draft_response.txt",
+        "--retrieved-cases-file",
+        "examples/reviewweaver/retrieved_cases.json",
+        "--output-dir",
+        "data/evaluation/reviewweaver_demo",
+        "--limit-cases",
+        "3",
+    ])
+
+    assert args.command == "run-reviewweaver"
+    assert str(args.review_file).endswith("reviewer_comment.txt")
+    assert str(args.manuscript_file).endswith("manuscript_excerpt.md")
+    assert str(args.response_file).endswith("author_draft_response.txt")
+    assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
+    assert args.limit_cases == 3

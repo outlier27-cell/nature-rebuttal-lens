@@ -1,0 +1,16 @@
+{
+  "labels": {
+    "community_norm_expectation": "Observable signal about field norms or shared community expectations.",
+    "editorial_risk_control": "Observable editor/reviewer signal about unresolved risk or revision burden.",
+    "ethical_acceptability": "Observable expectation for ethical, safety, privacy, or fairness acceptability.",
+    "journal_scope_fit": "Observable signal about journal scope, audience, contribution threshold, or fit.",
+    "novelty_threshold": "Observable expectation for higher novelty or stronger positioning.",
+    "presentation_standard": "Observable expectation for journal-quality presentation and clarity.",
+    "replicability_norm": "Observable expectation that findings should be replicable.",
+    "reviewer_authority_pressure": "Observable response pattern showing deference to reviewer authority.",
+    "transparency_norm": "Observable expectation for code, data, methods, or protocol transparency.",
+    "unknown": "No reliable institutional signal can be inferred."
+  },
+  "taxonomy_name": "institutional_signal_taxonomy",
+  "taxonomy_version": "v1"
+}

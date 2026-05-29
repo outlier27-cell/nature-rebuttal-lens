@@ -1,0 +1,140 @@
+{
+  "description": "Reviewer concern labels used by rule_based_v1 reviewer annotation.",
+  "labels": {
+    "ablation_mechanism": {
+      "definition": "Reviewer asks for ablations, mechanism analysis, feature contribution, or explanation of why the method works.",
+      "evidence_cues": [
+        "ablation",
+        "mechanism",
+        "feature importance",
+        "SHAP"
+      ],
+      "examples": [
+        "An ablation study is needed to show which component drives the gain."
+      ],
+      "label": "ablation_mechanism"
+    },
+    "baseline_comparison": {
+      "definition": "Reviewer asks whether the work is compared against appropriate prior methods, baselines, or state-of-the-art alternatives.",
+      "evidence_cues": [
+        "baseline",
+        "comparison",
+        "state-of-the-art",
+        "SOTA"
+      ],
+      "examples": [
+        "Please compare the proposed model with stronger baseline methods."
+      ],
+      "label": "baseline_comparison"
+    },
+    "clarity_presentation": {
+      "definition": "Reviewer requests clearer wording, figures, legends, organization, or editorial presentation.",
+      "evidence_cues": [
+        "clarify",
+        "unclear",
+        "figure",
+        "legend",
+        "typo"
+      ],
+      "examples": [
+        "Figure labels are difficult to read and should be clarified."
+      ],
+      "label": "clarity_presentation"
+    },
+    "dataset_bias_ethics_safety": {
+      "definition": "Reviewer raises bias, fairness, privacy, ethics, safety, or dataset representativeness concerns.",
+      "evidence_cues": [
+        "bias",
+        "ethics",
+        "privacy",
+        "fairness",
+        "safety"
+      ],
+      "examples": [
+        "The authors should discuss potential bias in the training data."
+      ],
+      "label": "dataset_bias_ethics_safety"
+    },
+    "experimental_design": {
+      "definition": "Reviewer questions whether the experiments, controls, validations, or study design are sufficient for the claim.",
+      "evidence_cues": [
+        "experiment",
+        "validation",
+        "control",
+        "prospective"
+      ],
+      "examples": [
+        "A prospective validation experiment would strengthen the study."
+      ],
+      "label": "experimental_design"
+    },
+    "generalization_scope": {
+      "definition": "Reviewer questions whether claims hold outside the reported setting, dataset, population, domain, or validation context.",
+      "evidence_cues": [
+        "generalize",
+        "external validation",
+        "other dataset",
+        "robustness"
+      ],
+      "examples": [
+        "The method should be tested on an external dataset."
+      ],
+      "label": "generalization_scope"
+    },
+    "novelty_positioning": {
+      "definition": "Reviewer questions originality, contribution, or positioning against related work.",
+      "evidence_cues": [
+        "novelty",
+        "incremental",
+        "contribution",
+        "related work"
+      ],
+      "examples": [
+        "The novelty over prior work is not sufficiently clear."
+      ],
+      "label": "novelty_positioning"
+    },
+    "reproducibility_reporting": {
+      "definition": "Reviewer requests clearer data, code, parameter, protocol, or availability information needed to reproduce the work.",
+      "evidence_cues": [
+        "code",
+        "data availability",
+        "reproduce",
+        "GitHub",
+        "Zenodo"
+      ],
+      "examples": [
+        "Please release the code and training data used for the model."
+      ],
+      "label": "reproducibility_reporting"
+    },
+    "statistics_significance": {
+      "definition": "Reviewer challenges statistical testing, uncertainty, sample size, significance, or quantitative confidence.",
+      "evidence_cues": [
+        "p-value",
+        "confidence interval",
+        "sample size",
+        "significance"
+      ],
+      "examples": [
+        "Report confidence intervals and statistical significance for the results."
+      ],
+      "label": "statistics_significance"
+    },
+    "theoretical_validity": {
+      "definition": "Reviewer challenges assumptions, formal validity, causality, or theoretical justification.",
+      "evidence_cues": [
+        "assumption",
+        "causal",
+        "theoretical",
+        "validity"
+      ],
+      "examples": [
+        "The causal assumptions behind the model require more justification."
+      ],
+      "label": "theoretical_validity"
+    }
+  },
+  "taxonomy_name": "concern_taxonomy",
+  "taxonomy_version": "v1"
+}

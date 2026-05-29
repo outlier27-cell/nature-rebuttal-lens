@@ -1,0 +1,20 @@
+{
+  "cognitive_trace_stages": [
+    "understand",
+    "question",
+    "evidence_plan",
+    "position",
+    "tone_calibrate",
+    "commitment_check",
+    "integrity_check",
+    "output"
+  ],
+  "completed_count": 50,
+  "error_count": 0,
+  "notes": [
+    "This is a recordable and traceable assistant workflow over candidate labels.",
+    "It is not a final human-evaluated benchmark or a final rebuttal-writing system."
+  ],
+  "trace_count": 50,
+  "workflow_id": "naturereview_interact_workflow_v2"
+}

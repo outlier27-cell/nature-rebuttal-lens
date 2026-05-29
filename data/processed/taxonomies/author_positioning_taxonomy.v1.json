@@ -1,0 +1,15 @@
+{
+  "labels": {
+    "accept_and_revise": "Author accepts the concern and revises.",
+    "clarify_without_new_work": "Author clarifies existing evidence without new work.",
+    "defer_to_future_work": "Author acknowledges value but defers to future work.",
+    "justify_existing_choice": "Author defends or justifies an existing choice.",
+    "narrow_claim": "Author narrows the claim or scope.",
+    "partially_concede": "Author accepts part of the concern while preserving part of the original position.",
+    "respectfully_disagree": "Author explicitly but politely challenges the reviewer premise.",
+    "translate_to_editorial_signal": "Author frames the response as an editor-readable resolution signal.",
+    "unknown": "Author position cannot be identified."
+  },
+  "taxonomy_name": "author_positioning_taxonomy",
+  "taxonomy_version": "v1"
+}

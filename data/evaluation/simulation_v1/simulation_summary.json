@@ -1,0 +1,26 @@
+{
+  "boundary": "not real peer review; research-only simulation; assistant evaluation only",
+  "concern_coverage_counts": {
+    "needs_author_confirmation": 47,
+    "partially_covered": 3
+  },
+  "label_status": "model_assisted_not_human_gold",
+  "notes": [
+    "This is a lightweight evaluation/simulation layer over workflow traces.",
+    "It does not simulate real reviewers or editors.",
+    "It is designed to test whether the assistant preserves concern, evidence, tone, provenance, and integrity signals."
+  ],
+  "role_counts": {
+    "author_rebuttal_agent": 50,
+    "editor_signal_agent": 50,
+    "reviewer_agent": 50
+  },
+  "roles": [
+    "author_rebuttal_agent",
+    "editor_signal_agent",
+    "reviewer_agent"
+  ],
+  "simulation_id": "simulation_v1_reviewer_author_editor_layer",
+  "source": "data/evaluation/workflow_v2/workflow_traces.jsonl",
+  "trace_count": 50
+}

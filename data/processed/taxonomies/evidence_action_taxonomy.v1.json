@@ -1,0 +1,20 @@
+{
+  "labels": {
+    "claim_narrowing": "Author narrows a claim or reduces overstatement.",
+    "code_data_availability": "Author provides code, data, weights, database, protocol, or availability details.",
+    "figure_table_revision": "Author revises figures, tables, captions, or visual presentation.",
+    "future_work_commitment": "Author defers the issue to future work.",
+    "limitation_discussion": "Author adds limitations or caveats.",
+    "literature_repositioning": "Author updates related work or contribution positioning.",
+    "method_clarification": "Author clarifies method, assumptions, or implementation.",
+    "new_analysis": "Author reports a new analysis, benchmark, robustness check, or comparison.",
+    "new_baseline_or_comparison": "Author adds or discusses additional baselines or comparative methods.",
+    "new_experiment": "Author reports a newly performed experiment or validation.",
+    "no_new_evidence_explanation_only": "Author explains existing evidence without new work.",
+    "statistical_test_or_uncertainty": "Author adds statistical testing, uncertainty estimates, sample-size discussion, or confidence intervals.",
+    "supplementary_material_revision": "Author moves or adds evidence to supplementary material.",
+    "unknown": "Evidence action cannot be identified."
+  },
+  "taxonomy_name": "evidence_action_taxonomy",
+  "taxonomy_version": "v1"
+}

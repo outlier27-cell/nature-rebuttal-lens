@@ -1,0 +1,13 @@
+{
+  "top_k": [
+    {
+      "unit_id": "riu_v1_example_001",
+      "score": 0.82,
+      "concern_type": "methodological_transparency",
+      "risk_type": "reproducibility_risk",
+      "response_strategy": "acknowledge_and_clarify",
+      "evidence_action": "clarify_existing_method",
+      "institutional_signal": "transparency_norm"
+    }
+  ]
+}

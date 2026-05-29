@@ -1,0 +1,230 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "actor_links": {
+      "items": {
+        "properties": {
+          "actor_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "actor_type": {
+            "enum": [
+              "reviewer",
+              "author",
+              "editor",
+              "manuscript",
+              "figure",
+              "table",
+              "dataset",
+              "code",
+              "benchmark",
+              "supplement",
+              "journal_policy",
+              "ai_agent",
+              "other"
+            ],
+            "type": "string"
+          },
+          "evidence": {
+            "type": "string"
+          },
+          "role_in_interaction": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "actor_type",
+          "evidence"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "author_positioning": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "concern_type": {
+      "type": "string"
+    },
+    "doi": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "editor_signal": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "evidence_action": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "institutional_signal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "journal": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "label_source": {
+      "enum": [
+        "heuristic",
+        "model_assisted",
+        "human_confirmed",
+        "mixed"
+      ],
+      "type": "string"
+    },
+    "pair_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "paper_id": {
+      "type": "string"
+    },
+    "provenance": {
+      "properties": {
+        "offset_recoverable": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "source_file": {
+          "type": "string"
+        },
+        "source_hash": {
+          "type": "string"
+        },
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "source_file",
+        "source_hash"
+      ],
+      "type": "object"
+    },
+    "response_offset": {
+      "properties": {
+        "end": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "integer"
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "response_strategy": {
+      "type": "string"
+    },
+    "response_text": {
+      "type": "string"
+    },
+    "review_offset": {
+      "properties": {
+        "end": {
+          "type": "integer"
+        },
+        "start": {
+          "type": "integer"
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "review_round": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ]
+    },
+    "review_text": {
+      "type": "string"
+    },
+    "reviewer_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "risk_type": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_url": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tone_commitment": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "unit_id": {
+      "type": "string"
+    },
+    "year": {
+      "type": [
+        "integer",
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "unit_id",
+    "paper_id",
+    "review_text",
+    "response_text",
+    "concern_type",
+    "response_strategy",
+    "provenance",
+    "label_source"
+  ],
+  "title": "ReviewInteractionUnit",
+  "type": "object"
+}

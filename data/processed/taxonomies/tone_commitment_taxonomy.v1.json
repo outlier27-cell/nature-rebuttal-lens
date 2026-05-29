@@ -1,0 +1,28 @@
+{
+  "commitment_level": [
+    "completed_change",
+    "promised_change",
+    "clarification_only",
+    "declined_with_reason",
+    "future_work",
+    "unknown"
+  ],
+  "risk_flags": [
+    "overclaim",
+    "unsupported_commitment",
+    "sycophancy",
+    "excessive_defensiveness",
+    "uncertainty_hiding",
+    "none"
+  ],
+  "taxonomy_name": "tone_commitment_taxonomy",
+  "taxonomy_version": "v1",
+  "tone": [
+    "cooperative",
+    "defensive",
+    "assertive",
+    "apologetic",
+    "neutral",
+    "unknown"
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "dimensions": [
+    {
+      "anchor_1": "Only repeats the explicit reviewer comment.",
+      "anchor_3": "Identifies an implicit risk but lacks clear evidence or boundary.",
+      "anchor_5": "Grounds the tacit concern in observable text and avoids mind-reading claims.",
+      "name": "tacit_concern_interpretation",
+      "scale": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "anchor_1": "Ignores institutional context.",
+      "anchor_3": "Mentions institutional pressure without linking it to author action.",
+      "anchor_5": "Links institutional signals to responsible author positioning without acceptance prediction.",
+      "name": "institutional_positioning_quality",
+      "scale": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "anchor_1": "Only suggests wording.",
+      "anchor_3": "Mentions evidence objects without explaining their role.",
+      "anchor_5": "Explains how human and non-human actors are realigned through evidence and response actions.",
+      "name": "actor_network_alignment",
+      "scale": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "anchor_1": "Directly generates a reply.",
+      "anchor_3": "Includes partial intermediate reasoning but misses commitment or integrity checks.",
+      "anchor_5": "Records the full slow-thinking chain and shows how it reduces overconfidence, sycophancy, and fabrication risk.",
+      "name": "cognitive_trace_quality",
+      "scale": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ]
+}

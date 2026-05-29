@@ -1,0 +1,130 @@
+{
+  "description": "Author response strategy labels used by rule_based_v1 author annotation.",
+  "labels": {
+    "acknowledge_and_fix": {
+      "definition": "Author accepts the point and reports a concrete manuscript, analysis, data, figure, or wording change.",
+      "evidence_cues": [
+        "we agree",
+        "we revised",
+        "we added",
+        "we corrected"
+      ],
+      "examples": [
+        "We agree and have revised the manuscript to include the requested comparison."
+      ],
+      "label": "acknowledge_and_fix"
+    },
+    "add_new_analysis": {
+      "definition": "Author adds a new computational, statistical, robustness, ablation, or re-analysis.",
+      "evidence_cues": [
+        "additional analysis",
+        "new analysis",
+        "ablation"
+      ],
+      "examples": [
+        "We added a new ablation analysis in Supplementary Figure 4."
+      ],
+      "label": "add_new_analysis"
+    },
+    "add_new_experiment": {
+      "definition": "Author adds or reports a new experiment, validation, control, or empirical study in response.",
+      "evidence_cues": [
+        "new experiment",
+        "we performed",
+        "we conducted"
+      ],
+      "examples": [
+        "We conducted an additional validation experiment."
+      ],
+      "label": "add_new_experiment"
+    },
+    "clarify_existing_evidence": {
+      "definition": "Author explains evidence already present or clarifies interpretation without adding substantial new work.",
+      "evidence_cues": [
+        "to clarify",
+        "we explain",
+        "we have clarified"
+      ],
+      "examples": [
+        "We clarify that the validation cohort was independent."
+      ],
+      "label": "clarify_existing_evidence"
+    },
+    "contest_reviewer_premise": {
+      "definition": "Author respectfully disagrees with the reviewer premise or argues the requested change is not applicable.",
+      "evidence_cues": [
+        "we disagree",
+        "respectfully disagree",
+        "not applicable"
+      ],
+      "examples": [
+        "We respectfully disagree because the suggested baseline solves a different task."
+      ],
+      "label": "contest_reviewer_premise"
+    },
+    "defer_future_work": {
+      "definition": "Author acknowledges the limitation but places the requested work outside the current study scope.",
+      "evidence_cues": [
+        "future work",
+        "beyond the scope",
+        "future studies"
+      ],
+      "examples": [
+        "We agree this is important and now discuss it as future work."
+      ],
+      "label": "defer_future_work"
+    },
+    "editorial_only_change": {
+      "definition": "Author responds with copyediting, formatting, figure legend, typo, or minor presentation updates.",
+      "evidence_cues": [
+        "typo",
+        "grammar",
+        "format",
+        "legend"
+      ],
+      "examples": [
+        "We corrected the typo and improved the figure legend."
+      ],
+      "label": "editorial_only_change"
+    },
+    "justify_method_choice": {
+      "definition": "Author defends a design, dataset, metric, model, or protocol choice with rationale.",
+      "evidence_cues": [
+        "we chose",
+        "because",
+        "rationale",
+        "we used"
+      ],
+      "examples": [
+        "We chose this metric because it is standard for the benchmark."
+      ],
+      "label": "justify_method_choice"
+    },
+    "narrow_claim_scope": {
+      "definition": "Author limits, softens, or removes a claim to match the available evidence.",
+      "evidence_cues": [
+        "toned down",
+        "narrowed",
+        "removed the claim"
+      ],
+      "examples": [
+        "We toned down the claim and now restrict it to the tested dataset."
+      ],
+      "label": "narrow_claim_scope"
+    },
+    "reframe_contribution": {
+      "definition": "Author shifts the framing of the contribution or emphasizes a different value proposition.",
+      "evidence_cues": [
+        "we emphasize",
+        "reframed",
+        "highlight"
+      ],
+      "examples": [
+        "We now emphasize the method as a screening tool rather than a final predictor."
+      ],
+      "label": "reframe_contribution"
+    }
+  },
+  "taxonomy_name": "response_strategy_taxonomy",
+  "taxonomy_version": "v1"
+}

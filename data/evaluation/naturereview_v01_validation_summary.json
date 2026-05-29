@@ -1,0 +1,376 @@
+{
+  "agnes_advice_leakage_hit_count": 0,
+  "api_handoff_status": "executed",
+  "checks": [
+    {
+      "details": {
+        "missing": []
+      },
+      "name": "Required docs exist",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "missing": []
+      },
+      "name": "Required schema fields exist",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "missing": []
+      },
+      "name": "Required taxonomy files exist",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "Seed candidates row count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "Model-ready seed row count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "label_source_counts": {
+          "model_assisted": 200
+        }
+      },
+      "name": "Seed labels are conservative candidate or model-assisted labels",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 245,
+        "minimum": 200
+      },
+      "name": "Interaction unit count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "missing_field_rows": 0
+      },
+      "name": "Interaction units contain required fields",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 245,
+        "total": 245
+      },
+      "name": "Provenance is complete",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 245,
+        "total": 245
+      },
+      "name": "Actor links are present",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "case_count": 199
+      },
+      "name": "Case index is non-empty",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actor_network_cases": 199,
+        "cases": 199
+      },
+      "name": "Actor-network cases match case index",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 100,
+        "expected": 100
+      },
+      "name": "Retrieval predictions row count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "missing": []
+      },
+      "name": "Retrieval metrics include R@1 R@3 and provenance completeness",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "Retrieval report includes P1 comparison",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 50,
+        "expected": 50
+      },
+      "name": "Workflow traces row count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 50,
+        "total": 50
+      },
+      "name": "Workflow trace stages are complete",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 50,
+        "total": 50
+      },
+      "name": "Workflow traces include agent intermediate outputs",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 50,
+        "total": 50
+      },
+      "name": "Workflow traces include cross-disciplinary lens map",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "hits": []
+      },
+      "name": "Agnes workflow advice path has no rule or lexical leakage",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "error_count": 0
+      },
+      "name": "Workflow traces have no execution errors",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "boundary_count": 50,
+        "label_status": "model_assisted_not_human_gold",
+        "role_complete_count": 50,
+        "summary_trace_count": 50,
+        "trace_count": 50
+      },
+      "name": "Simulation evaluation layer exists",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "task_count": 11
+      },
+      "name": "Evaluation protocol task contracts are complete",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "complete": 50,
+        "total": 50
+      },
+      "name": "Simulation traces include cross-disciplinary evaluation",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "path": "docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md"
+      },
+      "name": "Non-training open-source scope is explicit",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "path": "docs/PDF_DERIVED_DESIGN_LENSES_zh.md"
+      },
+      "name": "PDF-derived design lenses are documented",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "path": "docs/LICENSE_DECISION_zh.md"
+      },
+      "name": "License decision note exists",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "core_release_scope": "legacy_optional_non_core",
+        "label_status": "model_assisted_not_human_gold",
+        "provenance_complete_rate": 1.0,
+        "rows": 200
+      },
+      "name": "Legacy optional training seed export is non-core",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "actual": 200,
+        "expected": 200
+      },
+      "name": "API handoff requests row count",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "status": "executed"
+      },
+      "name": "API handoff is prepared or executed",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "errors": 0,
+        "requests": 200,
+        "results": 200
+      },
+      "name": "API seed review results are complete",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "hits": []
+      },
+      "name": "Secret scan",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "hits": []
+      },
+      "name": "Mojibake scan",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "data card declares no human gold",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "responsible use has hard boundaries",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "annotation guide has cross disciplinary fields",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "workflow has required trace order",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "simulation spec has required roles and boundary",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "api status documented as model assisted",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "api execution reflected in public docs",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "training design is documented",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "non training open source scope is explicit",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "pdf derived design lenses are documented",
+      "status": "PASS"
+    },
+    {
+      "details": {
+        "expected": true
+      },
+      "name": "training is not public core scope",
+      "status": "PASS"
+    }
+  ],
+  "counts": {
+    "actor_network_cases": 199,
+    "api_handoff_requests": 200,
+    "cases": 199,
+    "cross_disciplinary_lens_trace_count": 50,
+    "interaction_units": 245,
+    "retrieval_predictions": 100,
+    "seed_candidates": 200,
+    "seed_model_ready_or_reviewed": 200,
+    "simulation_traces": 50,
+    "training_seed_rows": 200,
+    "workflow_traces": 50
+  },
+  "generated_by": "python -m peer_review_skills.cli.main validate-naturereview-v01",
+  "label_source_counts": {
+    "interaction_units": {
+      "model_assisted": 245
+    },
+    "seed": {
+      "model_assisted": 200
+    }
+  },
+  "mojibake_hit_count": 0,
+  "overall_status": "PASS",
+  "secret_hit_count": 0,
+  "semantic_checks": {
+    "annotation_guide_has_cross_disciplinary_fields": true,
+    "api_execution_reflected_in_public_docs": true,
+    "api_status_documented_as_model_assisted": true,
+    "data_card_declares_no_human_gold": true,
+    "non_training_open_source_scope_is_explicit": true,
+    "pdf_derived_design_lenses_are_documented": true,
+    "responsible_use_has_hard_boundaries": true,
+    "simulation_spec_has_required_roles_and_boundary": true,
+    "training_design_is_documented": true,
+    "training_is_not_public_core_scope": true,
+    "workflow_has_required_trace_order": true
+  }
+}

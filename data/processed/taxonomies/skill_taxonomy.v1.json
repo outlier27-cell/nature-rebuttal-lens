@@ -1,0 +1,68 @@
+{
+  "description": "Reusable rebuttal skill families induced from aligned reviewer-author interactions.",
+  "labels": {
+    "evidence_upgrade": {
+      "definition": "Turn a reviewer evidence request into a concrete new experiment, analysis, baseline, or reproducibility artifact.",
+      "evidence_cues": [
+        "baseline",
+        "experiment",
+        "analysis",
+        "data_code"
+      ],
+      "examples": [
+        "Add a missing baseline, ablation, validation cohort, or code/data artifact."
+      ],
+      "label": "evidence_upgrade"
+    },
+    "mechanism_explanation": {
+      "definition": "Answer mechanism or ablation concerns by making causal, component, or feature contribution evidence explicit.",
+      "evidence_cues": [
+        "ablation",
+        "mechanism",
+        "feature importance"
+      ],
+      "examples": [
+        "Add ablation and feature-importance explanation for model behavior."
+      ],
+      "label": "mechanism_explanation"
+    },
+    "presentation_repair": {
+      "definition": "Resolve clarity and presentation concerns with targeted edits while avoiding over-claiming substantive changes.",
+      "evidence_cues": [
+        "clarify",
+        "figure",
+        "legend"
+      ],
+      "examples": [
+        "Improve figure readability and clarify ambiguous wording."
+      ],
+      "label": "presentation_repair"
+    },
+    "reproducibility_packaging": {
+      "definition": "Convert reproducibility criticism into precise data, code, parameter, and protocol disclosures.",
+      "evidence_cues": [
+        "code",
+        "dataset",
+        "reproducibility"
+      ],
+      "examples": [
+        "Release code, document parameters, and cite data repositories."
+      ],
+      "label": "reproducibility_packaging"
+    },
+    "scope_calibration": {
+      "definition": "Adjust claims to the demonstrated evidence when reviewers challenge generalization or overreach.",
+      "evidence_cues": [
+        "scope",
+        "generalization",
+        "narrowed"
+      ],
+      "examples": [
+        "Narrow a broad claim to the tested population or dataset."
+      ],
+      "label": "scope_calibration"
+    }
+  },
+  "taxonomy_name": "skill_taxonomy",
+  "taxonomy_version": "v1"
+}

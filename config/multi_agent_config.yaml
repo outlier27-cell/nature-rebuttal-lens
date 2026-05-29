@@ -1,0 +1,90 @@
+# Multi-Agent Configuration
+
+# Workflow mode for the v3 public entry point.
+workflow:
+  mode: "multi_agent"
+
+# Multi-agent specific settings
+multi_agent:
+  # Enable refinement loops (agents can improve each other's outputs)
+  enable_refinement: false
+
+  # Maximum refinement iterations
+  max_refinement_iterations: 2
+
+  # The workflow preserves data dependencies between layers.
+  # Actor-network mapping runs before the cross-disciplinary lens interpreter
+  # so the lens layer can reason over observable actor/evidence carriers.
+  sequential_dependency_layers: true
+
+  # Agent-specific configurations
+  agents:
+    reviewer_understanding_agent:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    tacit_concern_interpreter:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    institutional_signal_interpreter:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    evidence_action_planner:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    author_positioning_agent:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    tone_commitment_calibrator:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    actor_network_mapper:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    cross_disciplinary_lens_interpreter:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    integrity_adequacy_checker:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+# API configuration (can also use environment variables)
+api:
+  # base_url: "https://xh.v1api.cc"
+  # api_key: set PEER_REVIEW_API_KEY in the shell; do not write keys here
+  # model: "deepseek-v3"
+
+  # Or use environment variables:
+  # PEER_REVIEW_API_BASE_URL
+  # PEER_REVIEW_API_KEY
+  # PEER_REVIEW_API_MODEL
+
+# Cost optimization strategies
+optimization:
+  # Use cheaper models for simpler agents
+  use_tiered_models: true
+
+  # Cache taxonomy lookups
+  enable_caching: true
+
+  # Batch process multiple units
+  batch_size: 10
+
+  # Only run full workflow for critical cases
+  selective_execution: false

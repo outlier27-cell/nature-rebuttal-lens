@@ -1,0 +1,16 @@
+{
+  "labels": {
+    "community_standard_fit": "Reviewer invokes expected baselines, benchmarks, reporting norms, or field standards.",
+    "credibility_trust": "Reviewer questions whether claims are trustworthy or adequately supported.",
+    "ethical_or_social_risk": "Reviewer raises ethics, bias, privacy, safety, or societal risk.",
+    "evidence_chain_stability": "Reviewer questions whether figures, statistics, methods, and claims form a stable evidence chain.",
+    "methodological_maturity": "Reviewer questions whether the method is sufficiently mature, robust, or justified.",
+    "novelty_positioning": "Reviewer questions whether contribution is meaningfully new or well positioned.",
+    "presentation_as_epistemic_signal": "Reviewer treats presentation clarity as a signal of evidential reliability.",
+    "reproducibility_expectation": "Reviewer expects code, data, parameters, protocols, or reporting details.",
+    "scope_and_claim_boundary": "Reviewer questions whether claims exceed the evidence or context.",
+    "unknown": "No reliable tacit concern can be inferred from observable text."
+  },
+  "taxonomy_name": "tacit_concern_taxonomy",
+  "taxonomy_version": "v1"
+}

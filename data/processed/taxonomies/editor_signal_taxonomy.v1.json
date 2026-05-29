@@ -1,0 +1,15 @@
+{
+  "labels": {
+    "acceptance_signal": "Observable acceptance or publication-ready signal.",
+    "editorial_process_signal": "Observable process-related signal.",
+    "major_revision_signal": "Observable major revision signal.",
+    "minor_revision_signal": "Observable minor revision signal.",
+    "not_available": "No editor decision text is available.",
+    "request_for_clarification": "Observable request for clarification.",
+    "scope_or_journal_fit_signal": "Observable scope or journal fit signal.",
+    "unknown": "Decision signal cannot be identified.",
+    "unresolved_core_concern": "Observable signal of unresolved central concern."
+  },
+  "taxonomy_name": "editor_signal_taxonomy",
+  "taxonomy_version": "v1"
+}
