@@ -292,7 +292,7 @@ class MultiAgentOrchestrator:
         retrieval: dict[str, Any],
         taxonomies: dict[str, Any],
     ) -> dict[str, Any]:
-        """Execute the 12-agent manuscript-aware RebuttalLens workflow."""
+        """Execute the 12-agent manuscript-aware Nature RebuttalLens workflow."""
         self.message_bus = []
         self.execution_trace = []
         self._refinement_iteration_count = 0

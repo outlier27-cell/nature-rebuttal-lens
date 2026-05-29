@@ -1,4 +1,4 @@
-"""RebuttalLens manuscript-aware frontend agents."""
+"""Nature RebuttalLens manuscript-aware frontend agents."""
 
 import json
 from typing import Any, Optional
@@ -28,7 +28,7 @@ class ManuscriptContextExtractorAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a manuscript context extractor for RebuttalLens, a "
+                    "You are a manuscript context extractor for Nature RebuttalLens, a "
                     "manuscript-aware author rebuttal assistant. Summarize the supplied "
                     "manuscript sections as usable evidence context for reviewer-response "
                     "planning. Do NOT invent manuscript content. Do NOT infer experiments "
@@ -91,7 +91,7 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a manuscript evidence locator for RebuttalLens. Given reviewer "
+                    "You are a manuscript evidence locator for Nature RebuttalLens. Given reviewer "
                     "concerns and supplied manuscript context, identify which concerns are "
                     "supported, partially supported, contradicted, or missing in the manuscript. "
                     "Use only supplied manuscript text and prior agent outputs. Do NOT invent "
@@ -156,7 +156,7 @@ class CaseRetrievalInterpreterAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a Nature case retrieval interpreter for RebuttalLens. Interpret "
+                    "You are a Nature case retrieval interpreter for Nature RebuttalLens. Interpret "
                     "retrieved transparent peer-review cases as bounded analogies for the current "
                     "review interaction. Do NOT treat retrieved cases as rules. Do NOT predict "
                     "acceptance or editorial outcomes. Return only valid JSON:\n"

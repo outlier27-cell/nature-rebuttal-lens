@@ -1,4 +1,4 @@
-"""RebuttalLens manuscript-aware workflow entry point."""
+"""Nature RebuttalLens manuscript-aware workflow entry point."""
 
 import json
 from pathlib import Path
@@ -31,11 +31,11 @@ def run_rebuttal_lens_workflow(
     config: dict[str, Any] | None = None,
     model_client: Any | None = None,
 ) -> dict[str, Any]:
-    """Run one manuscript-aware RebuttalLens workflow trace."""
+    """Run one manuscript-aware Nature RebuttalLens workflow trace."""
     config = config or {}
     if config.get("enable_refinement", False):
         raise ValueError(
-            "RebuttalLens refinement is not yet supported; run without enable_refinement "
+            "Nature RebuttalLens refinement is not yet supported; run without enable_refinement "
             "or use the legacy v3 KB workflow refinement path."
         )
     root = Path(project_root)
@@ -70,7 +70,7 @@ def run_rebuttal_lens_workflow(
         encoding="utf-8",
     )
     summary = {
-        "system_name": "RebuttalLens",
+        "system_name": "Nature RebuttalLens",
         "workflow_version": "rebuttal_lens_v1",
         "total_traces": 1,
         "total_llm_calls": trace.get("execution_metadata", {}).get("total_llm_calls", 0),
@@ -93,11 +93,11 @@ def execute_rebuttal_lens_trace(
     model_client: Any,
     config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Execute the 12-agent RebuttalLens workflow for a prepared unit."""
+    """Execute the 12-agent Nature RebuttalLens workflow for a prepared unit."""
     config = config or {}
     if config.get("enable_refinement", False):
         raise ValueError(
-            "RebuttalLens refinement is not yet supported; run without enable_refinement."
+            "Nature RebuttalLens refinement is not yet supported; run without enable_refinement."
         )
     agents = {
         **create_rebuttal_lens_frontend_agents(model_client),
@@ -110,7 +110,7 @@ def execute_rebuttal_lens_trace(
     )
 
     trace = orchestrator.execute_rebuttal_lens_workflow(unit, retrieval, taxonomies)
-    trace["system_name"] = "RebuttalLens"
+    trace["system_name"] = "Nature RebuttalLens"
     trace["workflow_version"] = "rebuttal_lens_v1"
     trace["manuscript_context"] = unit.get("manuscript_context", {})
     trace["responsible_use_boundary"] = {

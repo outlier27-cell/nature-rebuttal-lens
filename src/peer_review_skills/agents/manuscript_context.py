@@ -1,5 +1,5 @@
 """
-Manuscript context helpers for RebuttalLens.
+Manuscript context helpers for Nature RebuttalLens.
 
 This module intentionally keeps manuscript parsing conservative. It can build
 section-level context from plain text, Markdown, or LaTeX-like text. Binary PDF
@@ -23,7 +23,7 @@ def load_manuscript_context(path: str | Path | None) -> dict[str, Any]:
         raise FileNotFoundError(f"manuscript file not found: {manuscript_path}")
     if manuscript_path.suffix.lower() not in TEXT_SUFFIXES:
         raise ValueError(
-            "RebuttalLens currently accepts text, Markdown, or LaTeX manuscript files. "
+            "Nature RebuttalLens currently accepts text, Markdown, or LaTeX manuscript files. "
             f"Unsupported suffix: {manuscript_path.suffix}"
         )
 

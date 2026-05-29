@@ -54,20 +54,20 @@
 
 ## Proposed Upgrade Phases
 
-### Phase 10: RebuttalLens Manuscript-Aware Final Workflow
+### Phase 10: Nature RebuttalLens Manuscript-Aware Final Workflow
 
-- Goal: upgrade the public system name and workflow from NatureReview-Interact v3 traces to RebuttalLens, a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow.
+- Goal: upgrade the public system name and workflow from NatureReview-Interact v3 traces to Nature RebuttalLens, a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow.
 - Changes:
   - Add conservative manuscript context loading for text, Markdown, and LaTeX-like files.
   - Add `ManuscriptContextExtractorAgent`, `ManuscriptEvidenceLocatorAgent`, and `CaseRetrievalInterpreterAgent` as independent LLM agents.
   - Add a 12-agent `execute_rebuttal_lens_workflow` orchestration path.
   - Add `run_rebuttal_lens_workflow` and `run-rebuttal-lens` CLI.
-  - Add examples and public documentation for the RebuttalLens name, manuscript-aware inputs, bounded Nature case analogies, and responsible-use boundaries.
+  - Add examples and public documentation for the Nature RebuttalLens name, manuscript-aware inputs, bounded Nature case analogies, and responsible-use boundaries.
   - Initialize local git and add `.gitignore` to prevent caches, node modules, API outputs, generated workflow demos, and large PDFs from accidental release.
 - Affected files/modules: `src/peer_review_skills/agents/manuscript_context.py`, `src/peer_review_skills/agents/rebuttal_lens_agents.py`, `src/peer_review_skills/agents/rebuttal_lens_workflow.py`, `src/peer_review_skills/agents/multi_agent_orchestrator.py`, `src/peer_review_skills/agents/specialized_agents.py`, `src/peer_review_skills/agents/specialized_agents_part2.py`, `src/peer_review_skills/agents/providers.py`, `src/peer_review_skills/cli/main.py`, `tests/test_rebuttal_lens_workflow.py`, `README.md`, `codex.md`, `docs/REBUTTAL_LENS_WORKFLOW_zh.md`, `examples/rebuttal_lens/*`, `.gitignore`.
 - Risks: PDF/DOCX parsing is intentionally not claimed in this phase; user manuscripts should not be uploaded to external APIs unless the user controls the privacy/legal risk.
-- Verification: targeted RebuttalLens tests, full pytest, compileall, v0.1 validator, secret scan, rule/legacy scan, local git tracked-file audit.
-- Rollback: remove RebuttalLens files and CLI command; existing `run-naturereview-multi-agent` path remains independent.
+- Verification: targeted Nature RebuttalLens tests, full pytest, compileall, v0.1 validator, secret scan, rule/legacy scan, local git tracked-file audit.
+- Rollback: remove Nature RebuttalLens files and CLI command; existing `run-naturereview-multi-agent` path remains independent.
 - Status: Completed.
 
 ### Phase 1: Acceptance Tests
@@ -228,7 +228,7 @@
 | Phase 8 final review | Refinement could loop until the iteration cap when integrity returned a critical issue for an unknown/missing agent | Fixed with fail-fast unrefinable critical issue handling and regression test |
 | Phase 9 review | Python config could persist API keys/Bearer values into `workflow_summary.json`; cross-disciplinary prompt used inconsistent Chinese lens names; direct test runner printed fragile Unicode marks | Fixed with recursive config redaction, value-shape secret redaction, readable lens prompt names, and ASCII direct-run test output |
 | Phase 9 final review | Taxonomy-aware agents could fail when external callers passed `taxonomies=None`; direct-run and public release scans needed fresh verification after the fix | Fixed with shared taxonomy-context normalization, regression tests, direct test runner verification, full pytest, compileall, validator, secret scan, and rule/legacy wording scans |
-| Phase 10 review | Final user workflow lacked manuscript context, original-manuscript evidence grounding, bounded case interpretation, clean project naming, and a GitHub release boundary | Fixed with RebuttalLens 12-agent workflow, manuscript-aware evidence map, case interpreter, CLI, examples, docs, local git initialization, and release blocker documentation |
+| Phase 10 review | Final user workflow lacked manuscript context, original-manuscript evidence grounding, bounded case interpretation, clean project naming, and a GitHub release boundary | Fixed with Nature RebuttalLens 12-agent workflow, manuscript-aware evidence map, case interpreter, CLI, examples, docs, local git initialization, and release blocker documentation |
 
 ## Verification Log
 
@@ -276,12 +276,12 @@
 | Phase 9 secret scan | PASS | No persisted real API keys or bearer tokens found in README, codex, UPGRADE, src, tests, docs, or data release paths |
 | Phase 9 public rule/legacy wording scans | PASS | No rule/keyword/lexical/heuristic/fallback markers in current v3 workflow output path and public multi-agent docs; no obsolete v3 prototype wording in current docs/config/agent code |
 | Phase 9 Unicode/mojibake guard scan | PASS | No fragile direct-run status symbols remain; the only matched mojibake-like strings are intentional regression-test guardrail markers that prevent corrupted lens names from entering prompts |
-| Phase 10 RebuttalLens targeted tests | PASS | `tests/test_rebuttal_lens_workflow.py`: 11 passed |
+| Phase 10 Nature RebuttalLens targeted tests | PASS | `tests/test_rebuttal_lens_workflow.py`: 11 passed |
 | Phase 10 full pytest | PASS | `72 passed` |
 | Phase 10 compileall | PASS | `$env:PYTHONPATH='src'; python -m compileall -q src tests` |
 | Phase 10 official validation | PASS | `validate-naturereview-v01`: `PASS`; counts stable with 245 interaction units, 100 retrieval predictions, 50 workflow traces, 50 simulation traces |
 | Phase 10 secret scan | PASS | No persisted real API keys or bearer tokens found in public project files, docs, examples, source, tests, or data release paths |
-| Phase 10 rule/legacy scan | PASS | RebuttalLens and current v3 public advice paths contain no rule/keyword/lexical/heuristic/fallback advice-basis markers after legacy provider wording cleanup |
+| Phase 10 rule/legacy scan | PASS | Nature RebuttalLens and current v3 public advice paths contain no rule/keyword/lexical/heuristic/fallback advice-basis markers after legacy provider wording cleanup |
 | Phase 10 GitHub readiness | BLOCKED | Local git was initialized, but this machine has no `gh` CLI and no remote repository configured; GitHub Project upload requires repo URL and authentication/tooling |
 
 ## Residual Risks
@@ -309,4 +309,4 @@
 - [x] Phase 7 true multi-agent mainline integration completed.
 - [x] Phase 8 dependency-aware refinement and release hardening completed.
 - [x] Phase 9 final pre-release review hardening completed.
-- [x] Phase 10 RebuttalLens manuscript-aware final workflow completed locally.
+- [x] Phase 10 Nature RebuttalLens manuscript-aware final workflow completed locally.

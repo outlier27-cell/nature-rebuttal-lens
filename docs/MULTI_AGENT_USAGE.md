@@ -1,6 +1,6 @@
-# RebuttalLens / Multi-Agent System Usage Guide
+# Nature RebuttalLens / Multi-Agent System Usage Guide
 
-RebuttalLens is the final manuscript-aware system name. The older `run-naturereview-multi-agent` command remains available for v0.1 KB traces; the final user-facing research assistant command is `run-rebuttal-lens`.
+Nature RebuttalLens is the final manuscript-aware system name. The older `run-naturereview-multi-agent` command remains available for v0.1 KB traces; the final user-facing research assistant command is `run-rebuttal-lens`.
 
 ```powershell
 $env:PYTHONPATH='src'
@@ -14,7 +14,7 @@ python -m peer_review_skills.cli.main run-rebuttal-lens `
   --output-dir data/evaluation/rebuttal_lens_demo
 ```
 
-The RebuttalLens trace adds manuscript context extraction, manuscript evidence location, and bounded Nature case interpretation before the existing cross-disciplinary multi-agent workflow.
+The Nature RebuttalLens trace adds manuscript context extraction, manuscript evidence location, and bounded Nature case interpretation before the existing cross-disciplinary multi-agent workflow.
 
 ---
 

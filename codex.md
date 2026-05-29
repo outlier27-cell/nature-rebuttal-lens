@@ -1,11 +1,11 @@
-# RebuttalLens 项目总览
+# Nature RebuttalLens 项目总览
 
 更新时间：2026-05-29
 项目目录：`C:\Users\wancy\Desktop\nature-comment`
 
 ## 一句话
 
-RebuttalLens 是一个基于 Nature 系列公开同行评审互动案例的跨学科、可追溯、可评估 Author Rebuttal Assistant workflow。它不是爬虫项目、不是训练微调项目、不是 RAG-only 系统、不是自动代写 rebuttal 的工具。
+Nature RebuttalLens 是一个基于 Nature 系列公开同行评审互动案例的跨学科、可追溯、可评估 Author Rebuttal Assistant workflow。它不是爬虫项目、不是训练微调项目、不是 RAG-only 系统、不是自动代写 rebuttal 的工具。
 
 它的核心目标是帮助作者理解 reviewer comment 背后的显性关切、隐含风险、制度信号、证据缺口、语气承诺和作者主体性边界，并用 Nature 历史案例作为有 provenance 的有限类比。
 
@@ -62,7 +62,7 @@ manuscript context
 
 ## 常用命令
 
-运行 RebuttalLens 示例：
+运行 Nature RebuttalLens 示例：
 
 ```powershell
 $env:PYTHONPATH='src'

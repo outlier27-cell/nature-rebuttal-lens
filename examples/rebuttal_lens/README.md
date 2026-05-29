@@ -1,4 +1,4 @@
-# RebuttalLens Example
+# Nature RebuttalLens Example
 
 This folder contains a minimal manuscript-aware Author Rebuttal Assistant example.
 

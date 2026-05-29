@@ -121,7 +121,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_rebuttal_lens = subparsers.add_parser(
         "run-rebuttal-lens",
         aliases=["run-reviewweaver"],
-        help="Run RebuttalLens manuscript-aware author rebuttal assistant workflow",
+        help="Run Nature RebuttalLens manuscript-aware author rebuttal assistant workflow",
     )
     run_rebuttal_lens.add_argument("--review-file", type=config.Path, required=True)
     run_rebuttal_lens.add_argument("--manuscript-file", type=config.Path, default=None)
@@ -506,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
             retrieved_cases=retrieved_cases,
             config=workflow_config,
         )
-        print("RebuttalLens workflow summary:")
+        print("Nature RebuttalLens workflow summary:")
         print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
         return 0
     parser.error(f"command not implemented yet: {args.command}")

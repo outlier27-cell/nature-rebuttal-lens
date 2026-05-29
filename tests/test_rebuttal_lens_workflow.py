@@ -205,7 +205,7 @@ def test_load_manuscript_context_splits_markdown_sections(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text(
         "# Title\n\n"
-        "RebuttalLens example.\n\n"
+        "Nature RebuttalLens example.\n\n"
         "## Methods\n\n"
         "We used an 80/10/10 dataset split with a fixed random seed.\n\n"
         "## Results\n\n"
@@ -335,7 +335,7 @@ def test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace(tmp_path):
         config={"output_dir": output_dir},
     )
 
-    assert summary["system_name"] == "RebuttalLens"
+    assert summary["system_name"] == "Nature RebuttalLens"
     assert summary["total_traces"] == 1
     assert summary["total_llm_calls"] == 12
     trace_path = output_dir / "rebuttal_lens_trace.json"
@@ -355,7 +355,7 @@ def test_rebuttal_lens_refinement_flag_fails_fast_until_supported(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="RebuttalLens refinement is not yet supported"):
+    with pytest.raises(ValueError, match="Nature RebuttalLens refinement is not yet supported"):
         run_rebuttal_lens_workflow(
             project_root=Path.cwd(),
             review_text="The dataset split is unclear.",

@@ -1,6 +1,6 @@
-# RebuttalLens 最终版工作流说明
+# Nature RebuttalLens 最终版工作流说明
 
-RebuttalLens 是从 NatureReview-Interact 升级出来的 manuscript-aware Author Rebuttal Assistant。它不是 final rebuttal generator，也不是接收率预测器；它的目标是把 reviewer comment、作者原稿、Nature 公开审稿互动案例、证据动作、语气承诺和跨学科解释整合成可追溯、可评估的工作流。
+Nature RebuttalLens 是从 NatureReview-Interact 升级出来的 manuscript-aware Author Rebuttal Assistant。它不是 final rebuttal generator，也不是接收率预测器；它的目标是把 reviewer comment、作者原稿、Nature 公开审稿互动案例、证据动作、语气承诺和跨学科解释整合成可追溯、可评估的工作流。
 
 ## 输入
 
@@ -29,7 +29,7 @@ RebuttalLens 是从 NatureReview-Interact 升级出来的 manuscript-aware Autho
 
 ## 输出
 
-RebuttalLens 输出 `rebuttal_lens_trace.json`，包含：
+Nature RebuttalLens 输出 `rebuttal_lens_trace.json`，包含：
 
 - manuscript context
 - manuscript evidence map

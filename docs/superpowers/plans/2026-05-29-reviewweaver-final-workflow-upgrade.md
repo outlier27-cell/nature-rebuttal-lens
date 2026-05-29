@@ -1,8 +1,8 @@
-# RebuttalLens Final Workflow Upgrade Implementation Plan
+# Nature RebuttalLens Final Workflow Upgrade Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Upgrade the current NatureReview-Interact v3 workflow into RebuttalLens, a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow that remains non-training, provenance-first, and not rule-generated.
+**Goal:** Upgrade the current NatureReview-Interact v3 workflow into Nature RebuttalLens, a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow that remains non-training, provenance-first, and not rule-generated.
 
 **Architecture:** Keep the existing independent LLM-agent foundation and add a manuscript context layer before reviewer understanding. The final workflow accepts reviewer comments, optional manuscript text/file, optional author draft response, Nature case retrieval context, and returns a trace with manuscript evidence maps, case analogies, evidence plans, cross-disciplinary lenses, and integrity gates.
 
@@ -57,9 +57,9 @@
 - [ ] Implement `ManuscriptContextExtractorAgent`, `ManuscriptEvidenceLocatorAgent`, and `CaseRetrievalInterpreterAgent`.
 - [ ] Ensure outputs require evidence provenance and author confirmation.
 
-### Task 3: RebuttalLens Orchestrator Integration
+### Task 3: Nature RebuttalLens Orchestrator Integration
 
-- [ ] Write failing tests for a complete RebuttalLens trace containing manuscript context, evidence map, case interpretation, 12 agent outputs, and responsible warnings.
+- [ ] Write failing tests for a complete Nature RebuttalLens trace containing manuscript context, evidence map, case interpretation, 12 agent outputs, and responsible warnings.
 - [ ] Modify orchestration so manuscript context flows into downstream agents.
 - [ ] Preserve existing v3 NatureReview multi-agent workflow compatibility.
 
@@ -71,7 +71,7 @@
 
 ### Task 5: Docs and Naming
 
-- [ ] Update public docs to foreground RebuttalLens name, manuscript-aware workflow, and cross-disciplinary value.
+- [ ] Update public docs to foreground Nature RebuttalLens name, manuscript-aware workflow, and cross-disciplinary value.
 - [ ] Add `docs/REBUTTAL_LENS_WORKFLOW_zh.md`.
 - [ ] Update `UPGRADE.md` Phase 10 with evidence, review, verification, and GitHub release constraints.
 
@@ -89,5 +89,5 @@
 - Existing `run-naturereview-multi-agent` tests still pass.
 - No API key is persisted.
 - No user-facing advice path uses keyword/rule/heuristic generation.
-- Public docs state the project is RebuttalLens / NatureReview-Interact derived, manuscript-aware, assistant-only, not final rebuttal generation.
+- Public docs state the project is Nature RebuttalLens / NatureReview-Interact derived, manuscript-aware, assistant-only, not final rebuttal generation.
 - GitHub publishing state is honestly reported with local git status and any authentication/tooling blockers.

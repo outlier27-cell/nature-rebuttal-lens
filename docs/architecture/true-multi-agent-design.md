@@ -1,8 +1,8 @@
-# RebuttalLens True Multi-Agent Architecture Design
+# Nature RebuttalLens True Multi-Agent Architecture Design
 
-RebuttalLens upgrades the v3 NatureReview-Interact architecture into a manuscript-aware workflow. The original `run-naturereview-multi-agent` path still runs the v0.1 KB trace workflow; the final user-facing research assistant path is `run-rebuttal-lens`.
+Nature RebuttalLens upgrades the v3 NatureReview-Interact architecture into a manuscript-aware workflow. The original `run-naturereview-multi-agent` path still runs the v0.1 KB trace workflow; the final user-facing research assistant path is `run-rebuttal-lens`.
 
-The RebuttalLens path runs 12 independent LLM calls per interaction in default no-refinement mode:
+The Nature RebuttalLens path runs 12 independent LLM calls per interaction in default no-refinement mode:
 
 1. ManuscriptContextExtractor
 2. ManuscriptEvidenceLocator
