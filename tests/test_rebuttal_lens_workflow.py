@@ -5,24 +5,24 @@ from typing import Any
 import pytest
 
 from peer_review_skills.agents.manuscript_context import (
-    build_reviewweaver_unit,
+    build_rebuttal_lens_unit,
     load_manuscript_context,
 )
-from peer_review_skills.agents.reviewweaver_agents import (
+from peer_review_skills.agents.rebuttal_lens_agents import (
     CaseRetrievalInterpreterAgent,
     ManuscriptContextExtractorAgent,
     ManuscriptEvidenceLocatorAgent,
-    create_reviewweaver_frontend_agents,
+    create_rebuttal_lens_frontend_agents,
 )
-from peer_review_skills.agents.reviewweaver_workflow import (
-    run_reviewweaver_workflow,
+from peer_review_skills.agents.rebuttal_lens_workflow import (
+    run_rebuttal_lens_workflow,
 )
 from peer_review_skills.agents.specialized_agents import EvidenceActionPlannerAgent
 from peer_review_skills.agents.specialized_agents_part2 import IntegrityAdequacyCheckerAgent
 from peer_review_skills.cli.main import build_parser
 
 
-class ReviewWeaverMockLLMClient:
+class RebuttalLensMockLLMClient:
     def __init__(self):
         self.model_name = "mock-deepseek-v3"
         self.call_count = 0
@@ -205,7 +205,7 @@ def test_load_manuscript_context_splits_markdown_sections(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text(
         "# Title\n\n"
-        "ReviewWeaver example.\n\n"
+        "RebuttalLens example.\n\n"
         "## Methods\n\n"
         "We used an 80/10/10 dataset split with a fixed random seed.\n\n"
         "## Results\n\n"
@@ -237,11 +237,11 @@ def test_load_manuscript_context_without_file_returns_review_only_boundary():
     assert context["evidence_boundary"]["missing_manuscript_warning"]
 
 
-def test_build_reviewweaver_unit_preserves_inputs_and_manuscript_context(tmp_path):
+def test_build_rebuttal_lens_unit_preserves_inputs_and_manuscript_context(tmp_path):
     manuscript = tmp_path / "manuscript.txt"
     manuscript.write_text("Methods\nWe describe the control experiment.", encoding="utf-8")
 
-    unit = build_reviewweaver_unit(
+    unit = build_rebuttal_lens_unit(
         review_text="The control experiment is unclear.",
         response_text="We will clarify this point.",
         manuscript_path=manuscript,
@@ -295,8 +295,8 @@ def test_build_reviewweaver_unit_preserves_inputs_and_manuscript_context(tmp_pat
         ),
     ],
 )
-def test_reviewweaver_frontend_agents_are_independent_llm_units(agent_cls, expected_field, inputs):
-    client = ReviewWeaverMockLLMClient()
+def test_rebuttal_lens_frontend_agents_are_independent_llm_units(agent_cls, expected_field, inputs):
+    client = RebuttalLensMockLLMClient()
     agent = agent_cls(agent_cls.__name__, client)
 
     message = agent.execute(inputs)
@@ -306,8 +306,8 @@ def test_reviewweaver_frontend_agents_are_independent_llm_units(agent_cls, expec
     assert client.call_count == 1
 
 
-def test_create_reviewweaver_frontend_agents_returns_three_agents():
-    agents = create_reviewweaver_frontend_agents(ReviewWeaverMockLLMClient())
+def test_create_rebuttal_lens_frontend_agents_returns_three_agents():
+    agents = create_rebuttal_lens_frontend_agents(RebuttalLensMockLLMClient())
 
     assert set(agents) == {
         "manuscript_context_extractor",
@@ -316,31 +316,31 @@ def test_create_reviewweaver_frontend_agents_returns_three_agents():
     }
 
 
-def test_run_reviewweaver_workflow_returns_manuscript_aware_trace(tmp_path):
+def test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text(
         "## Methods\n\nWe used an 80/10/10 dataset split.\n",
         encoding="utf-8",
     )
-    output_dir = tmp_path / "reviewweaver_output"
+    output_dir = tmp_path / "rebuttal_lens_output"
 
-    summary = run_reviewweaver_workflow(
+    summary = run_rebuttal_lens_workflow(
         project_root=Path.cwd(),
         review_text="The dataset split is unclear.",
         response_text="We will clarify the dataset split.",
         manuscript_path=manuscript,
-        model_client=ReviewWeaverMockLLMClient(),
+        model_client=RebuttalLensMockLLMClient(),
         retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
         taxonomies={},
         config={"output_dir": output_dir},
     )
 
-    assert summary["system_name"] == "ReviewWeaver"
+    assert summary["system_name"] == "RebuttalLens"
     assert summary["total_traces"] == 1
     assert summary["total_llm_calls"] == 12
-    trace_path = output_dir / "reviewweaver_trace.json"
+    trace_path = output_dir / "rebuttal_lens_trace.json"
     trace = json.loads(trace_path.read_text(encoding="utf-8"))
-    assert trace["workflow_version"] == "reviewweaver_v1"
+    assert trace["workflow_version"] == "rebuttal_lens_v1"
     assert trace["manuscript_context"]["mode"] == "manuscript_aware"
     outputs = trace["agent_intermediate_outputs"]
     assert "manuscript_context_extractor" in outputs
@@ -351,23 +351,23 @@ def test_run_reviewweaver_workflow_returns_manuscript_aware_trace(tmp_path):
     assert "author_must_verify_all_claims" in outputs["integrity_adequacy_checker"]["responsible_use_warnings"]
 
 
-def test_reviewweaver_refinement_flag_fails_fast_until_supported(tmp_path):
+def test_rebuttal_lens_refinement_flag_fails_fast_until_supported(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="ReviewWeaver refinement is not yet supported"):
-        run_reviewweaver_workflow(
+    with pytest.raises(ValueError, match="RebuttalLens refinement is not yet supported"):
+        run_rebuttal_lens_workflow(
             project_root=Path.cwd(),
             review_text="The dataset split is unclear.",
             manuscript_path=manuscript,
-            model_client=ReviewWeaverMockLLMClient(),
+            model_client=RebuttalLensMockLLMClient(),
             taxonomies={},
             config={"enable_refinement": True},
         )
 
 
 def test_evidence_action_planner_prompt_uses_manuscript_evidence_and_case_interpretation():
-    agent = EvidenceActionPlannerAgent("evidence_action_planner", ReviewWeaverMockLLMClient())
+    agent = EvidenceActionPlannerAgent("evidence_action_planner", RebuttalLensMockLLMClient())
 
     prompt = agent.build_prompt({
         "concern_map": {"concern_map": []},
@@ -383,12 +383,12 @@ def test_evidence_action_planner_prompt_uses_manuscript_evidence_and_case_interp
 
 
 def test_integrity_prompt_receives_manuscript_context_boundary():
-    agent = IntegrityAdequacyCheckerAgent("integrity_adequacy_checker", ReviewWeaverMockLLMClient())
+    agent = IntegrityAdequacyCheckerAgent("integrity_adequacy_checker", RebuttalLensMockLLMClient())
 
     prompt = agent.build_prompt({
         "all_agent_outputs": {},
         "unit": {
-            "unit_id": "reviewweaver_user_case",
+            "unit_id": "rebuttal_lens_user_case",
             "review_text": "Dataset split is unclear",
             "response_text": "We will clarify.",
             "provenance": {"input_source": "user_supplied"},
@@ -404,26 +404,26 @@ def test_integrity_prompt_receives_manuscript_context_boundary():
     assert user_payload["unit"]["manuscript_context"]["evidence_boundary"]["can_locate_textual_evidence"] is False
 
 
-def test_cli_parser_accepts_run_reviewweaver_file_inputs():
+def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
     parser = build_parser()
 
     args = parser.parse_args([
-        "run-reviewweaver",
+        "run-rebuttal-lens",
         "--review-file",
-        "examples/reviewweaver/reviewer_comment.txt",
+        "examples/rebuttal_lens/reviewer_comment.txt",
         "--manuscript-file",
-        "examples/reviewweaver/manuscript_excerpt.md",
+        "examples/rebuttal_lens/manuscript_excerpt.md",
         "--response-file",
-        "examples/reviewweaver/author_draft_response.txt",
+        "examples/rebuttal_lens/author_draft_response.txt",
         "--retrieved-cases-file",
-        "examples/reviewweaver/retrieved_cases.json",
+        "examples/rebuttal_lens/retrieved_cases.json",
         "--output-dir",
-        "data/evaluation/reviewweaver_demo",
+        "data/evaluation/rebuttal_lens_demo",
         "--limit-cases",
         "3",
     ])
 
-    assert args.command == "run-reviewweaver"
+    assert args.command == "run-rebuttal-lens"
     assert str(args.review_file).endswith("reviewer_comment.txt")
     assert str(args.manuscript_file).endswith("manuscript_excerpt.md")
     assert str(args.response_file).endswith("author_draft_response.txt")

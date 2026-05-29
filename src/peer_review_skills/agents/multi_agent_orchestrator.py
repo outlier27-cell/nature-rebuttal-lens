@@ -286,13 +286,13 @@ class MultiAgentOrchestrator:
             }
         }
 
-    def execute_reviewweaver_workflow(
+    def execute_rebuttal_lens_workflow(
         self,
         unit: dict[str, Any],
         retrieval: dict[str, Any],
         taxonomies: dict[str, Any],
     ) -> dict[str, Any]:
-        """Execute the 12-agent manuscript-aware ReviewWeaver workflow."""
+        """Execute the 12-agent manuscript-aware RebuttalLens workflow."""
         self.message_bus = []
         self.execution_trace = []
         self._refinement_iteration_count = 0
@@ -466,7 +466,7 @@ class MultiAgentOrchestrator:
         all_agent_outputs["integrity_adequacy_checker"] = final_integrity_output
 
         return {
-            "trace_id": f"reviewweaver_{unit.get('unit_id', 'unknown')}",
+            "trace_id": f"rebuttal_lens_{unit.get('unit_id', 'unknown')}",
             "query_unit_id": unit.get("unit_id", "unknown"),
             "agent_intermediate_outputs": all_agent_outputs,
             "message_bus": [msg.to_dict() for msg in self.message_bus],

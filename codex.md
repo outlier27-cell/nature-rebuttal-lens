@@ -1,11 +1,11 @@
-# ReviewWeaver 项目总览
+# RebuttalLens 项目总览
 
 更新时间：2026-05-29
 项目目录：`C:\Users\wancy\Desktop\nature-comment`
 
 ## 一句话
 
-ReviewWeaver 是一个基于 Nature 系列公开同行评审互动案例的跨学科、可追溯、可评估 Author Rebuttal Assistant workflow。它不是爬虫项目、不是训练微调项目、不是 RAG-only 系统、不是自动代写 rebuttal 的工具。
+RebuttalLens 是一个基于 Nature 系列公开同行评审互动案例的跨学科、可追溯、可评估 Author Rebuttal Assistant workflow。它不是爬虫项目、不是训练微调项目、不是 RAG-only 系统、不是自动代写 rebuttal 的工具。
 
 它的核心目标是帮助作者理解 reviewer comment 背后的显性关切、隐含风险、制度信号、证据缺口、语气承诺和作者主体性边界，并用 Nature 历史案例作为有 provenance 的有限类比。
 
@@ -62,18 +62,18 @@ manuscript context
 
 ## 常用命令
 
-运行 ReviewWeaver 示例：
+运行 RebuttalLens 示例：
 
 ```powershell
 $env:PYTHONPATH='src'
 $env:PEER_REVIEW_API_BASE_URL='https://xh.v1api.cc'
 $env:PEER_REVIEW_API_MODEL='deepseek-v3'
 $env:PEER_REVIEW_API_KEY='YOUR_KEY'
-python -m peer_review_skills.cli.main run-reviewweaver `
-  --review-file examples/reviewweaver/reviewer_comment.txt `
-  --manuscript-file examples/reviewweaver/manuscript_excerpt.md `
-  --response-file examples/reviewweaver/author_draft_response.txt `
-  --output-dir data/evaluation/reviewweaver_demo
+python -m peer_review_skills.cli.main run-rebuttal-lens `
+  --review-file examples/rebuttal_lens/reviewer_comment.txt `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
+  --response-file examples/rebuttal_lens/author_draft_response.txt `
+  --output-dir data/evaluation/rebuttal_lens_demo
 ```
 
 验证 v0.1 artifacts：

@@ -1,20 +1,20 @@
-# ReviewWeaver / Multi-Agent System Usage Guide
+# RebuttalLens / Multi-Agent System Usage Guide
 
-ReviewWeaver is the final manuscript-aware system name. The older `run-naturereview-multi-agent` command remains available for v0.1 KB traces; the final user-facing research assistant command is `run-reviewweaver`.
+RebuttalLens is the final manuscript-aware system name. The older `run-naturereview-multi-agent` command remains available for v0.1 KB traces; the final user-facing research assistant command is `run-rebuttal-lens`.
 
 ```powershell
 $env:PYTHONPATH='src'
 $env:PEER_REVIEW_API_BASE_URL='https://xh.v1api.cc'
 $env:PEER_REVIEW_API_MODEL='deepseek-v3'
 $env:PEER_REVIEW_API_KEY='YOUR_KEY'
-python -m peer_review_skills.cli.main run-reviewweaver `
-  --review-file examples/reviewweaver/reviewer_comment.txt `
-  --manuscript-file examples/reviewweaver/manuscript_excerpt.md `
-  --response-file examples/reviewweaver/author_draft_response.txt `
-  --output-dir data/evaluation/reviewweaver_demo
+python -m peer_review_skills.cli.main run-rebuttal-lens `
+  --review-file examples/rebuttal_lens/reviewer_comment.txt `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
+  --response-file examples/rebuttal_lens/author_draft_response.txt `
+  --output-dir data/evaluation/rebuttal_lens_demo
 ```
 
-The ReviewWeaver trace adds manuscript context extraction, manuscript evidence location, and bounded Nature case interpretation before the existing cross-disciplinary multi-agent workflow.
+The RebuttalLens trace adds manuscript context extraction, manuscript evidence location, and bounded Nature case interpretation before the existing cross-disciplinary multi-agent workflow.
 
 ---
 

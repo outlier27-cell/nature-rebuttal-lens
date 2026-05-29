@@ -1,8 +1,8 @@
-# ReviewWeaver True Multi-Agent Architecture Design
+# RebuttalLens True Multi-Agent Architecture Design
 
-ReviewWeaver upgrades the v3 NatureReview-Interact architecture into a manuscript-aware workflow. The original `run-naturereview-multi-agent` path still runs the v0.1 KB trace workflow; the final user-facing research assistant path is `run-reviewweaver`.
+RebuttalLens upgrades the v3 NatureReview-Interact architecture into a manuscript-aware workflow. The original `run-naturereview-multi-agent` path still runs the v0.1 KB trace workflow; the final user-facing research assistant path is `run-rebuttal-lens`.
 
-The ReviewWeaver path runs 12 independent LLM calls per interaction in default no-refinement mode:
+The RebuttalLens path runs 12 independent LLM calls per interaction in default no-refinement mode:
 
 1. ManuscriptContextExtractor
 2. ManuscriptEvidenceLocator

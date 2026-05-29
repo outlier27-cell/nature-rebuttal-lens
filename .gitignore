@@ -40,7 +40,7 @@ data/**
 data/evaluation/api_results/
 data/evaluation/workflow_v3/*.jsonl
 data/evaluation/workflow_v3/*.json
-data/evaluation/reviewweaver_demo/
+data/evaluation/rebuttal_lens_demo/
 data/evaluation/author_rebuttal_workflow/
 data/evaluation/api_handoff/
 data/evaluation/seed_set/

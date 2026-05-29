@@ -1,5 +1,5 @@
 """
-Manuscript context helpers for ReviewWeaver.
+Manuscript context helpers for RebuttalLens.
 
 This module intentionally keeps manuscript parsing conservative. It can build
 section-level context from plain text, Markdown, or LaTeX-like text. Binary PDF
@@ -23,7 +23,7 @@ def load_manuscript_context(path: str | Path | None) -> dict[str, Any]:
         raise FileNotFoundError(f"manuscript file not found: {manuscript_path}")
     if manuscript_path.suffix.lower() not in TEXT_SUFFIXES:
         raise ValueError(
-            "ReviewWeaver currently accepts text, Markdown, or LaTeX manuscript files. "
+            "RebuttalLens currently accepts text, Markdown, or LaTeX manuscript files. "
             f"Unsupported suffix: {manuscript_path.suffix}"
         )
 
@@ -55,14 +55,14 @@ def build_manuscript_context(
     }
 
 
-def build_reviewweaver_unit(
+def build_rebuttal_lens_unit(
     *,
     review_text: str,
     response_text: str = "",
     manuscript_path: str | Path | None = None,
     manuscript_text: str | None = None,
     editor_text: str = "",
-    unit_id: str = "reviewweaver_user_case",
+    unit_id: str = "rebuttal_lens_user_case",
 ) -> dict[str, Any]:
     if manuscript_path is not None and manuscript_text is not None:
         raise ValueError("Pass either manuscript_path or manuscript_text, not both")

@@ -118,17 +118,18 @@ def build_parser() -> argparse.ArgumentParser:
     run_naturereview_multi_agent.add_argument("--limit", type=int, default=5)
     run_naturereview_multi_agent.add_argument("--enable-refinement", action="store_true")
     run_naturereview_multi_agent.add_argument("--max-refinement-iterations", type=int, default=2)
-    run_reviewweaver = subparsers.add_parser(
-        "run-reviewweaver",
-        help="Run ReviewWeaver manuscript-aware author rebuttal assistant workflow",
+    run_rebuttal_lens = subparsers.add_parser(
+        "run-rebuttal-lens",
+        aliases=["run-reviewweaver"],
+        help="Run RebuttalLens manuscript-aware author rebuttal assistant workflow",
     )
-    run_reviewweaver.add_argument("--review-file", type=config.Path, required=True)
-    run_reviewweaver.add_argument("--manuscript-file", type=config.Path, default=None)
-    run_reviewweaver.add_argument("--response-file", type=config.Path, default=None)
-    run_reviewweaver.add_argument("--editor-file", type=config.Path, default=None)
-    run_reviewweaver.add_argument("--retrieved-cases-file", type=config.Path, default=None)
-    run_reviewweaver.add_argument("--output-dir", type=config.Path, default=None)
-    run_reviewweaver.add_argument("--limit-cases", type=int, default=5)
+    run_rebuttal_lens.add_argument("--review-file", type=config.Path, required=True)
+    run_rebuttal_lens.add_argument("--manuscript-file", type=config.Path, default=None)
+    run_rebuttal_lens.add_argument("--response-file", type=config.Path, default=None)
+    run_rebuttal_lens.add_argument("--editor-file", type=config.Path, default=None)
+    run_rebuttal_lens.add_argument("--retrieved-cases-file", type=config.Path, default=None)
+    run_rebuttal_lens.add_argument("--output-dir", type=config.Path, default=None)
+    run_rebuttal_lens.add_argument("--limit-cases", type=int, default=5)
 
     return parser
 
@@ -461,8 +462,8 @@ def main(argv: list[str] | None = None) -> int:
         print("NatureReview true multi-agent workflow summary:")
         print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
         return 0
-    if args.command == "run-reviewweaver":
-        from peer_review_skills.agents.reviewweaver_workflow import run_reviewweaver_workflow
+    if args.command in {"run-rebuttal-lens", "run-reviewweaver"}:
+        from peer_review_skills.agents.rebuttal_lens_workflow import run_rebuttal_lens_workflow
 
         review_text = config.resolve_project_path(args.review_file).read_text(encoding="utf-8")
         response_text = (
@@ -492,7 +493,7 @@ def main(argv: list[str] | None = None) -> int:
                 retrieved_cases = list(retrieved_case_payload)[: args.limit_cases]
             else:
                 parser.error("--retrieved-cases-file must contain a JSON object or array")
-        summary = run_reviewweaver_workflow(
+        summary = run_rebuttal_lens_workflow(
             project_root=config.PROJECT_ROOT,
             review_text=review_text,
             response_text=response_text,
@@ -505,7 +506,7 @@ def main(argv: list[str] | None = None) -> int:
             retrieved_cases=retrieved_cases,
             config=workflow_config,
         )
-        print("ReviewWeaver workflow summary:")
+        print("RebuttalLens workflow summary:")
         print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
         return 0
     parser.error(f"command not implemented yet: {args.command}")

@@ -1,4 +1,4 @@
-"""ReviewWeaver manuscript-aware frontend agents."""
+"""RebuttalLens manuscript-aware frontend agents."""
 
 import json
 from typing import Any, Optional
@@ -28,7 +28,7 @@ class ManuscriptContextExtractorAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a manuscript context extractor for ReviewWeaver, a "
+                    "You are a manuscript context extractor for RebuttalLens, a "
                     "manuscript-aware author rebuttal assistant. Summarize the supplied "
                     "manuscript sections as usable evidence context for reviewer-response "
                     "planning. Do NOT invent manuscript content. Do NOT infer experiments "
@@ -91,7 +91,7 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a manuscript evidence locator for ReviewWeaver. Given reviewer "
+                    "You are a manuscript evidence locator for RebuttalLens. Given reviewer "
                     "concerns and supplied manuscript context, identify which concerns are "
                     "supported, partially supported, contradicted, or missing in the manuscript. "
                     "Use only supplied manuscript text and prior agent outputs. Do NOT invent "
@@ -156,7 +156,7 @@ class CaseRetrievalInterpreterAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    "You are a Nature case retrieval interpreter for ReviewWeaver. Interpret "
+                    "You are a Nature case retrieval interpreter for RebuttalLens. Interpret "
                     "retrieved transparent peer-review cases as bounded analogies for the current "
                     "review interaction. Do NOT treat retrieved cases as rules. Do NOT predict "
                     "acceptance or editorial outcomes. Return only valid JSON:\n"
@@ -197,7 +197,7 @@ class CaseRetrievalInterpreterAgent(BaseAgent):
         return True, None
 
 
-def create_reviewweaver_frontend_agents(model_client: Any) -> dict[str, BaseAgent]:
+def create_rebuttal_lens_frontend_agents(model_client: Any) -> dict[str, BaseAgent]:
     return {
         "manuscript_context_extractor": ManuscriptContextExtractorAgent(
             "manuscript_context_extractor",
