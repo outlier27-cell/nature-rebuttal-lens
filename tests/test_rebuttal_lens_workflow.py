@@ -18,8 +18,11 @@ from peer_review_skills.agents.rebuttal_lens_workflow import (
     run_rebuttal_lens_workflow,
 )
 from peer_review_skills.agents.specialized_agents import EvidenceActionPlannerAgent
-from peer_review_skills.agents.specialized_agents_part2 import IntegrityAdequacyCheckerAgent
-from peer_review_skills.cli.main import build_parser
+from peer_review_skills.agents.specialized_agents_part2 import (
+    CrossDisciplinaryLensInterpreterAgent,
+    IntegrityAdequacyCheckerAgent,
+)
+from peer_review_skills.cli.main import build_parser, build_rebuttal_lens_argv, main
 
 
 class RebuttalLensMockLLMClient:
@@ -429,3 +432,113 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
     assert str(args.response_file).endswith("author_draft_response.txt")
     assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
     assert args.limit_cases == 3
+
+
+def test_cross_disciplinary_prompt_uses_readable_chinese_lens_names():
+    agent = CrossDisciplinaryLensInterpreterAgent(
+        "cross_disciplinary_lens_interpreter",
+        RebuttalLensMockLLMClient(),
+    )
+
+    prompt = agent.build_prompt(
+        {
+            "all_agent_outputs": {},
+            "unit": {"unit_id": "u1"},
+            "retrieval": {"top_k": [{"unit_id": "case_001"}]},
+        }
+    )
+    system_prompt = prompt[0]["content"]
+
+    for phrase in [
+        "默会知识边界",
+        "制度依赖",
+        "行动者网络对齐",
+        "快慢思维校正",
+        "情绪-语气-承诺校准",
+        "作者主体性门控",
+    ]:
+        assert phrase in system_prompt
+    for mojibake_marker in ["榛樹細", "鍒跺害", "琛屬", "鎯呯华", "浣滆€"]:
+        assert mojibake_marker not in system_prompt
+
+
+def test_public_config_lists_complete_rebuttal_lens_agent_set():
+    config_text = (Path.cwd() / "config/multi_agent_config.yaml").read_text(encoding="utf-8")
+
+    for agent_id in [
+        "manuscript_context_extractor",
+        "manuscript_evidence_locator",
+        "case_retrieval_interpreter",
+        "reviewer_understanding_agent",
+        "tacit_concern_interpreter",
+        "institutional_signal_interpreter",
+        "evidence_action_planner",
+        "author_positioning_agent",
+        "tone_commitment_calibrator",
+        "actor_network_mapper",
+        "cross_disciplinary_lens_interpreter",
+        "integrity_adequacy_checker",
+    ]:
+        assert f"{agent_id}:" in config_text
+    assert 'mode: "rebuttal_lens"' in config_text
+
+
+def test_public_audit_docs_are_not_stale_rule_based_findings():
+    audit_paths = [
+        Path.cwd() / "docs/audit/FINAL-AUDIT-SUMMARY.md",
+        Path.cwd() / "docs/audit/agent-implementation-audit.md",
+    ]
+    combined = "\n".join(path.read_text(encoding="utf-8") for path in audit_paths)
+
+    assert "Nature RebuttalLens" in combined
+    assert "12 independent LLM calls" in combined
+    assert "rule-based workflow assembly" not in combined.lower()
+    assert "NOT independent LLM-based agents" not in combined
+
+
+def test_python_project_has_installable_package_metadata():
+    pyproject_path = Path.cwd() / "pyproject.toml"
+    text = pyproject_path.read_text(encoding="utf-8")
+
+    assert 'name = "nature-rebuttal-lens"' in text
+    assert 'where = ["src"]' in text
+    assert 'include = ["peer_review_skills*"]' in text
+    assert 'run-rebuttal-lens = "peer_review_skills.cli.main:run_rebuttal_lens_cli"' in text
+    assert 'pythonpath = ["src"]' in text
+
+
+def test_console_script_wrapper_adds_run_rebuttal_lens_subcommand():
+    argv = build_rebuttal_lens_argv([
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--output-dir",
+        "data/evaluation/rebuttal_lens_demo",
+    ])
+
+    assert argv == [
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--output-dir",
+        "data/evaluation/rebuttal_lens_demo",
+    ]
+
+
+def test_run_rebuttal_lens_cli_reports_missing_api_without_traceback(monkeypatch, capsys):
+    monkeypatch.delenv("PEER_REVIEW_API_BASE_URL", raising=False)
+    monkeypatch.delenv("PEER_REVIEW_API_KEY", raising=False)
+    monkeypatch.delenv("PEER_REVIEW_API_MODEL", raising=False)
+
+    with pytest.raises(SystemExit) as exc_info:
+        main([
+            "run-rebuttal-lens",
+            "--review-file",
+            "examples/rebuttal_lens/reviewer_comment.txt",
+            "--output-dir",
+            "data/evaluation/rebuttal_lens_demo",
+        ])
+
+    captured = capsys.readouterr()
+    assert exc_info.value.code == 2
+    assert "missing PEER_REVIEW_API_KEY" in captured.err
+    assert "Traceback" not in captured.err

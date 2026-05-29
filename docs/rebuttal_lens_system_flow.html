@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nature RebuttalLens System Flow</title>
+  <style>
+    :root {
+      --ink: #111827;
+      --muted: #4b5563;
+      --line: #cbd5e1;
+      --panel: #ffffff;
+      --bg: #f8fafc;
+      --accent: #0f766e;
+      --accent-soft: #ccfbf1;
+      --blue: #1d4ed8;
+      --blue-soft: #dbeafe;
+      --amber: #92400e;
+      --amber-soft: #fef3c7;
+      --rose: #be123c;
+      --rose-soft: #ffe4e6;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+    }
+
+    header {
+      padding: 40px 32px 24px;
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 46px);
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      max-width: 980px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px;
+    }
+
+    main {
+      padding: 28px 32px 48px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 340px) minmax(640px, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 18px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .chip {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+    }
+
+    .flow {
+      display: grid;
+      gap: 18px;
+    }
+
+    .layer {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 16px;
+    }
+
+    .layer-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .layer-title span {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .agents {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .agent {
+      min-height: 92px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+    }
+
+    .agent strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .agent p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .input {
+      background: var(--blue-soft);
+      border-color: #93c5fd;
+    }
+
+    .evidence {
+      background: var(--accent-soft);
+      border-color: #5eead4;
+    }
+
+    .strategy {
+      background: var(--amber-soft);
+      border-color: #fbbf24;
+    }
+
+    .guard {
+      background: var(--rose-soft);
+      border-color: #fda4af;
+    }
+
+    .arrow {
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .outputs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #eef2ff;
+      color: #3730a3;
+    }
+
+    .boundary {
+      margin-top: 18px;
+      border-left: 4px solid var(--rose);
+    }
+
+    @media (max-width: 980px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .agents,
+      .outputs {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Nature RebuttalLens System Flow</h1>
+    <p class="subtitle">A manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow over Nature transparent peer-review interaction cases. The system outputs traceable planning artifacts, not final submission-ready rebuttal text.</p>
+  </header>
+
+  <main>
+    <div class="grid">
+      <aside class="panel">
+        <h2>Inputs</h2>
+        <div class="stack">
+          <div class="chip">Reviewer comment or review excerpt</div>
+          <div class="chip">Manuscript text / Markdown / LaTeX-like text</div>
+          <div class="chip">Optional draft author response</div>
+          <div class="chip">Optional editor letter</div>
+          <div class="chip">Optional retrieved Nature case analogies</div>
+        </div>
+
+        <div class="panel boundary">
+          <h2>Hard Boundaries</h2>
+          <div class="stack">
+            <div class="chip">No acceptance prediction</div>
+            <div class="chip">No fabricated evidence</div>
+            <div class="chip">No unsupported commitments</div>
+            <div class="chip">Author confirmation required</div>
+            <div class="chip">Case analogies are not rules</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="flow">
+        <div class="layer input">
+          <div class="layer-title">Layer 0: Manuscript Context <span>context boundary</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>1. manuscript_context_extractor</strong>
+              <p>Builds a section inventory and records what the supplied manuscript text can and cannot support.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer evidence">
+          <div class="layer-title">Layer 1: Review Understanding <span>concern and risk</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>2. reviewer_understanding_agent</strong>
+              <p>Extracts explicit reviewer concerns and observable textual evidence.</p>
+            </div>
+            <div class="agent">
+              <strong>3. tacit_concern_interpreter</strong>
+              <p>Interprets tacit risks without claiming private reviewer psychology.</p>
+            </div>
+            <div class="agent">
+              <strong>4. manuscript_evidence_locator</strong>
+              <p>Maps concerns to supplied manuscript evidence, partial support, missing evidence, or uncertainty.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer strategy">
+          <div class="layer-title">Layer 2: Strategy and Evidence <span>bounded planning</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>5. institutional_signal_interpreter</strong>
+              <p>Identifies journal, transparency, community, and editor-facing signals without predicting outcomes.</p>
+            </div>
+            <div class="agent">
+              <strong>6. case_retrieval_interpreter</strong>
+              <p>Uses retrieved Nature cases as bounded historical analogies.</p>
+            </div>
+            <div class="agent">
+              <strong>7. evidence_action_planner</strong>
+              <p>Plans evidence actions, required artifacts, and author-confirmation questions.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer">
+          <div class="layer-title">Layer 3: Author Response Planning <span>stance and commitment</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>8. author_positioning_agent</strong>
+              <p>Offers response stance options while preserving author agency.</p>
+            </div>
+            <div class="agent">
+              <strong>9. tone_commitment_calibrator</strong>
+              <p>Flags defensive tone, sycophancy risk, overclaim, and unsupported commitments.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer">
+          <div class="layer-title">Layer 4: Cross-Disciplinary Interpretation <span>humanistic lens</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>10. actor_network_mapper</strong>
+              <p>Maps human and non-human evidence carriers: figures, datasets, code, tables, supplements, methods text.</p>
+            </div>
+            <div class="agent">
+              <strong>11. cross_disciplinary_lens_interpreter</strong>
+              <p>Applies tacit knowledge, institutional dependence, actor-network alignment, fast/slow correction, tone/commitment, and author-agency lenses.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer guard">
+          <div class="layer-title">Layer 5: Integrity Gate <span>release-safe output</span></div>
+          <div class="agents">
+            <div class="agent">
+              <strong>12. integrity_adequacy_checker</strong>
+              <p>Checks adequacy, provenance, unsupported claims, responsible-use warnings, and author-confirmation requirements.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="layer">
+          <div class="layer-title">Outputs <span>traceable artifacts</span></div>
+          <div class="outputs">
+            <div class="chip"><code>rebuttal_lens_trace.json</code></div>
+            <div class="chip"><code>rebuttal_lens_summary.json</code></div>
+            <div class="chip">Concern map and tacit risk notes</div>
+            <div class="chip">Manuscript evidence map</div>
+            <div class="chip">Evidence action plan</div>
+            <div class="chip">Author confirmation questions</div>
+            <div class="chip">Tone and commitment warnings</div>
+            <div class="chip">Integrity and adequacy report</div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

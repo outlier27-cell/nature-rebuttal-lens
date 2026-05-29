@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import sys
 
 from peer_review_skills import config
 from peer_review_skills.agents.orchestrator import run_agent_workflow, run_api_handoff_workflow
@@ -41,6 +42,28 @@ from peer_review_skills.sample.mvp_selector import (
 from peer_review_skills.segment.unit_builder import build_review_units_for_paper
 from peer_review_skills.skills.pipeline import induce_skill_cards, write_skill_card_files
 from peer_review_skills.taxonomy.pipeline import build_taxonomy_artifacts
+
+
+def _require_rebuttal_lens_api_config(parser: argparse.ArgumentParser) -> dict[str, str]:
+    """Read API config for the public CLI and report missing keys without traceback."""
+    api_base = os.environ.get("PEER_REVIEW_API_BASE_URL", "https://xh.v1api.cc").strip()
+    api_key = os.environ.get("PEER_REVIEW_API_KEY", "").strip()
+    model = os.environ.get("PEER_REVIEW_API_MODEL", "deepseek-v3").strip()
+    missing = []
+    if not api_base:
+        missing.append("PEER_REVIEW_API_BASE_URL")
+    if not api_key:
+        missing.append("PEER_REVIEW_API_KEY")
+    if not model:
+        missing.append("PEER_REVIEW_API_MODEL")
+    if missing:
+        parser.error(
+            "missing "
+            + ", ".join(missing)
+            + "; set PEER_REVIEW_API_BASE_URL, PEER_REVIEW_API_KEY, and PEER_REVIEW_API_MODEL "
+            "before running Nature RebuttalLens"
+        )
+    return {"api_base": api_base, "api_key": api_key, "model": model}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -132,6 +155,19 @@ def build_parser() -> argparse.ArgumentParser:
     run_rebuttal_lens.add_argument("--limit-cases", type=int, default=5)
 
     return parser
+
+
+def build_rebuttal_lens_argv(argv: list[str] | None = None) -> list[str]:
+    """Build argv for the installed `run-rebuttal-lens` console script."""
+    raw_argv = list(sys.argv[1:] if argv is None else argv)
+    if raw_argv and raw_argv[0] in {"run-rebuttal-lens", "run-reviewweaver"}:
+        return raw_argv
+    return ["run-rebuttal-lens", *raw_argv]
+
+
+def run_rebuttal_lens_cli(argv: list[str] | None = None) -> int:
+    """Console-script entry point for running only the Nature RebuttalLens workflow."""
+    return main(build_rebuttal_lens_argv(argv))
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -479,6 +515,7 @@ def main(argv: list[str] | None = None) -> int:
         workflow_config = {
             "enable_refinement": False,
             "max_refinement_iterations": 0,
+            **_require_rebuttal_lens_api_config(parser),
         }
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)

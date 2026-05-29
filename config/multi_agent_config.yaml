@@ -1,10 +1,10 @@
 # Multi-Agent Configuration
 
-# Workflow mode for the v3 public entry point.
+# Workflow mode for the final public entry point.
 workflow:
-  mode: "multi_agent"
+  mode: "rebuttal_lens"
 
-# Multi-agent specific settings
+# Multi-agent settings for the 12-agent Nature RebuttalLens path.
 multi_agent:
   # Enable refinement loops (agents can improve each other's outputs)
   enable_refinement: false
@@ -19,6 +19,21 @@ multi_agent:
 
   # Agent-specific configurations
   agents:
+    manuscript_context_extractor:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    manuscript_evidence_locator:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
+    case_retrieval_interpreter:
+      model: "deepseek-v3"
+      temperature: 0.0
+      max_retries: 3
+
     reviewer_understanding_agent:
       model: "deepseek-v3"
       temperature: 0.0

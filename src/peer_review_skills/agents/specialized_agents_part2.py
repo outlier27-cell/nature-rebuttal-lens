@@ -296,7 +296,6 @@ class IntegrityAdequacyCheckerAgent(BaseAgent):
         if missing:
             return False, f"Missing required fields: {missing}"
 
-        # Check responsible use warnings
         required_warnings = [
             "assistant_only",
             "author_must_verify_all_claims"
@@ -310,7 +309,6 @@ class IntegrityAdequacyCheckerAgent(BaseAgent):
         return True, None
 
 
-# Agent factory function
 def create_all_specialized_agents(model_client: Any) -> dict[str, BaseAgent]:
     """
     Create all 9 specialized agents.

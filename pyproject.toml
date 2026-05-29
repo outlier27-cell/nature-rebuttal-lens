@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nature-rebuttal-lens"
+version = "0.1.0"
+description = "Manuscript-aware cross-disciplinary Author Rebuttal Assistant workflow over Nature transparent peer-review cases."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "Nature RebuttalLens contributors" }
+]
+keywords = [
+  "peer-review",
+  "author-rebuttal",
+  "scientific-communication",
+  "llm-agents",
+  "responsible-ai"
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/outlier27-cell/nature-rebuttal-lens"
+Repository = "https://github.com/outlier27-cell/nature-rebuttal-lens"
+
+[project.scripts]
+run-rebuttal-lens = "peer_review_skills.cli.main:run_rebuttal_lens_cli"
+nature-rebuttal-lens = "peer_review_skills.cli.main:run_rebuttal_lens_cli"
+peer-review-skills = "peer_review_skills.cli.main:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["peer_review_skills*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

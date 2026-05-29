@@ -70,6 +70,22 @@
 - Rollback: remove Nature RebuttalLens files and CLI command; existing `run-naturereview-multi-agent` path remains independent.
 - Status: Completed.
 
+### Phase 11: Pre-Release Readiness Hardening
+
+- Goal: perform the final maintainer-style release review and close concrete publication blockers for Nature RebuttalLens.
+- Changes:
+  - Add installable Python project metadata with CLI entry points in `pyproject.toml`.
+  - Update public configuration so `config/multi_agent_config.yaml` documents the final `rebuttal_lens` workflow and all 12 agents.
+  - Replace stale audit documents that described the pre-upgrade rule-assembly architecture with current Nature RebuttalLens implementation audits.
+  - Fix corrupted cross-disciplinary lens names in the executable agent prompt and core Chinese public docs.
+  - Add release-readiness regression tests for package metadata, public config completeness, stale audit wording, readable lens names, and CLI missing-API behavior.
+  - Make `run-rebuttal-lens` report missing API configuration as a clean CLI error instead of a Python traceback.
+- Affected files/modules: `pyproject.toml`, `.gitignore`, `config/multi_agent_config.yaml`, `docs/REBUTTAL_LENS_WORKFLOW_zh.md`, `docs/INTERDISCIPLINARY_SYSTEM_FRAME_zh.md`, `docs/PDF_DERIVED_DESIGN_LENSES_zh.md`, `docs/RESPONSIBLE_USE_zh.md`, `docs/audit/FINAL-AUDIT-SUMMARY.md`, `docs/audit/agent-implementation-audit.md`, `src/peer_review_skills/agents/specialized_agents_part2.py`, `src/peer_review_skills/cli/main.py`, `tests/test_rebuttal_lens_workflow.py`, `UPGRADE.md`.
+- Risks: published package metadata is intentionally minimal and uses only standard-library runtime dependencies; optional developer tooling remains documented as command-line checks rather than dependency pins.
+- Verification: targeted release-readiness tests, full pytest, compileall, v0.1 validator, CLI import/help smoke, secret scan, README/config/audit consistency scans.
+- Rollback: remove `pyproject.toml`, restore prior config and audit docs, and remove release-readiness regression tests.
+- Status: Completed.
+
 ### Phase 1: Acceptance Tests
 
 - Goal: encode the non-training, cross-disciplinary acceptance criteria before implementation.
@@ -229,6 +245,7 @@
 | Phase 9 review | Python config could persist API keys/Bearer values into `workflow_summary.json`; cross-disciplinary prompt used inconsistent Chinese lens names; direct test runner printed fragile Unicode marks | Fixed with recursive config redaction, value-shape secret redaction, readable lens prompt names, and ASCII direct-run test output |
 | Phase 9 final review | Taxonomy-aware agents could fail when external callers passed `taxonomies=None`; direct-run and public release scans needed fresh verification after the fix | Fixed with shared taxonomy-context normalization, regression tests, direct test runner verification, full pytest, compileall, validator, secret scan, and rule/legacy wording scans |
 | Phase 10 review | Final user workflow lacked manuscript context, original-manuscript evidence grounding, bounded case interpretation, clean project naming, and a GitHub release boundary | Fixed with Nature RebuttalLens 12-agent workflow, manuscript-aware evidence map, case interpreter, CLI, examples, docs, local git initialization, and release blocker documentation |
+| Phase 11 initial review | Release docs/config still had stale architecture state: no installable Python metadata, config listed only 9 legacy agents, audit docs still described a pre-upgrade rule-assembly system | Fixed with `pyproject.toml`, 12-agent config, current audit docs, and release-readiness regression tests |
 
 ## Verification Log
 
@@ -283,6 +300,14 @@
 | Phase 10 secret scan | PASS | No persisted real API keys or bearer tokens found in public project files, docs, examples, source, tests, or data release paths |
 | Phase 10 rule/legacy scan | PASS | Nature RebuttalLens and current v3 public advice paths contain no rule/keyword/lexical/heuristic/fallback advice-basis markers after legacy provider wording cleanup |
 | Phase 10 GitHub readiness | BLOCKED | Local git was initialized, but this machine has no `gh` CLI and no remote repository configured; GitHub Project upload requires repo URL and authentication/tooling |
+| Phase 11 targeted release-readiness tests | PASS | `tests/test_rebuttal_lens_workflow.py`: 18 passed, covering 12-agent workflow, package metadata, config completeness, readable lens names, stale audit wording, console-script argv wrapper, and clean missing-API CLI error |
+| Phase 11 full pytest | PASS | `$env:PYTHONPATH='src'; python -m pytest -q`: 80 passed |
+| Phase 11 compileall | PASS | `$env:PYTHONPATH='src'; python -m compileall -q src tests` |
+| Phase 11 official validation | PASS | `validate-naturereview-v01`: `PASS`; counts stable with 245 interaction units, 100 retrieval predictions, 50 workflow traces, 50 simulation traces, 50 cross-disciplinary lens traces, 200 seed/API handoff rows |
+| Phase 11 package dry-run | PASS | `python -m pip install --dry-run -e .` would install `nature-rebuttal-lens-0.1.0` |
+| Phase 11 CLI smoke | PASS | `peer_review_skills.cli.main --help` lists `run-rebuttal-lens`; missing API-key run exits 2 with a clear parser error and no traceback |
+| Phase 11 secret scan | PASS | No persisted real API keys or bearer tokens found in README, codex, UPGRADE, LICENSE, pyproject, src, tests, docs, examples, or release data paths |
+| Phase 11 stale/mojibake scan | PASS | Core public agent prompt, workflow docs, responsible-use docs, and audit docs contain no stale rule-assembly findings or corrupted lens-name markers |
 
 ## Residual Risks
 
@@ -290,7 +315,7 @@
 - Cross-disciplinary lenses are interpretive scaffolds over observable text, not proof of private intentions.
 - Current non-training system can plan and evaluate assistance, but it does not prove outcome improvement without human/user evaluation.
 - Existing legacy training artifacts may remain in the repo, but public scope must mark them as optional/non-core.
-- Some historical generated Chinese docs outside the core public v0.1 scope still display mojibake in terminal reads; the new core scope docs and validation report pass the existing mojibake scan.
+- Some historical generated Chinese docs outside the core public v0.1 scope may still display mojibake in terminal reads; the current core public docs, agent prompt, and release audit docs pass the Phase 11 mojibake/stale wording scan.
 
 ## Completion Checklist
 
@@ -310,3 +335,4 @@
 - [x] Phase 8 dependency-aware refinement and release hardening completed.
 - [x] Phase 9 final pre-release review hardening completed.
 - [x] Phase 10 Nature RebuttalLens manuscript-aware final workflow completed locally.
+- [x] Phase 11 pre-release readiness hardening completed.
