@@ -2796,11 +2796,18 @@ def _task_protocol_section(task: dict[str, str]) -> str:
 def _write_open_source_docs() -> None:
     readme = """# Nature RebuttalLens
 
+[![Python](https://img.shields.io/badge/python-3.10%2B-3776AB)](pyproject.toml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-green)](LICENSE)
+[![Status](https://img.shields.io/badge/status-research%20alpha-orange)](docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md)
+[![Agent Workflow](https://img.shields.io/badge/workflow-12%20agents-0f766e)](docs/REBUTTAL_LENS_WORKFLOW_zh.md)
+
 **Nature RebuttalLens is a manuscript-aware, cross-disciplinary Author Rebuttal Assistant workflow built from Nature transparent peer-review interaction cases.**
 
 It helps authors interpret reviewer comments with structure: what the reviewer explicitly asks for, what risk may sit behind the comment, what evidence in the manuscript is already usable, what still needs author confirmation, and how similar Nature review interactions can be used as bounded historical analogies.
 
 This is an independent open-source research project. It is not affiliated with, endorsed by, or operated by Nature Portfolio or Springer Nature.
+
+![Nature RebuttalLens workflow](docs/assets/rebuttal-lens-workflow.svg)
 
 ## What The System Does
 

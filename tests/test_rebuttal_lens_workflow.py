@@ -552,6 +552,7 @@ def test_readme_keeps_release_critical_open_source_sections():
         "python -m pip install -e .",
         "run-rebuttal-lens",
         "docs/rebuttal_lens_system_flow.html",
+        "docs/assets/rebuttal-lens-workflow.svg",
         "docs/DATA_CARD_zh.md",
         "docs/AGENT_CARD_zh.md",
         "docs/DATA_RELEASE_BOUNDARY_zh.md",
