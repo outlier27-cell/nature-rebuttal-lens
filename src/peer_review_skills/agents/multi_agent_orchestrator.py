@@ -27,11 +27,13 @@ class MultiAgentOrchestrator:
         self,
         agents: dict[str, BaseAgent],
         enable_refinement: bool = False,
-        max_refinement_iterations: int = 2
+        max_refinement_iterations: int = 2,
+        checkpoint_callback: Any | None = None,
     ):
         self.agents = agents
         self.enable_refinement = enable_refinement
         self.max_refinement_iterations = max_refinement_iterations
+        self.checkpoint_callback = checkpoint_callback
         self.message_bus: list[AgentMessage] = []
         self.execution_trace: list[dict[str, Any]] = []
         self._refinement_iteration_count = 0
@@ -72,13 +74,23 @@ class MultiAgentOrchestrator:
                 errors.append(f"Agent {agent_id} failed: {str(e)}")
 
         # Record layer execution
-        self.execution_trace.append({
+        trace_entry = {
             "layer": layer_name,
             "agents": agent_ids,
             "success_count": len(results),
             "error_count": len(errors),
             "errors": errors
-        })
+        }
+        self.execution_trace.append(trace_entry)
+        if self.checkpoint_callback is not None:
+            self.checkpoint_callback(
+                layer_name,
+                {
+                    "message_bus": [msg.to_dict() for msg in self.message_bus],
+                    "execution_trace": self.execution_trace,
+                    "summary": self.get_execution_summary(),
+                },
+            )
 
         if errors:
             raise RuntimeError(f"Layer {layer_name} failed: {errors}")

@@ -8,16 +8,16 @@
 
 ## 图谱统计
 
-- 节点数：421
-- 边数：454
+- 节点数：441
+- 边数：473
 - 架构层：6
 - 导览步骤：6
-- 节点类型：{'file': 71, 'document': 22, 'config': 3, 'class': 53, 'function': 269, 'concept': 3}
-- 边类型：{'contains': 322, 'imports': 126, 'documents': 3, 'implements': 2, 'validates': 1}
+- 节点类型：{'file': 71, 'document': 23, 'config': 3, 'class': 54, 'function': 287, 'concept': 3}
+- 边类型：{'contains': 341, 'imports': 126, 'documents': 3, 'implements': 2, 'validates': 1}
 
 ## 架构层
 
-- **公开入口与命令行层**：负责 package metadata、CLI 子命令、README 首页说明、示例入口和用户可见运行方式。（10 个文件级节点）
+- **公开入口与命令行层**：负责 package metadata、CLI 子命令、README 首页说明、示例入口和用户可见运行方式。（11 个文件级节点）
 - **Nature RebuttalLens 多智能体层**：实现 manuscript-aware 的 12-agent workflow，包括审稿理解、隐性风险、证据定位、案例解释、回应规划、跨学科镜头与完整性检查。（11 个文件级节点）
 - **数据处理与知识库构建层**：把 Nature 公开审稿互动数据加工为 normalized papers、review/response units、alignment、taxonomy、skill cards、KB 和 release-safe artifacts。（30 个文件级节点）
 - **模型 API、评测与发布门禁层**：封装 OpenAI-compatible API、handoff/review、retrieval baseline、simulation、diagnostics、judge、readiness 和 release validation。（21 个文件级节点）

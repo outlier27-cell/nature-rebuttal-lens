@@ -6,6 +6,7 @@ Each agent is an independent reasoning unit with its own LLM calls.
 """
 
 import json
+import copy
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -242,6 +243,113 @@ def attach_refinement_context(
         ),
     }
     return enriched
+
+
+def agent_runtime_options(config: dict[str, Any] | None, agent_id: str) -> dict[str, Any]:
+    """Resolve per-agent runtime options from public or nested multi-agent config."""
+    config = config or {}
+    multi_agent = config.get("multi_agent") if isinstance(config.get("multi_agent"), dict) else {}
+    agents = {}
+    if isinstance(multi_agent, dict) and isinstance(multi_agent.get("agents"), dict):
+        agents.update(multi_agent["agents"])
+    if isinstance(config.get("agents"), dict):
+        agents.update(config["agents"])
+    agent_config = agents.get(agent_id, {}) if isinstance(agents.get(agent_id, {}), dict) else {}
+
+    temperature = (
+        config["agent_temperature"]
+        if "agent_temperature" in config
+        else agent_config.get("temperature", multi_agent.get("agent_temperature", 0.0))
+    )
+    max_retries = (
+        config["agent_max_retries"]
+        if "agent_max_retries" in config
+        else agent_config.get("max_retries", multi_agent.get("agent_max_retries", 3))
+    )
+    return {
+        "temperature": float(temperature),
+        "max_retries": max(1, int(max_retries)),
+    }
+
+
+def agent_model_client(model_client: Any, config: dict[str, Any] | None, agent_id: str) -> Any:
+    """Return an agent-specific model client when config requests a different model."""
+    agent_config = _agent_config(config, agent_id)
+    model = agent_config.get("model")
+    if not model:
+        return model_client
+    cloned_client = copy.copy(model_client)
+    if hasattr(cloned_client, "model"):
+        setattr(cloned_client, "model", model)
+    if hasattr(cloned_client, "model_name"):
+        setattr(cloned_client, "model_name", model)
+    return cloned_client
+
+
+def _agent_config(config: dict[str, Any] | None, agent_id: str) -> dict[str, Any]:
+    config = config or {}
+    multi_agent = config.get("multi_agent") if isinstance(config.get("multi_agent"), dict) else {}
+    agents = {}
+    if isinstance(multi_agent, dict) and isinstance(multi_agent.get("agents"), dict):
+        agents.update(multi_agent["agents"])
+    if isinstance(config.get("agents"), dict):
+        agents.update(config["agents"])
+    return agents.get(agent_id, {}) if isinstance(agents.get(agent_id, {}), dict) else {}
+
+
+def require_field(output: dict[str, Any], field: str, expected_type: type | tuple[type, ...]) -> str | None:
+    """Return an error message when a required field is missing or has the wrong type."""
+    if field not in output:
+        return f"Missing '{field}' field"
+    if not isinstance(output[field], expected_type):
+        return f"'{field}' must be {_type_name(expected_type)}"
+    return None
+
+
+def require_optional_field(output: dict[str, Any], field: str, expected_type: type | tuple[type, ...]) -> str | None:
+    if field in output and not isinstance(output[field], expected_type):
+        return f"'{field}' must be {_type_name(expected_type)}"
+    return None
+
+
+def require_list_items(value: Any, field: str, expected_type: type | tuple[type, ...]) -> str | None:
+    if not isinstance(value, list):
+        return f"'{field}' must be a list"
+    for index, item in enumerate(value):
+        if not isinstance(item, expected_type):
+            return f"'{field}[{index}]' must be {_type_name(expected_type)}"
+    return None
+
+
+def require_bool_in_list_items(value: Any, field: str, key: str) -> str | None:
+    error = require_list_items(value, field, dict)
+    if error:
+        return error
+    for index, item in enumerate(value):
+        if key not in item:
+            return f"'{field}[{index}].{key}' is required"
+        if not isinstance(item[key], bool):
+            return f"'{field}[{index}].{key}' must be bool"
+    return None
+
+
+def require_list_item_fields(value: Any, field: str, required_fields: dict[str, type | tuple[type, ...]]) -> str | None:
+    error = require_list_items(value, field, dict)
+    if error:
+        return error
+    for index, item in enumerate(value):
+        for key, expected_type in required_fields.items():
+            if key not in item:
+                return f"'{field}[{index}].{key}' is required"
+            if not isinstance(item[key], expected_type):
+                return f"'{field}[{index}].{key}' must be {_type_name(expected_type)}"
+    return None
+
+
+def _type_name(expected_type: type | tuple[type, ...]) -> str:
+    if isinstance(expected_type, tuple):
+        return " or ".join(t.__name__ for t in expected_type)
+    return expected_type.__name__
 
 
 class LLMAgent(BaseAgent):

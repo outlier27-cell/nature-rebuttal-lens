@@ -13,6 +13,11 @@ from peer_review_skills.agents.base import (
     BaseAgent,
     attach_refinement_context,
     parse_agent_json_response,
+    require_bool_in_list_items,
+    require_field,
+    require_list_item_fields,
+    require_list_items,
+    require_optional_field,
 )
 
 
@@ -132,8 +137,21 @@ class TacitConcernInterpreterAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "risk_interpretation" not in output:
-            return False, "Missing 'risk_interpretation' field"
+        error = require_field(output, "risk_interpretation", list)
+        if error:
+            return False, error
+        error = require_list_item_fields(
+            output["risk_interpretation"],
+            "risk_interpretation",
+            {
+                "risk_type": str,
+                "tacit_concern": str,
+                "observable_trace": str,
+                "boundary": str,
+            },
+        )
+        if error:
+            return False, error
         return True, None
 
 
@@ -188,8 +206,20 @@ class InstitutionalSignalInterpreterAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "institutional_signal_note" not in output:
-            return False, "Missing 'institutional_signal_note' field"
+        error = require_field(output, "institutional_signal_note", list)
+        if error:
+            return False, error
+        error = require_list_item_fields(
+            output["institutional_signal_note"],
+            "institutional_signal_note",
+            {
+                "institutional_signal": str,
+                "action_link": str,
+                "boundary": str,
+            },
+        )
+        if error:
+            return False, error
         return True, None
 
 
@@ -253,8 +283,19 @@ class EvidenceActionPlannerAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "evidence_action_plan" not in output:
-            return False, "Missing 'evidence_action_plan' field"
+        error = require_field(output, "evidence_action_plan", list)
+        if error:
+            return False, error
+        error = require_bool_in_list_items(
+            output["evidence_action_plan"],
+            "evidence_action_plan",
+            "requires_author_confirmation",
+        )
+        if error:
+            return False, error
+        error = require_optional_field(output, "author_confirmation_questions", list)
+        if error:
+            return False, error
         return True, None
 
 
@@ -307,8 +348,20 @@ class AuthorPositioningAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "author_positioning" not in output:
-            return False, "Missing 'author_positioning' field"
+        error = require_field(output, "author_positioning", list)
+        if error:
+            return False, error
+        error = require_list_item_fields(
+            output["author_positioning"],
+            "author_positioning",
+            {
+                "position": str,
+                "stance_boundary": str,
+                "alternative_positions": list,
+            },
+        )
+        if error:
+            return False, error
         return True, None
 
 
@@ -366,8 +419,21 @@ class ToneCommitmentCalibratorAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "tone_commitment_warnings" not in output:
-            return False, "Missing 'tone_commitment_warnings' field"
+        error = require_field(output, "tone_commitment_warnings", list)
+        if error:
+            return False, error
+        error = require_list_item_fields(
+            output["tone_commitment_warnings"],
+            "tone_commitment_warnings",
+            {
+                "tone": str,
+                "commitment_level": str,
+                "risk_flags": list,
+                "boundary": str,
+            },
+        )
+        if error:
+            return False, error
         return True, None
 
 

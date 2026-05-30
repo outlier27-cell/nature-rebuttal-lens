@@ -5,9 +5,79 @@ from typing import Any, Optional
 
 from peer_review_skills.agents.base import (
     BaseAgent,
+    agent_model_client,
+    agent_runtime_options,
     attach_refinement_context,
     parse_agent_json_response,
+    require_bool_in_list_items,
+    require_field,
+    require_list_item_fields,
+    require_list_items,
+    require_optional_field,
 )
+
+
+def _selected_manuscript_sections(
+    sections: list[dict[str, Any]],
+    *,
+    query_text: str = "",
+    max_sections: int = 12,
+    preview_chars: int = 500,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    tokens = _query_tokens(query_text)
+    scored_sections: list[tuple[int, int, dict[str, Any]]] = []
+    for index, section in enumerate(sections):
+        searchable = f"{section.get('heading', '')} {section.get('text', '')}".lower()
+        score = sum(1 for token in tokens if token in searchable)
+        scored_sections.append((score, index, section))
+    selected_indices = {
+        index
+        for score, index, _section in sorted(scored_sections, key=lambda item: (-item[0], item[1]))[:max_sections]
+    }
+    selected = [
+        _section_preview(section, preview_chars=preview_chars)
+        for index, section in enumerate(sections)
+        if index in selected_indices
+    ]
+    truncated_chars = sum(section.get("truncated_chars", 0) for section in selected)
+    metadata = {
+        "total_sections": len(sections),
+        "selected_sections": len(selected),
+        "truncated_sections": max(0, len(sections) - len(selected)),
+        "truncated_chars": truncated_chars,
+        "selection_strategy": "review_relevance_then_document_order",
+    }
+    return selected, metadata
+
+
+def _section_preview(section: dict[str, Any], *, preview_chars: int) -> dict[str, Any]:
+    text = str(section.get("text", ""))
+    preview = text[:preview_chars]
+    return {
+        "section_id": section.get("section_id"),
+        "heading": section.get("heading"),
+        "text_preview": preview,
+        "char_count": len(text),
+        "truncated_chars": max(0, len(text) - len(preview)),
+    }
+
+
+def _query_tokens(text: str) -> set[str]:
+    raw_tokens = []
+    current = []
+    for char in text.lower():
+        if char.isalnum():
+            current.append(char)
+        elif current:
+            raw_tokens.append("".join(current))
+            current = []
+    if current:
+        raw_tokens.append("".join(current))
+    stopwords = {
+        "the", "and", "for", "with", "that", "this", "needs", "need",
+        "unclear", "please", "provide", "more", "detail", "details",
+    }
+    return {token for token in raw_tokens if len(token) >= 3 and token not in stopwords}
 
 
 class ManuscriptContextExtractorAgent(BaseAgent):
@@ -16,14 +86,12 @@ class ManuscriptContextExtractorAgent(BaseAgent):
     def build_prompt(self, inputs: dict[str, Any]) -> list[dict[str, str]]:
         manuscript_context = inputs.get("manuscript_context", {})
         sections = manuscript_context.get("sections", [])
-        section_preview = [
-            {
-                "section_id": section.get("section_id"),
-                "heading": section.get("heading"),
-                "text_preview": str(section.get("text", ""))[:500],
-            }
-            for section in sections[:12]
-        ]
+        section_preview, selection_metadata = _selected_manuscript_sections(
+            sections,
+            query_text=inputs.get("review_text", ""),
+            max_sections=12,
+            preview_chars=500,
+        )
         return [
             {
                 "role": "system",
@@ -57,6 +125,7 @@ class ManuscriptContextExtractorAgent(BaseAgent):
                     "manuscript_mode": manuscript_context.get("mode", "review_only"),
                     "evidence_boundary": manuscript_context.get("evidence_boundary", {}),
                     "sections": section_preview,
+                    "selection_metadata": selection_metadata,
                     "task": "Summarize manuscript context for evidence-grounded rebuttal planning",
                 }, inputs), ensure_ascii=False, indent=2),
             },
@@ -66,10 +135,16 @@ class ManuscriptContextExtractorAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "manuscript_context_note" not in output:
-            return False, "Missing 'manuscript_context_note' field"
-        if "section_inventory" not in output:
-            return False, "Missing 'section_inventory' field"
+        for field, expected_type in [
+            ("manuscript_context_note", dict),
+            ("section_inventory", list),
+        ]:
+            error = require_field(output, field, expected_type)
+            if error:
+                return False, error
+        error = require_optional_field(output, "author_confirmation_questions", list)
+        if error:
+            return False, error
         return True, None
 
 
@@ -79,14 +154,15 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
     def build_prompt(self, inputs: dict[str, Any]) -> list[dict[str, str]]:
         manuscript_context = inputs.get("manuscript_context", {})
         sections = manuscript_context.get("sections", [])
-        section_preview = [
-            {
-                "section_id": section.get("section_id"),
-                "heading": section.get("heading"),
-                "text_preview": str(section.get("text", ""))[:800],
-            }
-            for section in sections[:12]
-        ]
+        section_preview, selection_metadata = _selected_manuscript_sections(
+            sections,
+            query_text=" ".join([
+                str(inputs.get("review_text", "")),
+                json.dumps(inputs.get("concern_map", {}), ensure_ascii=False),
+            ]),
+            max_sections=12,
+            preview_chars=800,
+        )
         return [
             {
                 "role": "system",
@@ -121,6 +197,7 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
                     "manuscript_context_note": inputs.get("manuscript_context_note", {}),
                     "manuscript_mode": manuscript_context.get("mode", "review_only"),
                     "sections": section_preview,
+                    "selection_metadata": selection_metadata,
                     "task": "Locate manuscript evidence and gaps for reviewer concerns",
                 }, inputs), ensure_ascii=False, indent=2),
             },
@@ -130,10 +207,29 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "manuscript_evidence_map" not in output:
-            return False, "Missing 'manuscript_evidence_map' field"
-        if "evidence_gaps" not in output:
-            return False, "Missing 'evidence_gaps' field"
+        for field, expected_type in [
+            ("manuscript_evidence_map", list),
+            ("evidence_gaps", list),
+        ]:
+            error = require_field(output, field, expected_type)
+            if error:
+                return False, error
+        error = require_list_item_fields(
+            output["manuscript_evidence_map"],
+            "manuscript_evidence_map",
+            {
+                "concern_id": str,
+                "status": str,
+                "section_id": str,
+                "text_evidence": str,
+                "gap": str,
+            },
+        )
+        if error:
+            return False, error
+        error = require_optional_field(output, "author_confirmation_questions", list)
+        if error:
+            return False, error
         return True, None
 
 
@@ -190,28 +286,49 @@ class CaseRetrievalInterpreterAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "case_interpretation" not in output:
-            return False, "Missing 'case_interpretation' field"
-        if "case_use_boundary" not in output:
-            return False, "Missing 'case_use_boundary' field"
+        for field, expected_type in [
+            ("case_interpretation", list),
+            ("case_use_boundary", str),
+        ]:
+            error = require_field(output, field, expected_type)
+            if error:
+                return False, error
+        error = require_list_item_fields(
+            output["case_interpretation"],
+            "case_interpretation",
+            {
+                "case_id": str,
+                "analogy": str,
+                "transferable_strategy": str,
+                "boundary": str,
+            },
+        )
+        if error:
+            return False, error
         return True, None
 
 
-def create_rebuttal_lens_frontend_agents(model_client: Any) -> dict[str, BaseAgent]:
+def create_rebuttal_lens_frontend_agents(
+    model_client: Any,
+    config: dict[str, Any] | None = None,
+) -> dict[str, BaseAgent]:
+    context_options = agent_runtime_options(config, "manuscript_context_extractor")
+    evidence_options = agent_runtime_options(config, "manuscript_evidence_locator")
+    case_options = agent_runtime_options(config, "case_retrieval_interpreter")
     return {
         "manuscript_context_extractor": ManuscriptContextExtractorAgent(
             "manuscript_context_extractor",
-            model_client,
-            temperature=0.0,
+            agent_model_client(model_client, config, "manuscript_context_extractor"),
+            **context_options,
         ),
         "manuscript_evidence_locator": ManuscriptEvidenceLocatorAgent(
             "manuscript_evidence_locator",
-            model_client,
-            temperature=0.0,
+            agent_model_client(model_client, config, "manuscript_evidence_locator"),
+            **evidence_options,
         ),
         "case_retrieval_interpreter": CaseRetrievalInterpreterAgent(
             "case_retrieval_interpreter",
-            model_client,
-            temperature=0.0,
+            agent_model_client(model_client, config, "case_retrieval_interpreter"),
+            **case_options,
         ),
     }

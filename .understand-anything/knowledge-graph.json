@@ -14,8 +14,8 @@
       "CodeGraph"
     ],
     "description": "基于 Nature 透明同行评审互动案例的 manuscript-aware、跨学科 Author Rebuttal Assistant workflow。系统把审稿意见、作者回应、文本/Markdown/LaTeX/PDF/DOCX/DOC 原稿证据、证据动作、语气/承诺、编辑信号和 Responsible Use 组织成可记录、可追溯、可评估的多智能体流程。",
-    "analyzedAt": "2026-05-30T03:44:52.179315+00:00",
-    "gitCommitHash": "305fc4ad8dd9265ea3117e56c01930eb4f2fadef"
+    "analyzedAt": "2026-05-30T05:27:50.060112+00:00",
+    "gitCommitHash": "309a2894432d433af6afd84ea80a2756f3ecc345"
   },
   "nodes": [
     {
@@ -207,6 +207,17 @@
       "languageNotes": "该节点摘要使用中文生成，技术模块名保留英文以便对应源码。"
     },
     {
+      "id": "document:examples/rebuttal_lens/WORKED_EXAMPLE_zh.md",
+      "type": "document",
+      "name": "examples/rebuttal_lens/WORKED_EXAMPLE_zh.md",
+      "filePath": "examples/rebuttal_lens/WORKED_EXAMPLE_zh.md",
+      "summary": "项目文件。",
+      "tags": [
+        "rebuttal-lens"
+      ],
+      "languageNotes": "该节点摘要使用中文生成，技术模块名保留英文以便对应源码。"
+    },
+    {
       "id": "document:examples/rebuttal_lens/author_draft_response.txt",
       "type": "document",
       "name": "examples/rebuttal_lens/author_draft_response.txt",
@@ -359,8 +370,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 16,
-      "endLine": 44
+      "startLine": 17,
+      "endLine": 45
     },
     {
       "id": "class:src/peer_review_skills/agents/base.py:BaseAgent",
@@ -372,8 +383,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 47,
-      "endLine": 217
+      "startLine": 48,
+      "endLine": 218
     },
     {
       "id": "function:src/peer_review_skills/agents/base.py:attach_refinement_context",
@@ -385,8 +396,99 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 220,
-      "endLine": 244
+      "startLine": 221,
+      "endLine": 245
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:agent_runtime_options",
+      "type": "function",
+      "name": "agent_runtime_options",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`agent_runtime_options` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 248,
+      "endLine": 272
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:agent_model_client",
+      "type": "function",
+      "name": "agent_model_client",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`agent_model_client` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 275,
+      "endLine": 286
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:require_field",
+      "type": "function",
+      "name": "require_field",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`require_field` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 300,
+      "endLine": 306
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:require_optional_field",
+      "type": "function",
+      "name": "require_optional_field",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`require_optional_field` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 309,
+      "endLine": 312
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:require_list_items",
+      "type": "function",
+      "name": "require_list_items",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`require_list_items` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 315,
+      "endLine": 321
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:require_bool_in_list_items",
+      "type": "function",
+      "name": "require_bool_in_list_items",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`require_bool_in_list_items` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 324,
+      "endLine": 333
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/base.py:require_list_item_fields",
+      "type": "function",
+      "name": "require_list_item_fields",
+      "filePath": "src/peer_review_skills/agents/base.py",
+      "summary": "`require_list_item_fields` 函数/方法，位于 src/peer_review_skills/agents/base.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 336,
+      "endLine": 346
     },
     {
       "id": "class:src/peer_review_skills/agents/base.py:LLMAgent",
@@ -398,8 +500,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 247,
-      "endLine": 301
+      "startLine": 355,
+      "endLine": 409
     },
     {
       "id": "function:src/peer_review_skills/agents/base.py:create_agent",
@@ -411,8 +513,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 304,
-      "endLine": 330
+      "startLine": 412,
+      "endLine": 438
     },
     {
       "id": "function:src/peer_review_skills/agents/base.py:parse_agent_json_response",
@@ -424,8 +526,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 333,
-      "endLine": 363
+      "startLine": 441,
+      "endLine": 471
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:to_dict",
@@ -437,8 +539,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 25,
-      "endLine": 33
+      "startLine": 26,
+      "endLine": 34
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:from_dict",
@@ -450,8 +552,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 36,
-      "endLine": 44
+      "startLine": 37,
+      "endLine": 45
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:__init__",
@@ -463,8 +565,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 58,
-      "endLine": 70
+      "startLine": 59,
+      "endLine": 71
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:build_prompt",
@@ -476,8 +578,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 73,
-      "endLine": 80
+      "startLine": 74,
+      "endLine": 81
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:parse_response",
@@ -489,8 +591,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 83,
-      "endLine": 93
+      "startLine": 84,
+      "endLine": 94
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:validate_output",
@@ -502,8 +604,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 96,
-      "endLine": 103
+      "startLine": 97,
+      "endLine": 104
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:execute",
@@ -515,8 +617,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 105,
-      "endLine": 160
+      "startLine": 106,
+      "endLine": 161
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:refine",
@@ -528,8 +630,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 184,
-      "endLine": 213
+      "startLine": 185,
+      "endLine": 214
     },
     {
       "id": "method:src/peer_review_skills/agents/base.py:get_system_prompt",
@@ -541,8 +643,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 215,
-      "endLine": 217
+      "startLine": 216,
+      "endLine": 218
     },
     {
       "id": "file:src/peer_review_skills/agents/manuscript_context.py",
@@ -616,7 +718,7 @@
         "class"
       ],
       "startLine": 15,
-      "endLine": 736
+      "endLine": 748
     },
     {
       "id": "function:src/peer_review_skills/agents/multi_agent_orchestrator.py:create_orchestrator",
@@ -628,8 +730,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 739,
-      "endLine": 758
+      "startLine": 751,
+      "endLine": 770
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:__init__",
@@ -642,7 +744,7 @@
         "function"
       ],
       "startLine": 26,
-      "endLine": 38
+      "endLine": 40
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:execute_layer",
@@ -654,8 +756,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 40,
-      "endLine": 86
+      "startLine": 42,
+      "endLine": 98
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:execute_workflow",
@@ -667,8 +769,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 88,
-      "endLine": 287
+      "startLine": 100,
+      "endLine": 299
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:execute_rebuttal_lens_workflow",
@@ -680,8 +782,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 289,
-      "endLine": 482
+      "startLine": 301,
+      "endLine": 494
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:get_execution_summary",
@@ -693,8 +795,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 712,
-      "endLine": 724
+      "startLine": 724,
+      "endLine": 736
     },
     {
       "id": "method:src/peer_review_skills/agents/multi_agent_orchestrator.py:save_trace",
@@ -706,8 +808,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 726,
-      "endLine": 736
+      "startLine": 738,
+      "endLine": 748
     },
     {
       "id": "file:src/peer_review_skills/agents/orchestrator.py",
@@ -1131,8 +1233,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 13,
-      "endLine": 73
+      "startLine": 83,
+      "endLine": 148
     },
     {
       "id": "class:src/peer_review_skills/agents/rebuttal_lens_agents.py:ManuscriptEvidenceLocatorAgent",
@@ -1145,8 +1247,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 76,
-      "endLine": 137
+      "startLine": 151,
+      "endLine": 233
     },
     {
       "id": "class:src/peer_review_skills/agents/rebuttal_lens_agents.py:CaseRetrievalInterpreterAgent",
@@ -1159,8 +1261,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 140,
-      "endLine": 197
+      "startLine": 236,
+      "endLine": 308
     },
     {
       "id": "function:src/peer_review_skills/agents/rebuttal_lens_agents.py:create_rebuttal_lens_frontend_agents",
@@ -1173,8 +1275,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 200,
-      "endLine": 217
+      "startLine": 311,
+      "endLine": 334
     },
     {
       "id": "method:src/peer_review_skills/agents/rebuttal_lens_agents.py:build_prompt",
@@ -1187,8 +1289,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 16,
-      "endLine": 63
+      "startLine": 86,
+      "endLine": 132
     },
     {
       "id": "method:src/peer_review_skills/agents/rebuttal_lens_agents.py:parse_response",
@@ -1201,8 +1303,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 65,
-      "endLine": 66
+      "startLine": 134,
+      "endLine": 135
     },
     {
       "id": "method:src/peer_review_skills/agents/rebuttal_lens_agents.py:validate_output",
@@ -1215,8 +1317,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 68,
-      "endLine": 73
+      "startLine": 137,
+      "endLine": 148
     },
     {
       "id": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
@@ -1241,8 +1343,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 21,
-      "endLine": 85
+      "startLine": 22,
+      "endLine": 93
     },
     {
       "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_trace",
@@ -1255,8 +1357,36 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 88,
-      "endLine": 123
+      "startLine": 96,
+      "endLine": 138
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:load_rebuttal_lens_config",
+      "type": "function",
+      "name": "load_rebuttal_lens_config",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "summary": "`load_rebuttal_lens_config` 函数/方法，位于 src/peer_review_skills/agents/rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 141,
+      "endLine": 146
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:write_checkpoint",
+      "type": "function",
+      "name": "write_checkpoint",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "summary": "`write_checkpoint` 函数/方法，位于 src/peer_review_skills/agents/rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 222,
+      "endLine": 233
     },
     {
       "id": "file:src/peer_review_skills/agents/specialized_agents.py",
@@ -1279,8 +1409,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 26,
-      "endLine": 79
+      "startLine": 31,
+      "endLine": 84
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents.py:TacitConcernInterpreterAgent",
@@ -1292,8 +1422,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 82,
-      "endLine": 137
+      "startLine": 87,
+      "endLine": 155
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents.py:InstitutionalSignalInterpreterAgent",
@@ -1305,8 +1435,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 140,
-      "endLine": 193
+      "startLine": 158,
+      "endLine": 223
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents.py:EvidenceActionPlannerAgent",
@@ -1318,8 +1448,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 196,
-      "endLine": 258
+      "startLine": 226,
+      "endLine": 299
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents.py:AuthorPositioningAgent",
@@ -1331,8 +1461,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 261,
-      "endLine": 312
+      "startLine": 302,
+      "endLine": 365
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents.py:ToneCommitmentCalibratorAgent",
@@ -1344,8 +1474,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 315,
-      "endLine": 371
+      "startLine": 368,
+      "endLine": 437
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents.py:build_prompt",
@@ -1357,8 +1487,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 33,
-      "endLine": 69
+      "startLine": 38,
+      "endLine": 74
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents.py:parse_response",
@@ -1370,8 +1500,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 71,
-      "endLine": 72
+      "startLine": 76,
+      "endLine": 77
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents.py:validate_output",
@@ -1383,8 +1513,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 74,
-      "endLine": 79
+      "startLine": 79,
+      "endLine": 84
     },
     {
       "id": "file:src/peer_review_skills/agents/specialized_agents_part2.py",
@@ -1407,8 +1537,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 25,
-      "endLine": 82
+      "startLine": 30,
+      "endLine": 94
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents_part2.py:CrossDisciplinaryLensInterpreterAgent",
@@ -1420,8 +1550,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 85,
-      "endLine": 197
+      "startLine": 97,
+      "endLine": 210
     },
     {
       "id": "class:src/peer_review_skills/agents/specialized_agents_part2.py:IntegrityAdequacyCheckerAgent",
@@ -1433,8 +1563,8 @@
         "multi-agent",
         "class"
       ],
-      "startLine": 200,
-      "endLine": 309
+      "startLine": 213,
+      "endLine": 335
     },
     {
       "id": "function:src/peer_review_skills/agents/specialized_agents_part2.py:create_all_specialized_agents",
@@ -1446,8 +1576,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 312,
-      "endLine": 368
+      "startLine": 338,
+      "endLine": 400
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents_part2.py:build_prompt",
@@ -1459,8 +1589,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 32,
-      "endLine": 74
+      "startLine": 37,
+      "endLine": 79
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents_part2.py:parse_response",
@@ -1472,8 +1602,8 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 76,
-      "endLine": 77
+      "startLine": 81,
+      "endLine": 82
     },
     {
       "id": "method:src/peer_review_skills/agents/specialized_agents_part2.py:validate_output",
@@ -1485,8 +1615,21 @@
         "multi-agent",
         "function"
       ],
-      "startLine": 79,
-      "endLine": 82
+      "startLine": 84,
+      "endLine": 94
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/specialized_agents_part2.py:options",
+      "type": "function",
+      "name": "options",
+      "filePath": "src/peer_review_skills/agents/specialized_agents_part2.py",
+      "summary": "`options` 函数/方法，位于 src/peer_review_skills/agents/specialized_agents_part2.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "multi-agent",
+        "function"
+      ],
+      "startLine": 351,
+      "endLine": 352
     },
     {
       "id": "file:src/peer_review_skills/agents/workflow_integration.py",
@@ -4169,7 +4312,7 @@
         "function"
       ],
       "startLine": 689,
-      "endLine": 710
+      "endLine": 713
     },
     {
       "id": "function:tests/test_multi_agent.py:test_cross_disciplinary_lens_rejects_private_psychology_language",
@@ -4181,8 +4324,8 @@
         "tests",
         "function"
       ],
-      "startLine": 713,
-      "endLine": 736
+      "startLine": 715,
+      "endLine": 738
     },
     {
       "id": "function:tests/test_multi_agent.py:test_refinement_rechecks_integrity_and_preserves_original_agent_context",
@@ -4194,8 +4337,8 @@
         "tests",
         "function"
       ],
-      "startLine": 739,
-      "endLine": 824
+      "startLine": 741,
+      "endLine": 826
     },
     {
       "id": "function:tests/test_multi_agent.py:test_refinement_of_upstream_agent_refreshes_dependent_agents",
@@ -4207,8 +4350,8 @@
         "tests",
         "function"
       ],
-      "startLine": 827,
-      "endLine": 919
+      "startLine": 829,
+      "endLine": 921
     },
     {
       "id": "function:tests/test_multi_agent.py:test_refinement_fails_fast_for_unknown_agent_issue",
@@ -4220,8 +4363,8 @@
         "tests",
         "function"
       ],
-      "startLine": 922,
-      "endLine": 980
+      "startLine": 924,
+      "endLine": 982
     },
     {
       "id": "function:tests/test_multi_agent.py:test_multi_agent_workflow_fails_fast_without_retrieval",
@@ -4233,8 +4376,8 @@
         "tests",
         "function"
       ],
-      "startLine": 983,
-      "endLine": 992
+      "startLine": 985,
+      "endLine": 994
     },
     {
       "id": "function:tests/test_multi_agent.py:test_v3_loader_does_not_fall_back_to_legacy_paths",
@@ -4246,8 +4389,8 @@
         "tests",
         "function"
       ],
-      "startLine": 995,
-      "endLine": 1004
+      "startLine": 997,
+      "endLine": 1006
     },
     {
       "id": "function:tests/test_multi_agent.py:test_run_multi_agent_workflow_with_mock_client_writes_nonempty_traces",
@@ -4259,8 +4402,8 @@
         "tests",
         "function"
       ],
-      "startLine": 1007,
-      "endLine": 1023
+      "startLine": 1009,
+      "endLine": 1025
     },
     {
       "id": "function:tests/test_multi_agent.py:test_workflow_summary_redacts_secret_config_values",
@@ -4272,8 +4415,8 @@
         "tests",
         "function"
       ],
-      "startLine": 1026,
-      "endLine": 1057
+      "startLine": 1028,
+      "endLine": 1059
     },
     {
       "id": "function:tests/test_multi_agent.py:main",
@@ -4285,8 +4428,8 @@
         "tests",
         "function"
       ],
-      "startLine": 1060,
-      "endLine": 1072
+      "startLine": 1062,
+      "endLine": 1074
     },
     {
       "id": "method:tests/test_multi_agent.py:__init__",
@@ -4350,8 +4493,8 @@
         "tests",
         "class"
       ],
-      "startLine": 742,
-      "endLine": 782
+      "startLine": 744,
+      "endLine": 784
     },
     {
       "id": "class:tests/test_multi_agent.py:UpstreamRefinementClient",
@@ -4363,8 +4506,8 @@
         "tests",
         "class"
       ],
-      "startLine": 830,
-      "endLine": 886
+      "startLine": 832,
+      "endLine": 888
     },
     {
       "id": "class:tests/test_multi_agent.py:UnknownIssueClient",
@@ -4376,8 +4519,8 @@
         "tests",
         "class"
       ],
-      "startLine": 923,
-      "endLine": 954
+      "startLine": 925,
+      "endLine": 956
     },
     {
       "id": "file:tests/test_naturereview_v01_acceptance.py",
@@ -4972,8 +5115,22 @@
         "tests",
         "class"
       ],
-      "startLine": 29,
-      "endLine": 205
+      "startLine": 31,
+      "endLine": 208
+    },
+    {
+      "id": "class:tests/test_rebuttal_lens_workflow.py:RebuttalLensFailingLLMClient",
+      "type": "class",
+      "name": "RebuttalLensFailingLLMClient",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`RebuttalLensFailingLLMClient` 类，位于 tests/test_rebuttal_lens_workflow.py，参与项目的审稿互动数据处理或 agent 工作流实现。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "class"
+      ],
+      "startLine": 211,
+      "endLine": 225
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_splits_markdown_sections",
@@ -4986,8 +5143,8 @@
         "tests",
         "function"
       ],
-      "startLine": 208,
-      "endLine": 232
+      "startLine": 228,
+      "endLine": 252
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_without_file_returns_review_only_boundary",
@@ -5000,8 +5157,8 @@
         "tests",
         "function"
       ],
-      "startLine": 235,
-      "endLine": 241
+      "startLine": 255,
+      "endLine": 261
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_extracts_text_from_pdf",
@@ -5014,8 +5171,8 @@
         "tests",
         "function"
       ],
-      "startLine": 244,
-      "endLine": 268
+      "startLine": 264,
+      "endLine": 288
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_extracts_text_from_docx",
@@ -5028,8 +5185,8 @@
         "tests",
         "function"
       ],
-      "startLine": 271,
-      "endLine": 284
+      "startLine": 291,
+      "endLine": 304
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_doc_requires_converter_when_soffice_missing",
@@ -5042,8 +5199,8 @@
         "tests",
         "function"
       ],
-      "startLine": 287,
-      "endLine": 293
+      "startLine": 307,
+      "endLine": 313
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_build_rebuttal_lens_unit_preserves_inputs_and_manuscript_context",
@@ -5056,8 +5213,8 @@
         "tests",
         "function"
       ],
-      "startLine": 339,
-      "endLine": 356
+      "startLine": 359,
+      "endLine": 376
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_frontend_agents_are_independent_llm_units",
@@ -5070,8 +5227,8 @@
         "tests",
         "function"
       ],
-      "startLine": 397,
-      "endLine": 405
+      "startLine": 417,
+      "endLine": 425
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_create_rebuttal_lens_frontend_agents_returns_three_agents",
@@ -5084,8 +5241,8 @@
         "tests",
         "function"
       ],
-      "startLine": 408,
-      "endLine": 415
+      "startLine": 428,
+      "endLine": 435
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace",
@@ -5098,8 +5255,8 @@
         "tests",
         "function"
       ],
-      "startLine": 418,
-      "endLine": 450
+      "startLine": 438,
+      "endLine": 470
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_refinement_flag_fails_fast_until_supported",
@@ -5112,8 +5269,8 @@
         "tests",
         "function"
       ],
-      "startLine": 453,
-      "endLine": 465
+      "startLine": 473,
+      "endLine": 485
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_evidence_action_planner_prompt_uses_manuscript_evidence_and_case_interpretation",
@@ -5126,8 +5283,106 @@
         "tests",
         "function"
       ],
-      "startLine": 468,
-      "endLine": 481
+      "startLine": 488,
+      "endLine": 501
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_manuscript_evidence_prompt_selects_late_review_relevant_sections",
+      "type": "function",
+      "name": "test_manuscript_evidence_prompt_selects_late_review_relevant_sections",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_manuscript_evidence_prompt_selects_late_review_relevant_sections` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 504,
+      "endLine": 536
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_manuscript_context_prompt_records_section_and_character_truncation",
+      "type": "function",
+      "name": "test_manuscript_context_prompt_records_section_and_character_truncation",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_manuscript_context_prompt_records_section_and_character_truncation` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 539,
+      "endLine": 559
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_agents_reject_malformed_field_types",
+      "type": "function",
+      "name": "test_rebuttal_lens_agents_reject_malformed_field_types",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_rebuttal_lens_agents_reject_malformed_field_types` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 592,
+      "endLine": 598
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error",
+      "type": "function",
+      "name": "test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 601,
+      "endLine": 623
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_workflow_writes_layer_checkpoints",
+      "type": "function",
+      "name": "test_rebuttal_lens_workflow_writes_layer_checkpoints",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_rebuttal_lens_workflow_writes_layer_checkpoints` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 626,
+      "endLine": 646
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_agent_config_controls_retry_and_temperature",
+      "type": "function",
+      "name": "test_rebuttal_lens_agent_config_controls_retry_and_temperature",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_rebuttal_lens_agent_config_controls_retry_and_temperature` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 649,
+      "endLine": 667
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_config_loader_reads_public_agent_settings",
+      "type": "function",
+      "name": "test_rebuttal_lens_config_loader_reads_public_agent_settings",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_rebuttal_lens_config_loader_reads_public_agent_settings` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 670,
+      "endLine": 695
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_integrity_prompt_receives_manuscript_context_boundary",
@@ -5140,8 +5395,8 @@
         "tests",
         "function"
       ],
-      "startLine": 484,
-      "endLine": 503
+      "startLine": 698,
+      "endLine": 717
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_cli_parser_accepts_run_rebuttal_lens_file_inputs",
@@ -5154,8 +5409,8 @@
         "tests",
         "function"
       ],
-      "startLine": 506,
-      "endLine": 530
+      "startLine": 720,
+      "endLine": 744
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_cross_disciplinary_prompt_uses_readable_chinese_lens_names",
@@ -5168,8 +5423,22 @@
         "tests",
         "function"
       ],
-      "startLine": 533,
-      "endLine": 558
+      "startLine": 747,
+      "endLine": 772
+    },
+    {
+      "id": "function:tests/test_rebuttal_lens_workflow.py:test_backend_specialized_agents_apply_per_agent_model_config",
+      "type": "function",
+      "name": "test_backend_specialized_agents_apply_per_agent_model_config",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "summary": "`test_backend_specialized_agents_apply_per_agent_model_config` 函数/方法，位于 tests/test_rebuttal_lens_workflow.py，是项目工作流、数据处理、API、测试或发布门禁的一部分。",
+      "tags": [
+        "rebuttal-lens",
+        "tests",
+        "function"
+      ],
+      "startLine": 775,
+      "endLine": 793
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_public_config_lists_complete_rebuttal_lens_agent_set",
@@ -5182,8 +5451,8 @@
         "tests",
         "function"
       ],
-      "startLine": 561,
-      "endLine": 579
+      "startLine": 795,
+      "endLine": 813
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_public_audit_docs_are_not_stale_rule_based_findings",
@@ -5196,8 +5465,8 @@
         "tests",
         "function"
       ],
-      "startLine": 582,
-      "endLine": 592
+      "startLine": 816,
+      "endLine": 826
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_python_project_has_installable_package_metadata",
@@ -5210,8 +5479,8 @@
         "tests",
         "function"
       ],
-      "startLine": 595,
-      "endLine": 605
+      "startLine": 829,
+      "endLine": 839
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_console_script_wrapper_adds_run_rebuttal_lens_subcommand",
@@ -5224,8 +5493,8 @@
         "tests",
         "function"
       ],
-      "startLine": 608,
-      "endLine": 622
+      "startLine": 842,
+      "endLine": 856
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_run_rebuttal_lens_cli_reports_missing_api_without_traceback",
@@ -5238,8 +5507,8 @@
         "tests",
         "function"
       ],
-      "startLine": 625,
-      "endLine": 642
+      "startLine": 859,
+      "endLine": 876
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_readme_keeps_release_critical_open_source_sections",
@@ -5252,8 +5521,8 @@
         "tests",
         "function"
       ],
-      "startLine": 645,
-      "endLine": 669
+      "startLine": 879,
+      "endLine": 903
     },
     {
       "id": "function:tests/test_rebuttal_lens_workflow.py:test_core_public_chinese_docs_are_readable_not_mojibake",
@@ -5266,8 +5535,8 @@
         "tests",
         "function"
       ],
-      "startLine": 672,
-      "endLine": 697
+      "startLine": 906,
+      "endLine": 931
     },
     {
       "id": "method:tests/test_rebuttal_lens_workflow.py:__init__",
@@ -5280,8 +5549,8 @@
         "tests",
         "function"
       ],
-      "startLine": 30,
-      "endLine": 32
+      "startLine": 32,
+      "endLine": 35
     },
     {
       "id": "method:tests/test_rebuttal_lens_workflow.py:create_chat_completion",
@@ -5294,8 +5563,8 @@
         "tests",
         "function"
       ],
-      "startLine": 34,
-      "endLine": 205
+      "startLine": 37,
+      "endLine": 208
     },
     {
       "id": "concept:review-interaction-learning",
@@ -5346,6 +5615,55 @@
     {
       "source": "file:src/peer_review_skills/agents/base.py",
       "target": "function:src/peer_review_skills/agents/base.py:attach_refinement_context",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:agent_runtime_options",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:agent_model_client",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:require_field",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:require_optional_field",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:require_list_items",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:require_bool_in_list_items",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/base.py",
+      "target": "function:src/peer_review_skills/agents/base.py:require_list_item_fields",
       "type": "contains",
       "weight": 1.0,
       "description": "文件包含该函数定义。"
@@ -5778,6 +6096,20 @@
       "description": "文件包含该函数定义。"
     },
     {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:load_rebuttal_lens_config",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:write_checkpoint",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
       "source": "file:src/peer_review_skills/agents/specialized_agents.py",
       "target": "class:src/peer_review_skills/agents/specialized_agents.py:ReviewerUnderstandingAgent",
       "type": "contains",
@@ -5885,6 +6217,13 @@
     {
       "source": "file:src/peer_review_skills/agents/specialized_agents_part2.py",
       "target": "method:src/peer_review_skills/agents/specialized_agents_part2.py:validate_output",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/specialized_agents_part2.py",
+      "target": "function:src/peer_review_skills/agents/specialized_agents_part2.py:options",
       "type": "contains",
       "weight": 1.0,
       "description": "文件包含该函数定义。"
@@ -7424,6 +7763,13 @@
     },
     {
       "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "class:tests/test_rebuttal_lens_workflow.py:RebuttalLensFailingLLMClient",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该类定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
       "target": "function:tests/test_rebuttal_lens_workflow.py:test_load_manuscript_context_splits_markdown_sections",
       "type": "contains",
       "weight": 1.0,
@@ -7501,6 +7847,55 @@
     },
     {
       "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_manuscript_evidence_prompt_selects_late_review_relevant_sections",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_manuscript_context_prompt_records_section_and_character_truncation",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_agents_reject_malformed_field_types",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_workflow_writes_layer_checkpoints",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_agent_config_controls_retry_and_temperature",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_rebuttal_lens_config_loader_reads_public_agent_settings",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
       "target": "function:tests/test_rebuttal_lens_workflow.py:test_integrity_prompt_receives_manuscript_context_boundary",
       "type": "contains",
       "weight": 1.0,
@@ -7516,6 +7911,13 @@
     {
       "source": "file:tests/test_rebuttal_lens_workflow.py",
       "target": "function:tests/test_rebuttal_lens_workflow.py:test_cross_disciplinary_prompt_uses_readable_chinese_lens_names",
+      "type": "contains",
+      "weight": 1.0,
+      "description": "文件包含该函数定义。"
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "function:tests/test_rebuttal_lens_workflow.py:test_backend_specialized_agents_apply_per_agent_model_config",
       "type": "contains",
       "weight": 1.0,
       "description": "文件包含该函数定义。"
@@ -8519,6 +8921,7 @@
         "config:pyproject.toml",
         "document:README.md",
         "document:examples/rebuttal_lens/README.md",
+        "document:examples/rebuttal_lens/WORKED_EXAMPLE_zh.md",
         "document:examples/rebuttal_lens/author_draft_response.txt",
         "document:examples/rebuttal_lens/manuscript_excerpt.md",
         "document:examples/rebuttal_lens/reviewer_comment.txt",

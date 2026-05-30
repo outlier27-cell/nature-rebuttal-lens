@@ -9,8 +9,13 @@ from typing import Any, Optional
 
 from peer_review_skills.agents.base import (
     BaseAgent,
+    agent_model_client,
+    agent_runtime_options,
     attach_refinement_context,
     parse_agent_json_response,
+    require_field,
+    require_list_items,
+    require_optional_field,
 )
 from peer_review_skills.agents.specialized_agents import (
     AuthorPositioningAgent,
@@ -77,8 +82,15 @@ class ActorNetworkMapperAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "actor_network_note" not in output:
-            return False, "Missing 'actor_network_note' field"
+        error = require_field(output, "actor_network_note", list)
+        if error:
+            return False, error
+        error = require_list_items(output["actor_network_note"], "actor_network_note", dict)
+        if error:
+            return False, error
+        error = require_optional_field(output, "retrieved_case_ids", list)
+        if error:
+            return False, error
         return True, None
 
 
@@ -156,8 +168,9 @@ class CrossDisciplinaryLensInterpreterAgent(BaseAgent):
         return parse_agent_json_response(response)
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
-        if "lens_interpretations" not in output:
-            return False, "Missing 'lens_interpretations' field"
+        error = require_field(output, "lens_interpretations", dict)
+        if error:
+            return False, error
 
         required_lenses = [
             "tacit_knowledge_boundary",
@@ -301,15 +314,31 @@ class IntegrityAdequacyCheckerAgent(BaseAgent):
             "author_must_verify_all_claims"
         ]
         warnings = output.get("responsible_use_warnings", [])
+        if not isinstance(warnings, list):
+            return False, "'responsible_use_warnings' must be a list"
         missing_warnings = [w for w in required_warnings if w not in warnings]
 
         if missing_warnings:
             return False, f"Missing required warnings: {missing_warnings}"
+        for field, expected_type in [
+            ("adequacy_report", list),
+            ("response_adequacy", dict),
+            ("provenance_checks", list),
+        ]:
+            error = require_field(output, field, expected_type)
+            if error:
+                return False, error
+        error = require_optional_field(output, "issues", list)
+        if error:
+            return False, error
 
         return True, None
 
 
-def create_all_specialized_agents(model_client: Any) -> dict[str, BaseAgent]:
+def create_all_specialized_agents(
+    model_client: Any,
+    config: dict[str, Any] | None = None,
+) -> dict[str, BaseAgent]:
     """
     Create all 9 specialized agents.
 
@@ -319,50 +348,53 @@ def create_all_specialized_agents(model_client: Any) -> dict[str, BaseAgent]:
     Returns:
         Dictionary mapping agent_id to agent instance
     """
+    def options(agent_id: str) -> dict[str, Any]:
+        return agent_runtime_options(config, agent_id)
+
     return {
         "reviewer_understanding_agent": ReviewerUnderstandingAgent(
             "reviewer_understanding_agent",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "reviewer_understanding_agent"),
+            **options("reviewer_understanding_agent"),
         ),
         "tacit_concern_interpreter": TacitConcernInterpreterAgent(
             "tacit_concern_interpreter",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "tacit_concern_interpreter"),
+            **options("tacit_concern_interpreter"),
         ),
         "institutional_signal_interpreter": InstitutionalSignalInterpreterAgent(
             "institutional_signal_interpreter",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "institutional_signal_interpreter"),
+            **options("institutional_signal_interpreter"),
         ),
         "evidence_action_planner": EvidenceActionPlannerAgent(
             "evidence_action_planner",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "evidence_action_planner"),
+            **options("evidence_action_planner"),
         ),
         "author_positioning_agent": AuthorPositioningAgent(
             "author_positioning_agent",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "author_positioning_agent"),
+            **options("author_positioning_agent"),
         ),
         "tone_commitment_calibrator": ToneCommitmentCalibratorAgent(
             "tone_commitment_calibrator",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "tone_commitment_calibrator"),
+            **options("tone_commitment_calibrator"),
         ),
         "actor_network_mapper": ActorNetworkMapperAgent(
             "actor_network_mapper",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "actor_network_mapper"),
+            **options("actor_network_mapper"),
         ),
         "cross_disciplinary_lens_interpreter": CrossDisciplinaryLensInterpreterAgent(
             "cross_disciplinary_lens_interpreter",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "cross_disciplinary_lens_interpreter"),
+            **options("cross_disciplinary_lens_interpreter"),
         ),
         "integrity_adequacy_checker": IntegrityAdequacyCheckerAgent(
             "integrity_adequacy_checker",
-            model_client,
-            temperature=0.0
+            agent_model_client(model_client, config, "integrity_adequacy_checker"),
+            **options("integrity_adequacy_checker"),
         ),
     }

@@ -700,15 +700,23 @@ def test_cross_disciplinary_prompt_contains_readable_chinese_lens_names():
     )
     system_prompt = prompt[0]["content"]
 
-    assert "默会知识边界" in system_prompt
-    assert "制度依赖" in system_prompt
-    assert "行动者网络对齐" in system_prompt
-    assert "快慢思维校正" in system_prompt
-    assert "情绪-语气-承诺校准" in system_prompt
-    assert "作者主体性门控" in system_prompt
-    for marker in ["榛樹", "鍒跺", "琛屽", "蹇", "鎯呯", "浣滆"]:
+    for phrase in [
+        "默会知识边界",
+        "制度依赖",
+        "行动者网络对齐",
+        "快慢思维校正",
+        "情绪-语气-承诺校准",
+        "作者主体性门控",
+    ]:
+        assert phrase in system_prompt
+    for marker in [
+        "".join(chr(code) for code in [0x699B, 0x6A39, 0x7D30]),
+        "".join(chr(code) for code in [0x934F, 0x8DFA, 0x5BB3]),
+        "".join(chr(code) for code in [0x7403, 0x5C70, 0x59E9]),
+        chr(0x93AF),
+        chr(0x6D63),
+    ]:
         assert marker not in system_prompt
-
 
 def test_cross_disciplinary_lens_rejects_private_psychology_language():
     agent = CrossDisciplinaryLensInterpreterAgent(

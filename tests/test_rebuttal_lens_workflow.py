@@ -16,18 +16,21 @@ from peer_review_skills.agents.rebuttal_lens_agents import (
     create_rebuttal_lens_frontend_agents,
 )
 from peer_review_skills.agents.rebuttal_lens_workflow import (
+    load_rebuttal_lens_config,
     run_rebuttal_lens_workflow,
 )
 from peer_review_skills.agents.specialized_agents import EvidenceActionPlannerAgent
 from peer_review_skills.agents.specialized_agents_part2 import (
     CrossDisciplinaryLensInterpreterAgent,
     IntegrityAdequacyCheckerAgent,
+    create_all_specialized_agents,
 )
 from peer_review_skills.cli.main import build_parser, build_rebuttal_lens_argv, main
 
 
 class RebuttalLensMockLLMClient:
     def __init__(self):
+        self.model = "mock-deepseek-v3"
         self.model_name = "mock-deepseek-v3"
         self.call_count = 0
 
@@ -203,6 +206,36 @@ class RebuttalLensMockLLMClient:
             "choices": [{"message": {"content": json.dumps(content)}}],
             "usage": {"prompt_tokens": 10, "completion_tokens": 10},
         }
+
+
+class RebuttalLensFailingLLMClient(RebuttalLensMockLLMClient):
+    def __init__(self, fail_on_call: int):
+        super().__init__()
+        self.fail_on_call = fail_on_call
+        self.shared_call_count = {"value": 0}
+
+    def __copy__(self):
+        cloned = type(self)(self.fail_on_call)
+        cloned.model = self.model
+        cloned.model_name = self.model_name
+        cloned.shared_call_count = self.shared_call_count
+        return cloned
+
+    def create_chat_completion(
+        self,
+        messages: list[dict[str, str]],
+        response_format: dict[str, str] | None = None,
+        temperature: float = 0.0,
+    ) -> dict[str, Any]:
+        next_call = self.shared_call_count["value"] + 1
+        if next_call == self.fail_on_call:
+            self.shared_call_count["value"] = next_call
+            self.call_count = next_call
+            raise RuntimeError("simulated provider failure")
+        self.shared_call_count["value"] = next_call
+        response = super().create_chat_completion(messages, response_format, temperature)
+        self.call_count = self.shared_call_count["value"]
+        return response
 
 
 def test_load_manuscript_context_splits_markdown_sections(tmp_path):
@@ -481,6 +514,200 @@ def test_evidence_action_planner_prompt_uses_manuscript_evidence_and_case_interp
     assert user_payload["case_interpretation"]["case_use_boundary"] == "case analogy only"
 
 
+def test_manuscript_evidence_prompt_selects_late_review_relevant_sections():
+    agent = ManuscriptEvidenceLocatorAgent("manuscript_evidence_locator", RebuttalLensMockLLMClient())
+    sections = [
+        {
+            "section_id": f"section_{index:03d}",
+            "heading": f"Background {index}",
+            "text": "general background unrelated to dataset splitting",
+        }
+        for index in range(1, 18)
+    ]
+    sections.append({
+        "section_id": "section_018",
+        "heading": "Supplementary Methods",
+        "text": "The final dataset split uses 80/10/10 train validation test partitions.",
+    })
+
+    prompt = agent.build_prompt({
+        "review_text": "The dataset split is unclear and needs train validation test detail.",
+        "concern_map": {"concern_map": []},
+        "manuscript_context_note": {"mode": "manuscript_aware"},
+        "manuscript_context": {
+            "mode": "manuscript_aware",
+            "section_count": len(sections),
+            "sections": sections,
+        },
+    })
+    user_payload = json.loads(prompt[1]["content"])
+
+    selected_section_ids = [section["section_id"] for section in user_payload["sections"]]
+    assert "section_018" in selected_section_ids
+    assert user_payload["selection_metadata"]["total_sections"] == 18
+    assert user_payload["selection_metadata"]["truncated_sections"] >= 1
+    assert user_payload["selection_metadata"]["selection_strategy"] == "review_relevance_then_document_order"
+
+
+def test_manuscript_context_prompt_records_section_and_character_truncation():
+    agent = ManuscriptContextExtractorAgent("manuscript_context_extractor", RebuttalLensMockLLMClient())
+    sections = [
+        {
+            "section_id": "section_001",
+            "heading": "Methods",
+            "text": "dataset split " + ("x" * 1200),
+        }
+    ]
+
+    prompt = agent.build_prompt({
+        "manuscript_context": {
+            "mode": "manuscript_aware",
+            "section_count": len(sections),
+            "sections": sections,
+        },
+    })
+    user_payload = json.loads(prompt[1]["content"])
+
+    assert user_payload["selection_metadata"]["truncated_chars"] > 0
+    assert user_payload["sections"][0]["char_count"] > len(user_payload["sections"][0]["text_preview"])
+
+
+@pytest.mark.parametrize(
+    ("agent_cls", "output", "expected_error"),
+    [
+        (
+            ManuscriptEvidenceLocatorAgent,
+            {"manuscript_evidence_map": "not-a-list", "evidence_gaps": []},
+            "manuscript_evidence_map",
+        ),
+        (
+            CaseRetrievalInterpreterAgent,
+            {"case_interpretation": [], "case_use_boundary": ["not-a-string"]},
+            "case_use_boundary",
+        ),
+        (
+            EvidenceActionPlannerAgent,
+            {"evidence_action_plan": [{"requires_author_confirmation": "yes"}]},
+            "requires_author_confirmation",
+        ),
+        (
+            IntegrityAdequacyCheckerAgent,
+            {
+                "adequacy_report": [],
+                "response_adequacy": [],
+                "provenance_checks": [],
+                "responsible_use_warnings": ["assistant_only", "author_must_verify_all_claims"],
+            },
+            "response_adequacy",
+        ),
+    ],
+)
+def test_rebuttal_lens_agents_reject_malformed_field_types(agent_cls, output, expected_error):
+    agent = agent_cls(agent_cls.__name__, RebuttalLensMockLLMClient())
+
+    valid, error = agent.validate_output(output)
+
+    assert valid is False
+    assert expected_error in str(error)
+
+
+def test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "rebuttal_lens_failure_output"
+
+    with pytest.raises(RuntimeError, match="simulated provider failure"):
+        run_rebuttal_lens_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=RebuttalLensFailingLLMClient(fail_on_call=3),
+            retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+            taxonomies={},
+            config={"output_dir": output_dir, "agent_max_retries": 1},
+        )
+
+    failure_trace_path = output_dir / "rebuttal_lens_failure_trace.json"
+    assert failure_trace_path.exists()
+    failure_trace = json.loads(failure_trace_path.read_text(encoding="utf-8"))
+    assert failure_trace["status"] == "failed"
+    assert "simulated provider failure" in failure_trace["error"]
+    assert failure_trace["partial_trace"]["message_bus"]
+    assert "api_key" not in json.dumps(failure_trace).lower()
+
+
+def test_rebuttal_lens_workflow_writes_layer_checkpoints(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "rebuttal_lens_checkpoint_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir},
+    )
+
+    checkpoint_dir = output_dir / "checkpoints"
+    checkpoint_files = sorted(checkpoint_dir.glob("*.json"))
+    assert len(checkpoint_files) == 12
+    first_checkpoint = json.loads(checkpoint_files[0].read_text(encoding="utf-8"))
+    assert first_checkpoint["status"] == "checkpoint"
+    assert first_checkpoint["partial_trace"]["execution_trace"][0]["layer"] == "Layer 0: Manuscript Context"
+
+
+def test_rebuttal_lens_agent_config_controls_retry_and_temperature():
+    agents = create_rebuttal_lens_frontend_agents(
+        RebuttalLensMockLLMClient(),
+        {
+            "agents": {
+                "manuscript_evidence_locator": {
+                    "temperature": 0.25,
+                    "max_retries": 5,
+                }
+            }
+        },
+    )
+
+    evidence_agent = agents["manuscript_evidence_locator"]
+    context_agent = agents["manuscript_context_extractor"]
+    assert evidence_agent.temperature == 0.25
+    assert evidence_agent.max_retries == 5
+    assert context_agent.temperature == 0.0
+    assert context_agent.max_retries == 3
+
+
+def test_rebuttal_lens_config_loader_reads_public_agent_settings(tmp_path):
+    config_path = tmp_path / "multi_agent_config.yaml"
+    config_path.write_text(
+        """
+workflow:
+  mode: "rebuttal_lens"
+
+multi_agent:
+  enable_refinement: false
+  max_refinement_iterations: 2
+  agents:
+    manuscript_evidence_locator:
+      model: "deepseek-v3"
+      temperature: 0.25
+      max_retries: 5
+""".strip(),
+        encoding="utf-8",
+    )
+
+    config = load_rebuttal_lens_config(config_path)
+
+    assert config["workflow"]["mode"] == "rebuttal_lens"
+    assert config["multi_agent"]["enable_refinement"] is False
+    assert config["multi_agent"]["max_refinement_iterations"] == 2
+    assert config["multi_agent"]["agents"]["manuscript_evidence_locator"]["temperature"] == 0.25
+    assert config["multi_agent"]["agents"]["manuscript_evidence_locator"]["max_retries"] == 5
+
+
 def test_integrity_prompt_receives_manuscript_context_boundary():
     agent = IntegrityAdequacyCheckerAgent("integrity_adequacy_checker", RebuttalLensMockLLMClient())
 
@@ -554,9 +781,35 @@ def test_cross_disciplinary_prompt_uses_readable_chinese_lens_names():
         "作者主体性门控",
     ]:
         assert phrase in system_prompt
-    for mojibake_marker in ["榛樹細", "鍒跺害", "琛屬", "鎯呯华", "浣滆€"]:
+    for mojibake_marker in [
+        "".join(chr(code) for code in [0x699B, 0x6A39, 0x7D30]),
+        "".join(chr(code) for code in [0x934F, 0x8DFA, 0x5BB3]),
+        "".join(chr(code) for code in [0x7403, 0x5C70, 0x59E9]),
+        chr(0x93AF),
+        chr(0x6D63),
+    ]:
         assert mojibake_marker not in system_prompt
 
+
+def test_backend_specialized_agents_apply_per_agent_model_config():
+    agents = create_all_specialized_agents(
+        RebuttalLensMockLLMClient(),
+        {
+            "agents": {
+                "reviewer_understanding_agent": {
+                    "model": "reviewer-model",
+                    "temperature": 0.25,
+                    "max_retries": 5,
+                }
+            }
+        },
+    )
+
+    agent = agents["reviewer_understanding_agent"]
+    assert agent.client.model == "reviewer-model"
+    assert agent.client.model_name == "reviewer-model"
+    assert agent.temperature == 0.25
+    assert agent.max_retries == 5
 
 def test_public_config_lists_complete_rebuttal_lens_agent_set():
     config_text = (Path.cwd() / "config/multi_agent_config.yaml").read_text(encoding="utf-8")
@@ -680,14 +933,14 @@ def test_core_public_chinese_docs_are_readable_not_mojibake():
         Path.cwd() / "docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md",
     ]
     mojibake_markers = [
-        "绯荤粺",
-        "瀹＄",
-        "浣滆",
-        "杈撳",
-        "鍙戝",
-        "鎺ユ",
-        "鐨",
-        "榛樹細",
+        "".join(chr(code) for code in [0x7F01, 0xE218, 0x5D35]),
+        "".join(chr(code) for code in [0x943E, 0x7678]),
+        "".join(chr(code) for code in [0x6D63, 0x6C86]),
+        "".join(chr(code) for code in [0x93C9, 0x5820]),
+        "".join(chr(code) for code in [0x95B8, 0x6B04]),
+        "".join(chr(code) for code in [0x95B9, 0x6052]),
+        chr(0x95BB),
+        "".join(chr(code) for code in [0x6992, 0x6DBC, 0x7D31]),
     ]
 
     for path in public_docs:

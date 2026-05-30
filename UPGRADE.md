@@ -100,6 +100,28 @@
 - Rollback: revert the README/test additions and restore the previous Phase 11 release state.
 - Status: Completed.
 
+### Phase 14: Final Maturity Hardening
+
+- Goal: close the final review risks for Nature RebuttalLens before publication: long-manuscript evidence coverage, stronger agent output validation, durable failure traces/checkpoints, and real RebuttalLens agent config wiring.
+- Evidence:
+  - `ManuscriptContextExtractorAgent` and `ManuscriptEvidenceLocatorAgent` only passed the first 12 section previews into prompts, which can hide evidence in later manuscript sections.
+  - Agent validation mostly checked top-level field presence, so malformed field types could enter downstream prompts.
+  - `run_rebuttal_lens_workflow` wrote trace files only after full success, losing partial execution state on late API failure.
+  - `config/multi_agent_config.yaml` documented per-agent settings, but RebuttalLens factories did not consume those settings.
+  - Final review found that the 9 backend specialized agents still ignored per-agent `model` overrides even after temperature/retry wiring, and cross-disciplinary Chinese lens names were mojibake in executable prompts/tests.
+- Changes:
+  - Add deterministic manuscript section selection that includes review-relevant sections beyond the first 12, records truncation metadata, and exposes that metadata in prompts/traces.
+  - Add schema/type validation helpers for required lists, dicts, strings, booleans, nested lists, responsible-use warnings, and lens objects.
+  - Add checkpoint/failure trace persistence after each RebuttalLens layer and on exceptions without persisting API keys.
+  - Wire per-agent `model`, `temperature`, and `max_retries` configuration from the RebuttalLens config path across all 12 agents.
+  - Replace mojibake Chinese lens names with readable Chinese names in executable prompts and tests.
+  - Add `examples/rebuttal_lens/WORKED_EXAMPLE_zh.md` to document the complete input-to-output workflow.
+- Affected files/modules: `src/peer_review_skills/agents/base.py`, `src/peer_review_skills/agents/rebuttal_lens_agents.py`, `src/peer_review_skills/agents/specialized_agents.py`, `src/peer_review_skills/agents/specialized_agents_part2.py`, `src/peer_review_skills/agents/multi_agent_orchestrator.py`, `src/peer_review_skills/agents/rebuttal_lens_workflow.py`, `tests/test_rebuttal_lens_workflow.py`, `tests/test_multi_agent.py`, `examples/rebuttal_lens/WORKED_EXAMPLE_zh.md`, `UPGRADE.md`.
+- Risks: stricter validation can reject provider outputs that previously passed; checkpoint files can include user-supplied manuscript text, so they stay local output artifacts and are not release artifacts.
+- Verification: targeted red/green pytest for each behavior, full pytest, compileall, v0.1 validator, package dry-run, KG validation, secret scan, final review.
+- Rollback: revert Phase 14 code/tests and return to the prior successful `309a289` release surface.
+- Status: Completed pending final full verification and push.
+
 ### Phase 1: Acceptance Tests
 
 - Goal: encode the non-training, cross-disciplinary acceptance criteria before implementation.
