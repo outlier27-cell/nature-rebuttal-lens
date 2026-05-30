@@ -648,6 +648,7 @@ def test_readme_keeps_release_critical_open_source_sections():
     for required in [
         "## Installation",
         "python -m pip install -e .",
+        'python -m pip install -e ".[pdf]"',
         "run-rebuttal-lens",
         "docs/rebuttal_lens_system_flow.html",
         "docs/assets/rebuttal-lens-workflow.svg",

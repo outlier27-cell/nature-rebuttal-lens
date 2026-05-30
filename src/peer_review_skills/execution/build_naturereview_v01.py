@@ -2911,6 +2911,12 @@ cd nature-rebuttal-lens
 python -m pip install -e .
 ```
 
+For PDF manuscript text extraction support:
+
+```powershell
+python -m pip install -e ".[pdf]"
+```
+
 For local development without installing:
 
 ```powershell
