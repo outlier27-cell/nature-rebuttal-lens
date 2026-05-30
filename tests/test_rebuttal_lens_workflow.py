@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from zipfile import ZIP_DEFLATED, ZipFile
 from typing import Any
 
 import pytest
@@ -238,6 +239,101 @@ def test_load_manuscript_context_without_file_returns_review_only_boundary():
     assert context["sections"] == []
     assert context["evidence_boundary"]["can_locate_textual_evidence"] is False
     assert context["evidence_boundary"]["missing_manuscript_warning"]
+
+
+def test_load_manuscript_context_extracts_text_from_pdf(tmp_path):
+    pytest.importorskip("matplotlib")
+    pytest.importorskip("pdfplumber")
+    from matplotlib.backends.backend_pdf import PdfPages
+    import matplotlib.pyplot as plt
+
+    manuscript = tmp_path / "manuscript.pdf"
+    with PdfPages(manuscript) as pdf:
+        figure = plt.figure(figsize=(8.5, 11))
+        figure.text(
+            0.1,
+            0.9,
+            "Methods\nWe used an 80/10/10 dataset split with a fixed seed.",
+            fontsize=12,
+        )
+        pdf.savefig(figure)
+        plt.close(figure)
+
+    context = load_manuscript_context(manuscript)
+
+    assert context["mode"] == "manuscript_aware"
+    assert context["source_path"].endswith("manuscript.pdf")
+    assert context["extraction"]["format"] == "pdf"
+    assert context["evidence_boundary"]["no_binary_ocr_claim"] is True
+    assert any("80/10/10 dataset split" in section["text"] for section in context["sections"])
+
+
+def test_load_manuscript_context_extracts_text_from_docx(tmp_path):
+    manuscript = tmp_path / "manuscript.docx"
+    _write_minimal_docx(
+        manuscript,
+        ["Title", "Methods", "We used an 80/10/10 dataset split with a fixed seed."],
+    )
+
+    context = load_manuscript_context(manuscript)
+
+    assert context["mode"] == "manuscript_aware"
+    assert context["source_path"].endswith("manuscript.docx")
+    assert context["extraction"]["format"] == "docx"
+    assert any(section["heading"] == "Methods" for section in context["sections"])
+    assert any("80/10/10 dataset split" in section["text"] for section in context["sections"])
+
+
+def test_load_manuscript_context_doc_requires_converter_when_soffice_missing(tmp_path, monkeypatch):
+    manuscript = tmp_path / "manuscript.doc"
+    manuscript.write_bytes(b"legacy word binary")
+    monkeypatch.setattr("peer_review_skills.agents.manuscript_context.shutil.which", lambda name: None)
+
+    with pytest.raises(RuntimeError, match="LibreOffice/soffice is required"):
+        load_manuscript_context(manuscript)
+
+
+def _write_minimal_docx(path: Path, paragraphs: list[str]) -> None:
+    document_xml = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+        "<w:body>"
+        + "".join(
+            f"<w:p><w:r><w:t>{_xml_escape(paragraph)}</w:t></w:r></w:p>"
+            for paragraph in paragraphs
+        )
+        + "</w:body></w:document>"
+    )
+    with ZipFile(path, "w", ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "[Content_Types].xml",
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
+            '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
+            '<Default Extension="xml" ContentType="application/xml"/>'
+            '<Override PartName="/word/document.xml" '
+            'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>'
+            "</Types>",
+        )
+        archive.writestr(
+            "_rels/.rels",
+            '<?xml version="1.0" encoding="UTF-8"?>'
+            '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+            '<Relationship Id="rId1" '
+            'Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" '
+            'Target="word/document.xml"/>'
+            "</Relationships>",
+        )
+        archive.writestr("word/document.xml", document_xml)
+
+
+def _xml_escape(value: str) -> str:
+    return (
+        value.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+    )
 
 
 def test_build_rebuttal_lens_unit_preserves_inputs_and_manuscript_context(tmp_path):
@@ -505,6 +601,8 @@ def test_python_project_has_installable_package_metadata():
     assert 'include = ["peer_review_skills*"]' in text
     assert 'run-rebuttal-lens = "peer_review_skills.cli.main:run_rebuttal_lens_cli"' in text
     assert 'pythonpath = ["src"]' in text
+    assert '[project.optional-dependencies]' in text
+    assert 'pdf = ["pdfplumber>=0.11"]' in text
 
 
 def test_console_script_wrapper_adds_run_rebuttal_lens_subcommand():
@@ -563,6 +661,9 @@ def test_readme_keeps_release_critical_open_source_sections():
         "| Capability | Output |",
         "Layer 0: Manuscript context",
         "Layer 5: Integrity gate",
+        "extractable PDF text",
+        "DOCX",
+        "legacy DOC",
     ]:
         assert required in readme
 

@@ -2852,7 +2852,7 @@ Nature RebuttalLens runs a 12-agent manuscript-aware workflow:
 ```text
 User inputs
   reviewer comment
-  manuscript text / Markdown / LaTeX-like text
+  manuscript text / Markdown / LaTeX-like text / PDF / DOCX / DOC
   optional draft response
   optional editor letter
   optional retrieved Nature cases
@@ -2966,7 +2966,7 @@ The demo files are under `examples/rebuttal_lens/`:
 - `author_draft_response.txt`: optional draft author response
 - `retrieved_cases.json`: optional retrieved Nature case analogies
 
-Current manuscript loading supports text, Markdown, and LaTeX-like plain text files. PDF/DOCX parsing is intentionally not claimed in this release.
+Current manuscript loading supports text, Markdown, LaTeX-like plain text, extractable PDF text, DOCX, and legacy DOC files. PDF parsing uses text extraction only, not OCR or image/table understanding. Legacy `.doc` files require LibreOffice/soffice for conversion to DOCX before extraction.
 
 ## Current Status
 

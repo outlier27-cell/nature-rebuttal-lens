@@ -38,7 +38,7 @@ The older `run-naturereview-multi-agent` command remains as a legacy v0.1 KB tra
 | Area | Status | Evidence |
 | --- | --- | --- |
 | Public project name | PASS | README and GitHub repository use Nature RebuttalLens. |
-| Manuscript-aware input | PASS | Text/Markdown/LaTeX-like manuscript context is loaded conservatively; PDF/DOCX parsing is not claimed. |
+| Manuscript-aware input | PASS | Text/Markdown/LaTeX-like/PDF/DOCX/DOC manuscript context is loaded conservatively; PDF is text extraction only and legacy DOC requires LibreOffice/soffice conversion. |
 | Multi-agent workflow | PASS | `run-rebuttal-lens` writes `rebuttal_lens_trace.json` with 12 agent outputs and message bus metadata. |
 | Cross-disciplinary value | PASS | Workflow includes tacit knowledge, institutional dependence, actor-network, fast/slow correction, tone/commitment, and author-agency lenses. |
 | Responsible-use boundary | PASS | Outputs are assistant traces and planning artifacts, not final rebuttal text or acceptance predictions. |
@@ -73,7 +73,8 @@ An `rg` exit code of 1 means no matches were found.
 
 - Model-assisted labels are not human gold.
 - The system can plan and check author responses, but it does not prove acceptance-rate or outcome improvement.
-- PDF/DOCX manuscript parsing is intentionally outside the current supported input boundary.
+- PDF manuscript parsing is text extraction only; scanned PDFs, figures, and tables still require manual author confirmation or future explicit OCR/table parsers.
+- Legacy DOC parsing depends on local LibreOffice/soffice availability.
 - Users must control privacy and policy compliance before sending manuscript text to any external API endpoint.
 
 ## Release Verdict

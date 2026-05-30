@@ -31,6 +31,9 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+pdf = ["pdfplumber>=0.11"]
+
 [project.urls]
 Homepage = "https://github.com/outlier27-cell/nature-rebuttal-lens"
 Repository = "https://github.com/outlier27-cell/nature-rebuttal-lens"

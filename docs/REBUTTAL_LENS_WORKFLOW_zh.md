@@ -10,7 +10,7 @@ Nature RebuttalLens 是从 NatureReview-Interact 升级出来的 manuscript-awar
 - editor letter，可选
 - retrieved Nature cases，可选
 
-当前开源实现只默认解析文本、Markdown 和 LaTeX 类文本。PDF / DOCX 可以后续接入显式 parser，但系统不能在解析失败时假装看过原文。
+当前开源实现默认解析文本、Markdown、LaTeX 类文本、可抽取文本的 PDF、DOCX 和旧版 DOC。PDF 解析只做文本抽取，不做 OCR，也不声称理解图片或表格；旧版 `.doc` 需要本机安装 LibreOffice/soffice 转成 DOCX 后再抽取。系统不能在解析失败时假装看过原文。
 
 ## 12 个 Agent
 
