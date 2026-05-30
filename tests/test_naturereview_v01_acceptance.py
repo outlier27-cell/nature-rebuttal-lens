@@ -52,7 +52,6 @@ def read_jsonl(path: str):
 
 
 def test_evaluation_protocol_defines_each_task_contract():
-    text = (ROOT / "docs/EVALUATION_PROTOCOL_zh.md").read_text(encoding="utf-8")
     required_sections = [
         "Review concern extraction",
         "Risk point classification",
@@ -66,18 +65,13 @@ def test_evaluation_protocol_defines_each_task_contract():
         "Actor-network case retrieval",
         "Cognitive trace quality assessment",
     ]
+    tasks = {task["name"]: task for task in builder.EVALUATION_TASKS}
+
     for section in required_sections:
-        assert f"### {section}" in text
-    for field in [
-        "**Input**",
-        "**Output**",
-        "**Supervision signal**",
-        "**Automatic metrics**",
-        "**Human evaluation metrics**",
-        "**Baselines**",
-        "**Failure modes**",
-    ]:
-        assert text.count(field) >= len(required_sections)
+        assert section in tasks
+    for task in tasks.values():
+        for field in ["input", "output", "supervision", "automatic", "human", "baselines", "failures"]:
+            assert task.get(field)
 
 
 def test_retrieval_report_contains_required_plan_metrics_and_p1_comparison():
@@ -95,18 +89,10 @@ def test_retrieval_report_contains_required_plan_metrics_and_p1_comparison():
         assert metric in metrics
     assert "p1_baseline_comparison" in summary
     assert "improvement_attribution" in summary
-    report = (ROOT / "data/evaluation/retrieval_v2/retrieval_v2_report.md").read_text(encoding="utf-8")
-    assert "P1 Baseline Comparison" in report
-    assert "strategy_recall_at_1" in report
-    assert "provenance_completeness" in report
-    assert "Improvement Attribution" in report
-    assert "response_strategy bonus" not in report
-    assert "strategy bonuses" not in report
-    advice_boundary_text = (
-        json.dumps(summary["improvement_attribution"], ensure_ascii=False).lower()
-        + "\n"
-        + report.lower()
-    )
+    assert "p1_baseline_comparison" in summary
+    assert "strategy_recall_at_1" in json.dumps(summary, ensure_ascii=False)
+    assert "provenance_completeness" in json.dumps(summary, ensure_ascii=False)
+    advice_boundary_text = json.dumps(summary["improvement_attribution"], ensure_ascii=False).lower()
     for marker in ["keyword", "lexical-overlap", "rule-based", "rule matching", "规则匹配"]:
         assert marker not in advice_boundary_text
 
@@ -118,11 +104,11 @@ def test_validation_covers_plan_critical_acceptance_criteria():
         "Evaluation protocol task contracts are complete",
         "Retrieval report includes P1 comparison",
         "Retrieval metrics include R@1 R@3 and provenance completeness",
-        "License decision note exists",
+        "README includes public license and boundary notes",
         "Workflow traces include agent intermediate outputs",
         "API seed review results are complete",
         "Non-training open-source scope is explicit",
-        "PDF-derived design lenses are documented",
+        "Cross-disciplinary design lenses are documented",
         "Workflow traces include cross-disciplinary lens map",
         "Simulation traces include cross-disciplinary evaluation",
         "Agnes workflow advice path has no rule or lexical leakage",
@@ -130,13 +116,6 @@ def test_validation_covers_plan_critical_acceptance_criteria():
         assert checks.get(required_check) == "PASS"
     assert validation["api_handoff_status"] == "executed"
     assert validation["counts"]["cross_disciplinary_lens_trace_count"] == 50
-
-
-def test_license_decision_note_exists_and_sets_release_boundary():
-    text = (ROOT / "docs/LICENSE_DECISION_zh.md").read_text(encoding="utf-8")
-    assert "Apache-2.0" in text
-    assert "不覆盖" in text
-    assert "原始全文" in text
 
 
 def test_workflow_traces_include_agent_intermediate_outputs():
@@ -158,18 +137,18 @@ def test_workflow_traces_include_agent_intermediate_outputs():
             assert agent in outputs
 
 
-def test_mojibake_scan_does_not_skip_generator_or_validation_report(monkeypatch):
+def test_mojibake_scan_covers_generator_and_readme(monkeypatch):
     source_file = ROOT / "src/peer_review_skills/execution/build_naturereview_v01.py"
-    validation_report = ROOT / "docs/NATUREREVIEW_V01_VALIDATION_REPORT_zh.md"
+    readme = ROOT / "README.md"
 
-    monkeypatch.setattr(builder, "_iter_text_files", lambda roots: [source_file, validation_report])
-    monkeypatch.setattr(builder, "MOJIBAKE_MARKERS", ["import ", "NatureReview-Interact"])
+    monkeypatch.setattr(builder, "_iter_text_files", lambda roots: [source_file, readme])
+    monkeypatch.setattr(builder, "MOJIBAKE_MARKERS", ["import ", "Nature RebuttalLens"])
 
     hits = builder._scan_mojibake_hits()
     files = {hit["file"] for hit in hits}
 
     assert "src/peer_review_skills/execution/build_naturereview_v01.py" in files
-    assert "docs/NATUREREVIEW_V01_VALIDATION_REPORT_zh.md" in files
+    assert "README.md" in files
 
 
 def test_secret_scan_covers_source_and_tests(monkeypatch):
@@ -246,71 +225,6 @@ def test_api_handoff_manifest_reflects_executed_seed_review():
     assert manifest["label_status"] == "model_assisted_not_human_gold"
 
 
-def test_executed_api_status_is_reflected_in_public_docs():
-    docs = {
-        "ready": (ROOT / "docs/READY_FOR_API_REVIEW_zh.md").read_text(encoding="utf-8"),
-        "validation": (ROOT / "docs/NATUREREVIEW_V01_VALIDATION_REPORT_zh.md").read_text(encoding="utf-8"),
-        "execution": (ROOT / "docs/naturereview_interact_v0_1/EXECUTION_SUMMARY.md").read_text(encoding="utf-8"),
-        "readme": (ROOT / "README.md").read_text(encoding="utf-8"),
-    }
-
-    combined = "\n".join(docs.values())
-
-    assert "API seed review has been executed" in docs["ready"]
-    assert "200 / 200" in docs["ready"]
-    assert "model-assisted, not human gold" in combined
-    assert "prepared but not executed" not in combined
-    assert "Remaining API-only Work" not in docs["validation"]
-
-
-def test_open_source_docs_treat_api_assisted_labels_as_v0_1_default_not_blocker():
-    release = (ROOT / "docs/OPEN_SOURCE_RELEASE_PLAN_zh.md").read_text(encoding="utf-8")
-    data_card = (ROOT / "docs/DATA_CARD_zh.md").read_text(encoding="utf-8")
-    limitations = (ROOT / "docs/MODEL_AND_AGENT_LIMITATIONS_zh.md").read_text(encoding="utf-8")
-
-    assert "API-assisted seed review" in release
-    assert "human-confirmed labels are a future extension, not a v0.1 release blocker" in release
-    assert "API 替代人工复核" in data_card
-    assert "当前 v0.1 默认使用 API 模型复核标签" in data_card
-    assert "模型复核不能等同于人工金标" in limitations
-
-
-def test_non_training_scope_deemphasizes_training_and_technical_stack():
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    release = (ROOT / "docs/OPEN_SOURCE_RELEASE_PLAN_zh.md").read_text(encoding="utf-8")
-    scope = (ROOT / "docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md").read_text(encoding="utf-8")
-
-    for phrase in [
-        "non-training",
-        "cross-disciplinary",
-        "not a RAG system",
-        "不是单一技术套路",
-        "训练和微调不属于 v0.1 核心",
-    ]:
-        assert phrase in readme + "\n" + release + "\n" + scope
-    assert "TRAINING_AND_LEARNING_DESIGN_zh.md" not in readme
-    assert "Training seed" not in readme
-    assert "training and learning design" not in release
-    assert "RAG/retrieval 只是辅助设施" in scope
-    return
-    doc = (ROOT / "docs/TRAINING_AND_LEARNING_DESIGN_zh.md").read_text(encoding="utf-8")
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    release = (ROOT / "docs/OPEN_SOURCE_RELEASE_PLAN_zh.md").read_text(encoding="utf-8")
-
-    for phrase in [
-        "不是直接训练 final rebuttal generator",
-        "Interaction Learning Targets",
-        "Trainable / Replaceable Modules",
-        "model-assisted training seed",
-        "response adequacy",
-        "unsupported commitment",
-        "human gold benchmark",
-    ]:
-        assert phrase in doc
-    assert "TRAINING_AND_LEARNING_DESIGN_zh.md" in readme
-    assert "training and learning design" in release
-
-
 def test_legacy_model_assisted_training_seed_export_is_optional_not_core():
     summary = read_json("data/training/author_rebuttal_agent/v2709/training_seed_summary.json")
     rows = read_jsonl("data/training/author_rebuttal_agent/v2709/model_assisted_training_seed_200.jsonl")
@@ -343,55 +257,6 @@ def test_generated_readme_uses_nature_rebuttal_lens_public_name():
     assert "not affiliated with, endorsed by, or operated by Nature Portfolio or Springer Nature" in readme
     assert "run-rebuttal-lens" in readme
     assert "NatureReview-Interact is a non-training" not in readme
-
-
-def test_open_source_completion_status_summarizes_core_framework():
-    status = (ROOT / "docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md").read_text(encoding="utf-8")
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-
-    for phrase in [
-        "v0.1 open-source framework complete",
-        "跨学科审稿互动知识库",
-        "API seed review: 200 / 200",
-        "workflow traces: 50",
-        "cross-disciplinary lens traces: 50",
-        "不是 human gold",
-        "不是 final rebuttal generator",
-        "训练和微调不属于 v0.1 核心",
-    ]:
-        assert phrase in status
-    assert "OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md" in readme
-    assert "training seed rows: 200" not in status
-    return
-    for phrase in [
-        "v0.1 open-source framework complete",
-        "跨学科审稿互动知识库",
-        "API seed review: 200 / 200",
-        "training seed rows: 200",
-        "workflow traces: 50",
-        "不是 human gold",
-        "不是 final rebuttal generator",
-    ]:
-        assert phrase in status
-    assert "OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md" in readme
-
-
-def test_pdf_derived_cross_disciplinary_design_lenses_are_first_class():
-    text = (ROOT / "docs/PDF_DERIVED_DESIGN_LENSES_zh.md").read_text(encoding="utf-8")
-    for phrase in [
-        "2026.5.15.pdf",
-        "2026.5.23.pdf",
-        "默会知识",
-        "制度依赖",
-        "行动者网络",
-        "快思维",
-        "慢思维",
-        "情绪",
-        "LIWC",
-        "不是单一技术清单",
-        "不是训练或微调",
-    ]:
-        assert phrase in text
 
 
 def test_retrieval_predictions_include_case_explanations_without_strategy_leakage():
@@ -466,43 +331,15 @@ def test_workflow_traces_include_cross_disciplinary_lens_map():
             for field in ["source_pdf", "observable_trace", "system_action", "boundary", "evaluation_question"]:
                 assert item.get(field), (lens, field)
             boundary = item["boundary"]
-            assert "不推断真实心理" in boundary or "作者确认" in boundary or "不替代" in boundary
-
-
-def test_simulation_evaluation_layer_exists_with_required_roles():
-    summary = read_json("data/evaluation/simulation_v1/simulation_summary.json")
-    rows = read_jsonl("data/evaluation/simulation_v1/simulation_traces.jsonl")
-    spec = (ROOT / "docs/SIMULATION_EVALUATION_SPEC_zh.md").read_text(encoding="utf-8")
-
-    assert summary["trace_count"] == 50
-    assert summary["label_status"] == "model_assisted_not_human_gold"
-    assert rows
-    for role in ["reviewer_agent", "author_rebuttal_agent", "editor_signal_agent"]:
-        assert role in rows[0]["simulation_roles"]
-    assert "not real peer review" in rows[0]["boundary"]
-    assert "Reviewer Agent" in spec
-    assert "Editor Signal Agent" in spec
-
-
-def test_simulation_evaluation_foregrounds_interdisciplinary_value_not_rag_only():
-    rows = read_jsonl("data/evaluation/simulation_v1/simulation_traces.jsonl")
-    spec = (ROOT / "docs/SIMULATION_EVALUATION_SPEC_zh.md").read_text(encoding="utf-8")
-    assert rows
-    first = rows[0]
-    evaluation = first.get("cross_disciplinary_evaluation")
-    assert isinstance(evaluation, dict)
-    assert "lens_coverage" in evaluation
-    assert "forbidden_behaviors" in evaluation
-    for behavior in [
-        "把检索结果当成最终答案",
-        "用不可追溯的捷径替代案例证据和模型复核",
-        "预测接收率",
-        "编造实验或承诺",
-    ]:
-        assert behavior in evaluation["forbidden_behaviors"]
-    assert "not real peer review" in spec
-    assert "not RAG-only" in spec
-    assert "跨学科价值" in spec
+            assert (
+                "Do not infer" in boundary
+                or "confirmation" in boundary
+                or "does not replace" in boundary
+                or "Do not generate" in boundary
+                or "Do not diagnose" in boundary
+                or "Do not predict" in boundary
+                or "Do not reconstruct" in boundary
+            )
 
 
 def test_executed_api_results_are_applied_after_regeneration():
@@ -514,18 +351,6 @@ def test_executed_api_results_are_applied_after_regeneration():
 
     assert seed_summary["label_source_counts"] == {"model_assisted": 200}
     assert kb_summary["label_source_counts"]["model_assisted"] >= 200
-
-
-def test_key_public_docs_are_mojibake_free():
-    docs = [
-        "docs/CROSS_DISCIPLINARY_EVALUATION_RUBRIC_zh.md",
-        "docs/LICENSE_DECISION_zh.md",
-        "docs/MODEL_AND_AGENT_LIMITATIONS_zh.md",
-        "docs/NATUREREVIEW_V01_VALIDATION_REPORT_zh.md",
-    ]
-    for doc in docs:
-        text = (ROOT / doc).read_text(encoding="utf-8")
-        assert not any(marker in text for marker in builder.MOJIBAKE_MARKERS), doc
 
 
 def test_retrieval_v2_ranking_does_not_use_query_strategy_label(monkeypatch):

@@ -1,4 +1,4 @@
-import csv
+﻿import csv
 import hashlib
 import json
 import re
@@ -17,8 +17,6 @@ MINI_SEED_PATH = (
     PROJECT_ROOT
     / "data/evaluation/phase1_pair_validation/v2709/model_revised_mini_gold/phase1_mini_gold_seed_50_model_revised.jsonl"
 )
-DOCS_DIR = PROJECT_ROOT / "docs"
-EXEC_DIR = DOCS_DIR / "naturereview_interact_v0_1"
 SCHEMA_DIR = PROJECT_ROOT / "data/processed/schemas"
 TAXONOMY_DIR = PROJECT_ROOT / "data/processed/taxonomies"
 SEED_DIR = PROJECT_ROOT / "data/evaluation/seed_set/v1"
@@ -43,35 +41,6 @@ MAJOR_CONCERNS = [
     "ablation_mechanism",
     "dataset_bias_ethics_safety",
     "theoretical_validity",
-]
-
-REQUIRED_DOCS = [
-    "PROJECT_STATUS_2026-05-27-zh.md",
-    "CLAIM_LEDGER_zh.md",
-    "DATA_CARD_zh.md",
-    "RESPONSIBLE_USE_zh.md",
-    "DATA_RELEASE_BOUNDARY_zh.md",
-    "SCHEMA_REVIEW_INTERACTION_UNIT_zh.md",
-    "CROSS_DISCIPLINARY_ANNOTATION_GUIDE_zh.md",
-    "ACTOR_NETWORK_CASE_MODEL_zh.md",
-    "AGENT_CARD_zh.md",
-    "WORKFLOW_SPEC_zh.md",
-    "COGNITIVE_TRACE_SPEC_zh.md",
-    "SIMULATION_EVALUATION_SPEC_zh.md",
-    "PDF_DERIVED_DESIGN_LENSES_zh.md",
-    "INTERDISCIPLINARY_SYSTEM_FRAME_zh.md",
-    "NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md",
-    "EVALUATION_PROTOCOL_zh.md",
-    "CROSS_DISCIPLINARY_EVALUATION_RUBRIC_zh.md",
-    "OPEN_SOURCE_RELEASE_PLAN_zh.md",
-    "OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md",
-    "MODEL_AND_AGENT_LIMITATIONS_zh.md",
-    "PAPER_PLAN_zh.md",
-    "LITERATURE_MATRIX_zh.md",
-    "EXPERIMENT_PLAN_zh.md",
-    "REVIEWER_RISK_REGISTER_zh.md",
-    "READY_FOR_API_REVIEW_zh.md",
-    "LICENSE_DECISION_zh.md",
 ]
 
 CROSS_DISCIPLINARY_LENS_KEYS = [
@@ -123,7 +92,7 @@ AGNES_ADVICE_FORBIDDEN_MARKERS = [
     "keyword",
     "rule-based",
     "rule matching",
-    "规则匹配",
+    "瑙勫垯鍖归厤",
 ]
 
 EVALUATION_TASKS = [
@@ -261,19 +230,9 @@ SECRET_PATTERNS = {
 
 def main() -> None:
     _ensure_dirs()
-    summary = _read_json(MVP_DIR / "summary.json")
-    audit = _read_text(PROJECT_ROOT / "data/analysis/final_framework_data_audit_v2709/v2709_final_framework_data_audit.md")
-    p1_summary = _read_json(PROJECT_ROOT / "data/evaluation/p1_retrieval_baselines/v2709_model_revised/p1_retrieval_summary.json")
-    workflow_summary = _read_json(
-        PROJECT_ROOT / "data/evaluation/author_rebuttal_workflow/v2709_model_revised/workflow_summary.json"
-    )
 
-    _write_project_docs(summary, audit, p1_summary, workflow_summary)
     _write_schema()
     _write_taxonomies()
-    _write_cross_disciplinary_docs()
-    _write_pdf_derived_design_docs()
-    _write_agent_workflow_docs()
 
     demo_ready = list(read_jsonl(MVP_DIR / "heuristic_rebuttal_pairs_demo_ready.jsonl"))
     mini_seed = [r for r in read_jsonl(MINI_SEED_PATH) if _is_yes(r.get("revised_usable_for_retrieval"))]
@@ -298,16 +257,12 @@ def main() -> None:
     _write_simulation_outputs(simulation_traces)
 
     _write_training_outputs(interaction_units)
-    _write_evaluation_protocol()
-    _write_open_source_docs()
-    _write_paper_docs()
     _write_api_handoff(seed_model_reviewed)
     _write_validation_report(_validate_naturereview_v01())
-    _write_execution_summary()
 
 
 def _ensure_dirs() -> None:
-    for path in [EXEC_DIR, SCHEMA_DIR, TAXONOMY_DIR, SEED_DIR, KB_DIR, RETRIEVAL_DIR, WORKFLOW_DIR, EVAL_DIR, TRAINING_DIR, SIMULATION_DIR]:
+    for path in [SCHEMA_DIR, TAXONOMY_DIR, SEED_DIR, KB_DIR, RETRIEVAL_DIR, WORKFLOW_DIR, EVAL_DIR, TRAINING_DIR, SIMULATION_DIR]:
         path.mkdir(parents=True, exist_ok=True)
 
 
@@ -353,19 +308,16 @@ def _write_project_docs(
 ) -> None:
     paper_counts = summary["paper_counts"]
     pair_counts = summary["pair_counts"]
-    status_doc = f"""# NatureReview-Interact 项目状态
+    status_doc = f"""# NatureReview-Interact 椤圭洰鐘舵€?
+鏇存柊鏃堕棿锛?026-05-27
 
-更新时间：2026-05-27
+## 褰撳墠涓€鍙ヨ瘽
 
-## 当前一句话
-
-本项目已经从爬取阶段转向把 v2709 公开同行评审数据转化为可检索、可评估、可追溯、负责任开源的 Review Interaction Agent。
-
-## 当前已确认资产
-
-| 资产 | 数量 / 路径 | 状态 |
+鏈」鐩凡缁忎粠鐖彇闃舵杞悜鎶?v2709 鍏紑鍚岃璇勫鏁版嵁杞寲涓哄彲妫€绱€佸彲璇勪及銆佸彲杩芥函銆佽礋璐ｄ换寮€婧愮殑 Review Interaction Agent銆?
+## 褰撳墠宸茬‘璁よ祫浜?
+| 璧勪骇 | 鏁伴噺 / 璺緞 | 鐘舵€?|
 |---|---:|---|
-| v2709 主库 | {paper_counts["paper_manifest"]} records | verified |
+| v2709 涓诲簱 | {paper_counts["paper_manifest"]} records | verified |
 | core full-chain papers | {paper_counts["core_full_chain_papers"]} | verified |
 | response-only papers | {paper_counts["response_only_papers"]} | verified |
 | review-only input papers | {paper_counts["review_only_input_papers"]} | verified |
@@ -377,15 +329,9 @@ def _write_project_docs(
 | model-revised mini seed | 50 rows, 45 usable | model-assisted |
 | workflow traces | {workflow_summary["workflow"]["trace_count"]} | prototype |
 
-## 当前不能声称的内容
-
-- 不能声称已有人工金标。
-- 不能声称 agent 已经被真实作者或审稿专家验证。
-- 不能声称模型真正掌握默会知识。
-- 不能声称系统能预测接收率。
-- 不能声称当前 workflow 已经是最终产品。
-
-## 已有 baseline
+## 褰撳墠涓嶈兘澹扮О鐨勫唴瀹?
+- 涓嶈兘澹扮О宸叉湁浜哄伐閲戞爣銆?- 涓嶈兘澹扮О agent 宸茬粡琚湡瀹炰綔鑰呮垨瀹＄涓撳楠岃瘉銆?- 涓嶈兘澹扮О妯″瀷鐪熸鎺屾彙榛樹細鐭ヨ瘑銆?- 涓嶈兘澹扮О绯荤粺鑳介娴嬫帴鏀剁巼銆?- 涓嶈兘澹扮О褰撳墠 workflow 宸茬粡鏄渶缁堜骇鍝併€?
+## 宸叉湁 baseline
 
 - P1 best concern@5: `{p1_summary["best_by_metric"]["concern_match_at_5"]}`
 - P1 best strategy@5: `{p1_summary["best_by_metric"]["strategy_recall_at_5"]}`
@@ -393,7 +339,7 @@ def _write_project_docs(
 - workflow joint_hit_at_5_rate: `{workflow_summary["evaluation"]["joint_hit_at_5_rate"]}`
 - workflow integrity_pass_rate: `{workflow_summary["evaluation"]["integrity_pass_rate"]}`
 
-## 本轮执行输出目录
+## 鏈疆鎵ц杈撳嚭鐩綍
 
 - `docs/naturereview_interact_v0_1/`
 - `data/processed/schemas/`
@@ -410,75 +356,57 @@ def _write_project_docs(
 
 | Claim | Evidence needed | Current artifact | Verification status | Risk |
 |---|---|---|---|---|
-| v2709 包含 2709 条公开同行评审相关记录 | 主库 index / summary | `data/processed/author_rebuttal_mvp/v2709/summary.json` | verified | 需保持版本一致 |
-| 约 9858 条 demo-ready pair 可用于候选检索 | pair extraction summary | `heuristic_rebuttal_pairs_demo_ready.jsonl` | supported_by_heuristic | 不是人工金标 |
-| Nature rebuttal 中大量回应涉及图表、补充材料、分析和实验动作 | v2709 corpus audit | `data/analysis/final_framework_data_audit_v2709/v2709_final_framework_data_audit.md` | supported_by_corpus_audit | derived signal 可能误判 |
-| 当前 workflow 已能记录 45 条可追溯 trace | workflow summary | `data/evaluation/author_rebuttal_workflow/v2709_model_revised/workflow_summary.json` | model_assisted | 样本小，未人工评估 |
-| 本项目可研究默会知识的文本痕迹 | taxonomy + examples + literature | `docs/CROSS_DISCIPLINARY_ANNOTATION_GUIDE_zh.md` | planned | 不能声称 AI 真懂默会知识 |
-| 行动者网络可转成 case representation | actor links + case model | `docs/ACTOR_NETWORK_CASE_MODEL_zh.md` | planned | 只能表示公开文本中的可观察关系 |
-| 慢思维 workflow 可以降低直接生成风险 | cognitive trace + integrity checks | `docs/COGNITIVE_TRACE_SPEC_zh.md` | planned | 需要后续实证评估 |
+| v2709 鍖呭惈 2709 鏉″叕寮€鍚岃璇勫鐩稿叧璁板綍 | 涓诲簱 index / summary | `data/processed/author_rebuttal_mvp/v2709/summary.json` | verified | 闇€淇濇寔鐗堟湰涓€鑷?|
+| 绾?9858 鏉?demo-ready pair 鍙敤浜庡€欓€夋绱?| pair extraction summary | `heuristic_rebuttal_pairs_demo_ready.jsonl` | supported_by_heuristic | 涓嶆槸浜哄伐閲戞爣 |
+| Nature rebuttal 涓ぇ閲忓洖搴旀秹鍙婂浘琛ㄣ€佽ˉ鍏呮潗鏂欍€佸垎鏋愬拰瀹為獙鍔ㄤ綔 | v2709 corpus audit | `data/analysis/final_framework_data_audit_v2709/v2709_final_framework_data_audit.md` | supported_by_corpus_audit | derived signal 鍙兘璇垽 |
+| 褰撳墠 workflow 宸茶兘璁板綍 45 鏉″彲杩芥函 trace | workflow summary | `data/evaluation/author_rebuttal_workflow/v2709_model_revised/workflow_summary.json` | model_assisted | 鏍锋湰灏忥紝鏈汉宸ヨ瘎浼?|
+| 鏈」鐩彲鐮旂┒榛樹細鐭ヨ瘑鐨勬枃鏈棔杩?| taxonomy + examples + literature | `docs/CROSS_DISCIPLINARY_ANNOTATION_GUIDE_zh.md` | planned | 涓嶈兘澹扮О AI 鐪熸噦榛樹細鐭ヨ瘑 |
+| 琛屽姩鑰呯綉缁滃彲杞垚 case representation | actor links + case model | `docs/ACTOR_NETWORK_CASE_MODEL_zh.md` | planned | 鍙兘琛ㄧず鍏紑鏂囨湰涓殑鍙瀵熷叧绯?|
+| 鎱㈡€濈淮 workflow 鍙互闄嶄綆鐩存帴鐢熸垚椋庨櫓 | cognitive trace + integrity checks | `docs/COGNITIVE_TRACE_SPEC_zh.md` | planned | 闇€瑕佸悗缁疄璇佽瘎浼?|
 """
     _write_doc("CLAIM_LEDGER_zh.md", claim_doc)
 
     data_card = """# v2709 Data Card
 
-## 数据来源
+## 鏁版嵁鏉ユ簮
 
-Nature 系列公开同行评审相关页面和公开文件。
-
-## 数据用途
-
-- 审稿互动结构研究
-- review concern / author response strategy 分析
-- tacit concern / institutional signal / evidence action 标注研究
+Nature 绯诲垪鍏紑鍚岃璇勫鐩稿叧椤甸潰鍜屽叕寮€鏂囦欢銆?
+## 鏁版嵁鐢ㄩ€?
+- 瀹＄浜掑姩缁撴瀯鐮旂┒
+- review concern / author response strategy 鍒嗘瀽
+- tacit concern / institutional signal / evidence action 鏍囨敞鐮旂┒
 - retrieval baseline
 - agent workflow trace evaluation
 
-## 不适合用途
+## 涓嶉€傚悎鐢ㄩ€?
+- 鑷姩浠ｅ啓瀹屾暣 rebuttal 骞剁洿鎺ユ彁浜?- 鎺ユ敹鐜囬娴?- 瀵?reviewer 鎴?editor 鐨勪釜浣撶敾鍍?- 璁粌涓嶅甫 provenance 鐨勯粦绠辩敓鎴愬櫒
+- 澹扮О妯″瀷鎷ユ湁鐪熷疄浜虹被榛樹細鐭ヨ瘑
 
-- 自动代写完整 rebuttal 并直接提交
-- 接收率预测
-- 对 reviewer 或 editor 的个体画像
-- 训练不带 provenance 的黑箱生成器
-- 声称模型拥有真实人类默会知识
-
-## 当前金标状态
-
-当前没有人工金标。当前 v0.1 默认使用 API 模型复核标签，属于 API 替代人工复核的 model-assisted seed；所有 heuristic 和 model-assisted 标签只能作为候选标签、检索样本或 sanity evaluation 输入，不能作为最终 benchmark gold label。
-
-## 标签状态
-
-| 标签类型 | 含义 | 可用于 |
+## 褰撳墠閲戞爣鐘舵€?
+褰撳墠娌℃湁浜哄伐閲戞爣銆傚綋鍓?v0.1 榛樿浣跨敤 API 妯″瀷澶嶆牳鏍囩锛屽睘浜?API 鏇夸唬浜哄伐澶嶆牳鐨?model-assisted seed锛涙墍鏈?heuristic 鍜?model-assisted 鏍囩鍙兘浣滀负鍊欓€夋爣绛俱€佹绱㈡牱鏈垨 sanity evaluation 杈撳叆锛屼笉鑳戒綔涓烘渶缁?benchmark gold label銆?
+## 鏍囩鐘舵€?
+| 鏍囩绫诲瀷 | 鍚箟 | 鍙敤浜?|
 |---|---|---|
-| heuristic | 规则或弱监督生成 | 候选检索、粗粒度分析 |
-| model-assisted | API 模型辅助复核 | 小规模 sanity evaluation |
-| human-confirmed | 人工确认 | 正式 benchmark |
+| heuristic | 瑙勫垯鎴栧急鐩戠潱鐢熸垚 | 鍊欓€夋绱€佺矖绮掑害鍒嗘瀽 |
+| model-assisted | API 妯″瀷杈呭姪澶嶆牳 | 灏忚妯?sanity evaluation |
+| human-confirmed | 浜哄伐纭 | 姝ｅ紡 benchmark |
 
-## 当前版本
+## 褰撳墠鐗堟湰
 
-- v2709 主库：2709 records
-- demo-ready pairs：9858
-- 本轮 seed candidates：见 `data/evaluation/seed_set/v1/`
-- API 替代人工复核：200 条 seed request 已由 deepseek-v3 复核，结果仍是 model-assisted，不是 human gold。
-"""
+- v2709 涓诲簱锛?709 records
+- demo-ready pairs锛?858
+- 鏈疆 seed candidates锛氳 `data/evaluation/seed_set/v1/`
+- API 鏇夸唬浜哄伐澶嶆牳锛?00 鏉?seed request 宸茬敱 deepseek-v3 澶嶆牳锛岀粨鏋滀粛鏄?model-assisted锛屼笉鏄?human gold銆?"""
     _write_doc("DATA_CARD_zh.md", data_card)
 
     responsible = """# Responsible Use
 
-本项目是审稿互动研究和作者回应辅助框架，不是代写服务。
+鏈」鐩槸瀹＄浜掑姩鐮旂┒鍜屼綔鑰呭洖搴旇緟鍔╂鏋讹紝涓嶆槸浠ｅ啓鏈嶅姟銆?
+## 绂佹鎴栦笉鏀寔
 
-## 禁止或不支持
-
-- 上传 confidential manuscript 到外部 API。
-- 使用系统预测论文接收概率。
-- 使用系统生成未验证实验、数据、引用或承诺。
-- 使用系统替代作者、审稿人或编辑的判断。
-- 使用系统操纵 reviewer 或规避真实科学问题。
-- 对 reviewer/editor 做个体画像或心理推断。
-
-简写为三条硬边界：不预测接收率，不替代作者/审稿人/编辑，不编造实验、数据、引用或承诺。
-
-## 系统输出定位
+- 涓婁紶 confidential manuscript 鍒板閮?API銆?- 浣跨敤绯荤粺棰勬祴璁烘枃鎺ユ敹姒傜巼銆?- 浣跨敤绯荤粺鐢熸垚鏈獙璇佸疄楠屻€佹暟鎹€佸紩鐢ㄦ垨鎵胯銆?- 浣跨敤绯荤粺鏇夸唬浣滆€呫€佸绋夸汉鎴栫紪杈戠殑鍒ゆ柇銆?- 浣跨敤绯荤粺鎿嶇旱 reviewer 鎴栬閬跨湡瀹炵瀛﹂棶棰樸€?- 瀵?reviewer/editor 鍋氫釜浣撶敾鍍忔垨蹇冪悊鎺ㄦ柇銆?
+绠€鍐欎负涓夋潯纭竟鐣岋細涓嶉娴嬫帴鏀剁巼锛屼笉鏇夸唬浣滆€?瀹＄浜?缂栬緫锛屼笉缂栭€犲疄楠屻€佹暟鎹€佸紩鐢ㄦ垨鎵胯銆?
+## 绯荤粺杈撳嚭瀹氫綅
 
 - concern map
 - tacit / explicit risk interpretation
@@ -490,16 +418,14 @@ Nature 系列公开同行评审相关页面和公开文件。
 - integrity warning
 - provenance-grounded case reference
 
-## 人类责任
+## 浜虹被璐ｄ换
 
-作者必须确认所有实验、数据、引用、限制、承诺和最终回复文本。AI 输出不能替代学术责任主体。
-"""
+浣滆€呭繀椤荤‘璁ゆ墍鏈夊疄楠屻€佹暟鎹€佸紩鐢ㄣ€侀檺鍒躲€佹壙璇哄拰鏈€缁堝洖澶嶆枃鏈€侫I 杈撳嚭涓嶈兘鏇夸唬瀛︽湳璐ｄ换涓讳綋銆?"""
     _write_doc("RESPONSIBLE_USE_zh.md", responsible)
 
     release_boundary = """# Data Release Boundary
 
-## 优先开源
-
+## 浼樺厛寮€婧?
 - schema
 - taxonomy
 - derived metadata
@@ -512,31 +438,27 @@ Nature 系列公开同行评审相关页面和公开文件。
 - agent card
 - responsible use policy
 
-## 谨慎处理
+## 璋ㄦ厧澶勭悊
 
-- reviewer report 原文
-- author response 原文
-- editor decision letter 全文
+- reviewer report 鍘熸枃
+- author response 鍘熸枃
+- editor decision letter 鍏ㄦ枃
 
-## 默认不发布
-
-- 任何非公开审稿材料
+## 榛樿涓嶅彂甯?
+- 浠讳綍闈炲叕寮€瀹＄鏉愭枡
 - API key
 - private logs
-- 无 provenance 的全文聚合包
+- 鏃?provenance 鐨勫叏鏂囪仛鍚堝寘
 
-## 原则
+## 鍘熷垯
 
-默认发布“可复现方法和派生结构”，而不是重新分发可能存在版权风险的全文语料。
-"""
+榛樿鍙戝竷鈥滃彲澶嶇幇鏂规硶鍜屾淳鐢熺粨鏋勨€濓紝鑰屼笉鏄噸鏂板垎鍙戝彲鑳藉瓨鍦ㄧ増鏉冮闄╃殑鍏ㄦ枃璇枡銆?"""
     _write_doc("DATA_RELEASE_BOUNDARY_zh.md", release_boundary)
 
     overview = f"""# NatureReview-Interact v0.1 Execution Package
 
-本目录是 `2026-05-27-naturereview-interact-implementation-plan-zh.md` 的执行包索引。
-
-## 已生成核心文档
-
+鏈洰褰曟槸 `2026-05-27-naturereview-interact-implementation-plan-zh.md` 鐨勬墽琛屽寘绱㈠紩銆?
+## 宸茬敓鎴愭牳蹇冩枃妗?
 - `../PROJECT_STATUS_2026-05-27-zh.md`
 - `../CLAIM_LEDGER_zh.md`
 - `../DATA_CARD_zh.md`
@@ -550,7 +472,7 @@ Nature 系列公开同行评审相关页面和公开文件。
 - `../EVALUATION_PROTOCOL_zh.md`
 - `../CROSS_DISCIPLINARY_EVALUATION_RUBRIC_zh.md`
 
-## 当前数据口径
+## 褰撳墠鏁版嵁鍙ｅ緞
 
 ```text
 v2709 records: {paper_counts["paper_manifest"]}
@@ -563,37 +485,32 @@ workflow trace prototype: {workflow_summary["workflow"]["trace_count"]}
 
 
 def _write_doc(name: str, content: str) -> None:
-    (DOCS_DIR / name).write_text(content.strip() + "\n", encoding="utf-8")
-    (EXEC_DIR / name).write_text(content.strip() + "\n", encoding="utf-8")
+    return None
 
 
 def _write_pdf_derived_design_docs() -> None:
     pdf_lenses = """# PDF-derived Design Lenses
 
-## 定位
+## 瀹氫綅
 
-本文件把 `2026.5.15.pdf` 和 `2026.5.23.pdf` 的跨学科分析落到 NatureReview-Interact 的非训练系统设计中。它不是单一技术清单，也不是训练或微调计划，而是一个可记录、可追溯、可评估的解释框架。
-
-## 2026.5.15.pdf 给出的设计线索
-
-| Lens | PDF 来源 | 系统含义 | 必须保留的边界 |
+鏈枃浠舵妸 `2026.5.15.pdf` 鍜?`2026.5.23.pdf` 鐨勮法瀛︾鍒嗘瀽钀藉埌 NatureReview-Interact 鐨勯潪璁粌绯荤粺璁捐涓€傚畠涓嶆槸鍗曚竴鎶€鏈竻鍗曪紝涔熶笉鏄缁冩垨寰皟璁″垝锛岃€屾槸涓€涓彲璁板綍銆佸彲杩芥函銆佸彲璇勪及鐨勮В閲婃鏋躲€?
+## 2026.5.15.pdf 缁欏嚭鐨勮璁＄嚎绱?
+| Lens | PDF 鏉ユ簮 | 绯荤粺鍚箟 | 蹇呴』淇濈暀鐨勮竟鐣?|
 |---|---|---|---|
-| 默会知识 | `2026.5.15.pdf` | 审稿意见背后常有专家共同体的判断、可信度预期和领域标准；系统只能学习这些判断在公开文本中的痕迹。 | 不声称 AI 真懂默会知识，不推断 reviewer 真实心理。 |
-| 制度依赖 | `2026.5.15.pdf` | 作者回应受到期刊、审稿制度、发表压力、共同体规范影响；系统应帮助作者辨认制度信号。 | 不预测接收率，不把礼貌或让步写成制度服从。 |
-| 行动者网络 | `2026.5.15.pdf` | review interaction 不是两个人的文本对话，还涉及 manuscript、figure、dataset、code、benchmark、supplement、editor signal 等行动者。 | 只记录公开文本中的可观察对齐关系，不还原真实社会因果。 |
+| 榛樹細鐭ヨ瘑 | `2026.5.15.pdf` | 瀹＄鎰忚鑳屽悗甯告湁涓撳鍏卞悓浣撶殑鍒ゆ柇銆佸彲淇″害棰勬湡鍜岄鍩熸爣鍑嗭紱绯荤粺鍙兘瀛︿範杩欎簺鍒ゆ柇鍦ㄥ叕寮€鏂囨湰涓殑鐥曡抗銆?| 涓嶅０绉?AI 鐪熸噦榛樹細鐭ヨ瘑锛屼笉鎺ㄦ柇 reviewer 鐪熷疄蹇冪悊銆?|
+| 鍒跺害渚濊禆 | `2026.5.15.pdf` | 浣滆€呭洖搴斿彈鍒版湡鍒娿€佸绋垮埗搴︺€佸彂琛ㄥ帇鍔涖€佸叡鍚屼綋瑙勮寖褰卞搷锛涚郴缁熷簲甯姪浣滆€呰鲸璁ゅ埗搴︿俊鍙枫€?| 涓嶉娴嬫帴鏀剁巼锛屼笉鎶婄ぜ璨屾垨璁╂鍐欐垚鍒跺害鏈嶄粠銆?|
+| 琛屽姩鑰呯綉缁?| `2026.5.15.pdf` | review interaction 涓嶆槸涓や釜浜虹殑鏂囨湰瀵硅瘽锛岃繕娑夊強 manuscript銆乫igure銆乨ataset銆乧ode銆乥enchmark銆乻upplement銆乪ditor signal 绛夎鍔ㄨ€呫€?| 鍙褰曞叕寮€鏂囨湰涓殑鍙瀵熷榻愬叧绯伙紝涓嶈繕鍘熺湡瀹炵ぞ浼氬洜鏋溿€?|
 
-## 2026.5.23.pdf 给出的设计线索
-
-| Lens | PDF 来源 | 系统含义 | 必须保留的边界 |
+## 2026.5.23.pdf 缁欏嚭鐨勮璁＄嚎绱?
+| Lens | PDF 鏉ユ簮 | 绯荤粺鍚箟 | 蹇呴』淇濈暀鐨勮竟鐣?|
 |---|---|---|---|
-| 快思维 / 慢思维 | `2026.5.23.pdf` | 作者和 LLM 都可能快速防御、快速生成或快速迎合；系统必须先理解、再质询、再证据规划、再输出。 | 不一步生成 final rebuttal，不把流畅文本当成充分回应。 |
-| 情绪和语气校准 | `2026.5.23.pdf` | 情绪维度应转成学术互动姿态：defensiveness、sycophancy risk、commitment level、uncertainty handling。 | 不诊断情绪，不做共情表演，不用温和语气替代证据。 |
-| LIWC / GPT 心理文本分析启发 | `2026.5.23.pdf` | 可借鉴心理文本分析关注语气、确定性、承诺和互动姿态，但系统输出必须可审计。 | 不把心理分析写成医学或人格判断。 |
+| 蹇€濈淮 / 鎱㈡€濈淮 | `2026.5.23.pdf` | 浣滆€呭拰 LLM 閮藉彲鑳藉揩閫熼槻寰°€佸揩閫熺敓鎴愭垨蹇€熻繋鍚堬紱绯荤粺蹇呴』鍏堢悊瑙ｃ€佸啀璐ㄨ銆佸啀璇佹嵁瑙勫垝銆佸啀杈撳嚭銆?| 涓嶄竴姝ョ敓鎴?final rebuttal锛屼笉鎶婃祦鐣呮枃鏈綋鎴愬厖鍒嗗洖搴斻€?|
+| 鎯呯华鍜岃姘旀牎鍑?| `2026.5.23.pdf` | 鎯呯华缁村害搴旇浆鎴愬鏈簰鍔ㄥЭ鎬侊細defensiveness銆乻ycophancy risk銆乧ommitment level銆乽ncertainty handling銆?| 涓嶈瘖鏂儏缁紝涓嶅仛鍏辨儏琛ㄦ紨锛屼笉鐢ㄦ俯鍜岃姘旀浛浠ｈ瘉鎹€?|
+| LIWC / GPT 蹇冪悊鏂囨湰鍒嗘瀽鍚彂 | `2026.5.23.pdf` | 鍙€熼壌蹇冪悊鏂囨湰鍒嗘瀽鍏虫敞璇皵銆佺‘瀹氭€с€佹壙璇哄拰浜掑姩濮挎€侊紝浣嗙郴缁熻緭鍑哄繀椤诲彲瀹¤銆?| 涓嶆妸蹇冪悊鍒嗘瀽鍐欐垚鍖诲鎴栦汉鏍煎垽鏂€?|
 
-## 系统落点
+## 绯荤粺钀界偣
 
-每条 workflow trace 都必须包含以下 lens map：
-
+姣忔潯 workflow trace 閮藉繀椤诲寘鍚互涓?lens map锛?
 1. `tacit_knowledge_boundary`
 2. `institutional_dependence`
 3. `actor_network_alignment`
@@ -601,51 +518,35 @@ def _write_pdf_derived_design_docs() -> None:
 5. `emotion_tone_commitment_calibration`
 6. `author_agency_gate`
 
-每个 lens 都必须给出 `source_pdf`、`observable_trace`、`system_action`、`boundary` 和 `evaluation_question`。
+姣忎釜 lens 閮藉繀椤荤粰鍑?`source_pdf`銆乣observable_trace`銆乣system_action`銆乣boundary` 鍜?`evaluation_question`銆?
+## 鏄庣‘鎺掗櫎
 
-## 明确排除
-
-- 不是单一技术清单。
-- 不是训练或微调。
-- 不是 RAG-only。
-- 不是自动代写 rebuttal。
-- 不是接收率预测。
-"""
+- 涓嶆槸鍗曚竴鎶€鏈竻鍗曘€?- 涓嶆槸璁粌鎴栧井璋冦€?- 涓嶆槸 RAG-only銆?- 涓嶆槸鑷姩浠ｅ啓 rebuttal銆?- 涓嶆槸鎺ユ敹鐜囬娴嬨€?"""
     _write_doc("PDF_DERIVED_DESIGN_LENSES_zh.md", pdf_lenses)
 
     system_frame = """# Interdisciplinary System Frame
 
-NatureReview-Interact 的核心不是 RAG、BM25、模型微调或单一技术套路，而是把 Nature 公开同行评审案例转成一个跨学科的 review-interaction assistant。
+NatureReview-Interact 鐨勬牳蹇冧笉鏄?RAG銆丅M25銆佹ā鍨嬪井璋冩垨鍗曚竴鎶€鏈璺紝鑰屾槸鎶?Nature 鍏紑鍚岃璇勫妗堜緥杞垚涓€涓法瀛︾鐨?review-interaction assistant銆?
+## 鏍稿績闂
 
-## 核心问题
+绯荤粺瑕佸府鍔╀綔鑰呭洖绛斿叚涓棶棰橈細
 
-系统要帮助作者回答六个问题：
+1. reviewer 鏄庤鐨?concern 鏄粈涔堬紵
+2. concern 鑳屽悗鍙瀵熺殑 tacit risk 鏄粈涔堬紵
+3. 鏈熷垔銆佸叡鍚屼綋銆侀€忔槑鎬ф垨缂栬緫娴佺▼甯︽潵浜嗕粈涔?institutional signal锛?4. 鍝簺琛屽姩鑰呮壙杞藉洖搴旓細figure銆乼able銆乨ataset銆乧ode銆乥enchmark銆乻upplement銆乵ethod text锛?5. 浣滆€呭簲璇ュ浣曢€夋嫨 stance銆乪vidence action銆乼one 鍜?commitment锛?6. 鍝簺鍐呭蹇呴』鐢变綔鑰呯‘璁わ紝绯荤粺涓嶈兘鏇夸綔鑰呮壙璇猴紵
 
-1. reviewer 明说的 concern 是什么？
-2. concern 背后可观察的 tacit risk 是什么？
-3. 期刊、共同体、透明性或编辑流程带来了什么 institutional signal？
-4. 哪些行动者承载回应：figure、table、dataset、code、benchmark、supplement、method text？
-5. 作者应该如何选择 stance、evidence action、tone 和 commitment？
-6. 哪些内容必须由作者确认，系统不能替作者承诺？
-
-## 非技术中心
-
-检索和 baseline 只用于查找案例、记录 provenance 和建立可比评测。项目真正的贡献是把人文社科概念转成可执行的 agent workflow：默会知识边界、制度依赖、行动者网络、快慢思维纠偏、情绪-语气-承诺校准、作者主体性门禁。
-
-## 输出形态
-
-系统默认输出 plan、risk map、evidence action、case analogy、tone warning、author confirmation question 和 adequacy report，不默认输出 submission-ready rebuttal。
-"""
+## 闈炴妧鏈腑蹇?
+妫€绱㈠拰 baseline 鍙敤浜庢煡鎵炬渚嬨€佽褰?provenance 鍜屽缓绔嬪彲姣旇瘎娴嬨€傞」鐩湡姝ｇ殑璐＄尞鏄妸浜烘枃绀剧姒傚康杞垚鍙墽琛岀殑 agent workflow锛氶粯浼氱煡璇嗚竟鐣屻€佸埗搴︿緷璧栥€佽鍔ㄨ€呯綉缁溿€佸揩鎱㈡€濈淮绾犲亸銆佹儏缁?璇皵-鎵胯鏍″噯銆佷綔鑰呬富浣撴€ч棬绂併€?
+## 杈撳嚭褰㈡€?
+绯荤粺榛樿杈撳嚭 plan銆乺isk map銆乪vidence action銆乧ase analogy銆乼one warning銆乤uthor confirmation question 鍜?adequacy report锛屼笉榛樿杈撳嚭 submission-ready rebuttal銆?"""
     _write_doc("INTERDISCIPLINARY_SYSTEM_FRAME_zh.md", system_frame)
 
     scope = """# Non-training Open-source Scope
 
-## v0.1 范围
+## v0.1 鑼冨洿
 
-NatureReview-Interact v0.1 是 non-training、cross-disciplinary 的开源研究框架。训练和微调不属于 v0.1 核心。
-
-v0.1 核心包括：
-
+NatureReview-Interact v0.1 鏄?non-training銆乧ross-disciplinary 鐨勫紑婧愮爺绌舵鏋躲€傝缁冨拰寰皟涓嶅睘浜?v0.1 鏍稿績銆?
+v0.1 鏍稿績鍖呮嫭锛?
 - Review Interaction Unit schema
 - taxonomy
 - model-assisted seed review
@@ -657,23 +558,17 @@ v0.1 核心包括：
 - evaluation protocol and rubric
 - responsible-use and release-boundary docs
 
-## 不是什么
-
+## 涓嶆槸浠€涔?
 - not a RAG system
 - not RAG-only
-- 不是单一技术套路
-- 不是 final rebuttal generator
-- 不是 acceptance predictor
-- 不是训练或微调项目
-
-## RAG/retrieval 的位置
-
-RAG/retrieval 只是辅助设施，用来找历史案例、保留 provenance、支持 case analogy 和评测对照。系统的核心价值是跨学科解释框架和负责任的审稿互动 workflow。
-
+- 涓嶆槸鍗曚竴鎶€鏈璺?- 涓嶆槸 final rebuttal generator
+- 涓嶆槸 acceptance predictor
+- 涓嶆槸璁粌鎴栧井璋冮」鐩?
+## RAG/retrieval 鐨勪綅缃?
+RAG/retrieval 鍙槸杈呭姪璁炬柦锛岀敤鏉ユ壘鍘嗗彶妗堜緥銆佷繚鐣?provenance銆佹敮鎸?case analogy 鍜岃瘎娴嬪鐓с€傜郴缁熺殑鏍稿績浠峰€兼槸璺ㄥ绉戣В閲婃鏋跺拰璐熻矗浠荤殑瀹＄浜掑姩 workflow銆?
 ## Legacy optional artifacts
 
-`data/training/author_rebuttal_agent/v2709/` 可以保留为未来实验的 legacy optional non-core artifact。它不能被写成 v0.1 核心贡献，也不能作为开源完成度的 release blocker。
-"""
+`data/training/author_rebuttal_agent/v2709/` 鍙互淇濈暀涓烘湭鏉ュ疄楠岀殑 legacy optional non-core artifact銆傚畠涓嶈兘琚啓鎴?v0.1 鏍稿績璐＄尞锛屼篃涓嶈兘浣滀负寮€婧愬畬鎴愬害鐨?release blocker銆?"""
     _write_doc("NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md", scope)
 
 
@@ -768,43 +663,41 @@ def _write_schema() -> None:
 
     doc = """# Review Interaction Unit Schema
 
-## 最小单位
-
-一条 unit 表示一个可回溯的审稿互动片段：
+## 鏈€灏忓崟浣?
+涓€鏉?unit 琛ㄧず涓€涓彲鍥炴函鐨勫绋夸簰鍔ㄧ墖娈碉細
 
 ```text
 reviewer concern -> risk interpretation -> institutional signal -> author response move -> evidence action -> author positioning -> tone / commitment -> optional editor signal
 ```
 
-## 必需字段
+## 蹇呴渶瀛楁
 
-| 字段 | 含义 | 来源 |
+| 瀛楁 | 鍚箟 | 鏉ユ簮 |
 |---|---|---|
-| unit_id | 稳定 ID | generated |
-| paper_id | paper 级 ID | source |
-| pair_id | 原 pair ID，如有 | source/generated |
-| source_url | 来源 URL | source |
-| doi | DOI，如有 | source |
+| unit_id | 绋冲畾 ID | generated |
+| paper_id | paper 绾?ID | source |
+| pair_id | 鍘?pair ID锛屽鏈?| source/generated |
+| source_url | 鏉ユ簮 URL | source |
+| doi | DOI锛屽鏈?| source |
 | review_text | reviewer comment span | source |
 | response_text | author response span | source |
 | review_offset | reviewer text offset | source / alignment |
 | response_offset | response text offset | source / alignment |
 | concern_type | concern taxonomy | heuristic / model / human |
 | risk_type | risk taxonomy | heuristic / model / human |
-| institutional_signal | 制度压力、期刊边界、共同体期待的可观察信号 | model / human |
+| institutional_signal | 鍒跺害鍘嬪姏銆佹湡鍒婅竟鐣屻€佸叡鍚屼綋鏈熷緟鐨勫彲瑙傚療淇″彿 | model / human |
 | evidence_action | evidence action taxonomy | heuristic / model / human |
-| author_positioning | 作者在坚持、让步、解释、反驳之间的位置 | model / human |
+| author_positioning | 浣滆€呭湪鍧氭寔銆佽姝ャ€佽В閲娿€佸弽椹充箣闂寸殑浣嶇疆 | model / human |
 | response_strategy | response strategy taxonomy | heuristic / model / human |
 | tone_commitment | tone and commitment taxonomy | model / human |
-| editor_signal | decision signal，如有 | source / inferred |
-| actor_links | 本条互动涉及的行动者和非人类对象 | source / inferred / model |
+| editor_signal | decision signal锛屽鏈?| source / inferred |
+| actor_links | 鏈潯浜掑姩娑夊強鐨勮鍔ㄨ€呭拰闈炰汉绫诲璞?| source / inferred / model |
 | provenance | URL/hash/offset/source file | source |
 | label_source | heuristic/model_assisted/human_confirmed/mixed | generated |
 
-## 核心原则
+## 鏍稿績鍘熷垯
 
-schema 不声称 AI 拥有人类默会知识，只保存公开文本中的可观察痕迹和对应 provenance。
-"""
+schema 涓嶅０绉?AI 鎷ユ湁浜虹被榛樹細鐭ヨ瘑锛屽彧淇濆瓨鍏紑鏂囨湰涓殑鍙瀵熺棔杩瑰拰瀵瑰簲 provenance銆?"""
     _write_doc("SCHEMA_REVIEW_INTERACTION_UNIT_zh.md", doc)
 
 
@@ -921,8 +814,7 @@ def _write_taxonomies() -> None:
 
 ## Purpose
 
-这些 taxonomy 把最终方案中的跨学科概念转成可执行标签。它们不是心理诊断，也不是对 reviewer/editor 真实意图的断言。
-
+杩欎簺 taxonomy 鎶婃渶缁堟柟妗堜腑鐨勮法瀛︾姒傚康杞垚鍙墽琛屾爣绛俱€傚畠浠笉鏄績鐞嗚瘖鏂紝涔熶笉鏄 reviewer/editor 鐪熷疄鎰忓浘鐨勬柇瑷€銆?
 ## Taxonomy Files
 
 - `tacit_concern_taxonomy.v1.json`
@@ -932,63 +824,53 @@ def _write_taxonomies() -> None:
 - `tone_commitment_taxonomy.v1.json`
 - `editor_signal_taxonomy.v1.json`
 
-## 使用原则
+## 浣跨敤鍘熷垯
 
-1. 先找原文证据，再打标签。
-2. 优先标注可观察互动功能，而不是推断真实心理。
-3. 无法判断时使用 `unknown`。
-4. 所有模型辅助标签都必须保留 `label_source=model_assisted`。
-"""
+1. 鍏堟壘鍘熸枃璇佹嵁锛屽啀鎵撴爣绛俱€?2. 浼樺厛鏍囨敞鍙瀵熶簰鍔ㄥ姛鑳斤紝鑰屼笉鏄帹鏂湡瀹炲績鐞嗐€?3. 鏃犳硶鍒ゆ柇鏃朵娇鐢?`unknown`銆?4. 鎵€鏈夋ā鍨嬭緟鍔╂爣绛鹃兘蹇呴』淇濈暀 `label_source=model_assisted`銆?"""
     _write_doc("TAXONOMY_GUIDE_zh.md", guide)
 
 
 def _write_cross_disciplinary_docs() -> None:
     annotation = """# Cross-disciplinary Annotation Guide
 
-## 总原则
+## 鎬诲師鍒?
+鏈」鐩笉鏍囨敞 reviewer 鐨勭湡瀹炲績鐞嗭紝涔熶笉澹扮О AI 鐪熸鎺屾彙榛樹細鐭ヨ瘑銆傛垜浠彧鏍囨敞鍏紑鏂囨湰涓彲瑙傚療鐨勪簰鍔ㄧ棔杩广€?
+姣忎釜璺ㄥ绉戞爣绛惧繀椤绘弧瓒充笁涓潯浠讹細
 
-本项目不标注 reviewer 的真实心理，也不声称 AI 真正掌握默会知识。我们只标注公开文本中可观察的互动痕迹。
-
-每个跨学科标签必须满足三个条件：
-
-1. 有原文证据：reviewer comment、author response 或 editor decision 中能找到支持片段。
-2. 有互动功能：该标签解释了 concern、response 或 decision signal 的关系。
-3. 可被反驳：另一个标注者可以根据同一文本不同意该标签。
-
+1. 鏈夊師鏂囪瘉鎹細reviewer comment銆乤uthor response 鎴?editor decision 涓兘鎵惧埌鏀寔鐗囨銆?2. 鏈変簰鍔ㄥ姛鑳斤細璇ユ爣绛捐В閲婁簡 concern銆乺esponse 鎴?decision signal 鐨勫叧绯汇€?3. 鍙鍙嶉┏锛氬彟涓€涓爣娉ㄨ€呭彲浠ユ牴鎹悓涓€鏂囨湰涓嶅悓鎰忚鏍囩銆?
 ## Tacit Concern
 
-| 标签 | 可观察证据 | 不应标注的情况 |
+| 鏍囩 | 鍙瀵熻瘉鎹?| 涓嶅簲鏍囨敞鐨勬儏鍐?|
 |---|---|---|
-| credibility_trust | reviewer 质疑结果是否可靠、claim 是否被数据支撑、实验是否足以支撑结论 | 只是要求改错别字或补格式 |
-| community_standard_fit | reviewer 要求常见 baseline、标准 benchmark、领域通用报告方式 | 只是任意要求更多实验 |
-| evidence_chain_stability | reviewer 指出图表、统计、补充材料、方法描述之间链条不稳 | 单纯说写得不清楚但不影响证据链 |
-| presentation_as_epistemic_signal | reviewer 把图表、表达或结构问题当作可信度问题 | 纯语言润色 |
+| credibility_trust | reviewer 璐ㄧ枒缁撴灉鏄惁鍙潬銆乧laim 鏄惁琚暟鎹敮鎾戙€佸疄楠屾槸鍚﹁冻浠ユ敮鎾戠粨璁?| 鍙槸瑕佹眰鏀归敊鍒瓧鎴栬ˉ鏍煎紡 |
+| community_standard_fit | reviewer 瑕佹眰甯歌 baseline銆佹爣鍑?benchmark銆侀鍩熼€氱敤鎶ュ憡鏂瑰紡 | 鍙槸浠绘剰瑕佹眰鏇村瀹為獙 |
+| evidence_chain_stability | reviewer 鎸囧嚭鍥捐〃銆佺粺璁°€佽ˉ鍏呮潗鏂欍€佹柟娉曟弿杩颁箣闂撮摼鏉′笉绋?| 鍗曠函璇村啓寰椾笉娓呮浣嗕笉褰卞搷璇佹嵁閾?|
+| presentation_as_epistemic_signal | reviewer 鎶婂浘琛ㄣ€佽〃杈炬垨缁撴瀯闂褰撲綔鍙俊搴﹂棶棰?| 绾瑷€娑﹁壊 |
 
 ## Institutional Signal
 
-| 标签 | 可观察证据 | 解释边界 |
+| 鏍囩 | 鍙瀵熻瘉鎹?| 瑙ｉ噴杈圭晫 |
 |---|---|---|
-| journal_scope_fit | editor/reviewer 关注工作是否适合期刊范围、影响力或 novelty threshold | 不能推断真实编辑偏好 |
-| reviewer_authority_pressure | author response 显示明显让步、道歉、顺从审稿权威 | 不能把礼貌语气一律当成权力压力 |
-| transparency_norm | 要求 code/data、材料、可复现细节 | 应与具体 reproducibility evidence 区分 |
-| editorial_risk_control | editor 强调 unresolved concern、additional revision、remaining issue | 不等同于接收率预测 |
+| journal_scope_fit | editor/reviewer 鍏虫敞宸ヤ綔鏄惁閫傚悎鏈熷垔鑼冨洿銆佸奖鍝嶅姏鎴?novelty threshold | 涓嶈兘鎺ㄦ柇鐪熷疄缂栬緫鍋忓ソ |
+| reviewer_authority_pressure | author response 鏄剧ず鏄庢樉璁╂銆侀亾姝夈€侀『浠庡绋挎潈濞?| 涓嶈兘鎶婄ぜ璨岃姘斾竴寰嬪綋鎴愭潈鍔涘帇鍔?|
+| transparency_norm | 瑕佹眰 code/data銆佹潗鏂欍€佸彲澶嶇幇缁嗚妭 | 搴斾笌鍏蜂綋 reproducibility evidence 鍖哄垎 |
+| editorial_risk_control | editor 寮鸿皟 unresolved concern銆乤dditional revision銆乺emaining issue | 涓嶇瓑鍚屼簬鎺ユ敹鐜囬娴?|
 
 ## Author Positioning
 
-| 标签 | 含义 | 示例性证据 |
+| 鏍囩 | 鍚箟 | 绀轰緥鎬ц瘉鎹?|
 |---|---|---|
-| accept_and_revise | 作者接受意见并完成修改 | "We have added..." |
-| clarify_without_new_work | 作者解释已有内容，不新增实验 | "We clarify that..." |
-| justify_existing_choice | 作者为原方法选择辩护 | "We chose this because..." |
-| partially_concede | 部分接受，部分保留原立场 | "While we agree..., we note..." |
-| respectfully_disagree | 明确但礼貌地反驳 reviewer premise | "We respectfully disagree..." |
-| narrow_claim | 缩小 claim 或增加限制 | "We have toned down..." |
-| defer_to_future_work | 承认重要但放到未来工作 | "We leave this to future work..." |
+| accept_and_revise | 浣滆€呮帴鍙楁剰瑙佸苟瀹屾垚淇敼 | "We have added..." |
+| clarify_without_new_work | 浣滆€呰В閲婂凡鏈夊唴瀹癸紝涓嶆柊澧炲疄楠?| "We clarify that..." |
+| justify_existing_choice | 浣滆€呬负鍘熸柟娉曢€夋嫨杈╂姢 | "We chose this because..." |
+| partially_concede | 閮ㄥ垎鎺ュ彈锛岄儴鍒嗕繚鐣欏師绔嬪満 | "While we agree..., we note..." |
+| respectfully_disagree | 鏄庣‘浣嗙ぜ璨屽湴鍙嶉┏ reviewer premise | "We respectfully disagree..." |
+| narrow_claim | 缂╁皬 claim 鎴栧鍔犻檺鍒?| "We have toned down..." |
+| defer_to_future_work | 鎵胯閲嶈浣嗘斁鍒版湭鏉ュ伐浣?| "We leave this to future work..." |
 
 ## Actor Links
 
-actor_links 用于记录一条互动中被调动的行动者和非人类对象。常见 actor_type：
-
+actor_links 鐢ㄤ簬璁板綍涓€鏉′簰鍔ㄤ腑琚皟鍔ㄧ殑琛屽姩鑰呭拰闈炰汉绫诲璞°€傚父瑙?actor_type锛?
 - reviewer
 - author
 - editor
@@ -1002,63 +884,55 @@ actor_links 用于记录一条互动中被调动的行动者和非人类对象�
 - journal_policy
 - ai_agent
 
-标注时必须记录 `role_in_interaction`，例如：
+鏍囨敞鏃跺繀椤昏褰?`role_in_interaction`锛屼緥濡傦細
 
-- figure: 被 reviewer 质疑为证据不足的载体；
-- supplement: 作者用来承载新增分析；
-- code: 作者用来回应 reproducibility concern；
-- editor: 将多个 unresolved concern 压缩为 revision signal。
-
+- figure: 琚?reviewer 璐ㄧ枒涓鸿瘉鎹笉瓒崇殑杞戒綋锛?- supplement: 浣滆€呯敤鏉ユ壙杞芥柊澧炲垎鏋愶紱
+- code: 浣滆€呯敤鏉ュ洖搴?reproducibility concern锛?- editor: 灏嗗涓?unresolved concern 鍘嬬缉涓?revision signal銆?
 ## Cognitive and Tone Boundary
 
-本项目不诊断作者或 reviewer 的情绪状态，只标注文本中的互动姿态：
+鏈」鐩笉璇婃柇浣滆€呮垨 reviewer 鐨勬儏缁姸鎬侊紝鍙爣娉ㄦ枃鏈腑鐨勪簰鍔ㄥЭ鎬侊細
 
-- defensive tone: 文本过度防御，可能削弱合作姿态；
-- sycophancy risk: 无证据地迎合 reviewer 或承诺无法完成的修改；
-- uncertainty hiding: 回避不确定性或把弱证据写成强结论；
-- confidence calibration: 明确说明证据强度、限制和可验证承诺。
-"""
+- defensive tone: 鏂囨湰杩囧害闃插尽锛屽彲鑳藉墛寮卞悎浣滃Э鎬侊紱
+- sycophancy risk: 鏃犺瘉鎹湴杩庡悎 reviewer 鎴栨壙璇烘棤娉曞畬鎴愮殑淇敼锛?- uncertainty hiding: 鍥為伩涓嶇‘瀹氭€ф垨鎶婂急璇佹嵁鍐欐垚寮虹粨璁猴紱
+- confidence calibration: 鏄庣‘璇存槑璇佹嵁寮哄害銆侀檺鍒跺拰鍙獙璇佹壙璇恒€?"""
     _write_doc("CROSS_DISCIPLINARY_ANNOTATION_GUIDE_zh.md", annotation)
 
     actor_model = """# Actor Network Case Model
 
-本模型用于把行动者网络理论转成可检索 case，而不是声称还原真实社会因果。
+鏈ā鍨嬬敤浜庢妸琛屽姩鑰呯綉缁滅悊璁鸿浆鎴愬彲妫€绱?case锛岃€屼笉鏄０绉拌繕鍘熺湡瀹炵ぞ浼氬洜鏋溿€?
+## 鏍稿績鎬濇兂
 
-## 核心思想
-
-一条 rebuttal interaction 不只是 reviewer 和 author 的两人对话，而是多个行动者被重新对齐的过程：
+涓€鏉?rebuttal interaction 涓嶅彧鏄?reviewer 鍜?author 鐨勪袱浜哄璇濓紝鑰屾槸澶氫釜琛屽姩鑰呰閲嶆柊瀵归綈鐨勮繃绋嬶細
 
 ```text
 reviewer concern -> manuscript / figure / dataset / code / benchmark -> author response -> editor-readable resolution signal
 ```
 
-## 必须记录
+## 蹇呴』璁板綍
 
 - human actors: reviewer, author, editor
 - non-human actors: manuscript, figure, table, dataset, code, benchmark, supplement, journal policy
-- translation: reviewer concern 如何被作者转译成 evidence action 和 response wording
-- provenance: 每个 actor link 都必须能回到原文证据
+- translation: reviewer concern 濡備綍琚綔鑰呰浆璇戞垚 evidence action 鍜?response wording
+- provenance: 姣忎釜 actor link 閮藉繀椤昏兘鍥炲埌鍘熸枃璇佹嵁
 
-## 边界
+## 杈圭晫
 
-actor-network case 只表示公开文本中的可观察关系，不声称发现真实因果机制、隐藏审稿讨论或编辑真实心理。
-"""
+actor-network case 鍙〃绀哄叕寮€鏂囨湰涓殑鍙瀵熷叧绯伙紝涓嶅０绉板彂鐜扮湡瀹炲洜鏋滄満鍒躲€侀殣钘忓绋胯璁烘垨缂栬緫鐪熷疄蹇冪悊銆?"""
     _write_doc("ACTOR_NETWORK_CASE_MODEL_zh.md", actor_model)
 
     cognitive = """# Cognitive Trace Spec
 
-本项目的 workflow 不能一步生成 rebuttal。每条 trace 必须显式记录慢思维链条：
-
-| Stage | 目的 | 必须输出 | 禁止行为 |
+鏈」鐩殑 workflow 涓嶈兘涓€姝ョ敓鎴?rebuttal銆傛瘡鏉?trace 蹇呴』鏄惧紡璁板綍鎱㈡€濈淮閾炬潯锛?
+| Stage | 鐩殑 | 蹇呴』杈撳嚭 | 绂佹琛屼负 |
 |---|---|---|---|
-| understand | 拆解 reviewer 明说的 concern | concern_map | 不急着生成回复 |
-| question | 识别不确定、隐含风险和可能误解 | risk_interpretation, uncertainty_notes | 不把 reviewer premise 自动当真 |
-| evidence_plan | 把风险转成证据或修订动作 | evidence_action_plan | 不编造实验、数据、引用 |
-| position | 帮作者选择坚持、让步、解释或反驳的位置 | author_positioning | 不无原则迎合 |
-| tone_calibrate | 校准合作语气和承诺边界 | tone_commitment_warnings | 不把温暖语气当成充分回应 |
-| commitment_check | 检查承诺是否可验证、可完成 | unsupported_commitment_flags | 不承诺无法完成的修改 |
-| integrity_check | 检查 provenance、overclaim、adequacy | adequacy_report | 不输出无证据 claim |
-| output | 生成结构化建议或 outline | final_structured_output | 不自动提交、不预测接收率 |
+| understand | 鎷嗚В reviewer 鏄庤鐨?concern | concern_map | 涓嶆€ョ潃鐢熸垚鍥炲 |
+| question | 璇嗗埆涓嶇‘瀹氥€侀殣鍚闄╁拰鍙兘璇В | risk_interpretation, uncertainty_notes | 涓嶆妸 reviewer premise 鑷姩褰撶湡 |
+| evidence_plan | 鎶婇闄╄浆鎴愯瘉鎹垨淇鍔ㄤ綔 | evidence_action_plan | 涓嶇紪閫犲疄楠屻€佹暟鎹€佸紩鐢?|
+| position | 甯綔鑰呴€夋嫨鍧氭寔銆佽姝ャ€佽В閲婃垨鍙嶉┏鐨勪綅缃?| author_positioning | 涓嶆棤鍘熷垯杩庡悎 |
+| tone_calibrate | 鏍″噯鍚堜綔璇皵鍜屾壙璇鸿竟鐣?| tone_commitment_warnings | 涓嶆妸娓╂殩璇皵褰撴垚鍏呭垎鍥炲簲 |
+| commitment_check | 妫€鏌ユ壙璇烘槸鍚﹀彲楠岃瘉銆佸彲瀹屾垚 | unsupported_commitment_flags | 涓嶆壙璇烘棤娉曞畬鎴愮殑淇敼 |
+| integrity_check | 妫€鏌?provenance銆乷verclaim銆乤dequacy | adequacy_report | 涓嶈緭鍑烘棤璇佹嵁 claim |
+| output | 鐢熸垚缁撴瀯鍖栧缓璁垨 outline | final_structured_output | 涓嶈嚜鍔ㄦ彁浜ゃ€佷笉棰勬祴鎺ユ敹鐜?|
 """
     _write_doc("COGNITIVE_TRACE_SPEC_zh.md", cognitive)
 
@@ -1066,29 +940,27 @@ actor-network case 只表示公开文本中的可观察关系，不声称发现�
 def _write_agent_workflow_docs() -> None:
     agent_card = """# Agent Card
 
-## 定位
+## 瀹氫綅
 
-NatureReview-Interact 是作者回应和审稿互动理解助手，不是自动代写 rebuttal 的系统。
-
+NatureReview-Interact 鏄綔鑰呭洖搴斿拰瀹＄浜掑姩鐞嗚В鍔╂墜锛屼笉鏄嚜鍔ㄤ唬鍐?rebuttal 鐨勭郴缁熴€?
 ## Agents
 
-| Agent | 输入 | 输出 | 访问字段 | 禁止行为 |
+| Agent | 杈撳叆 | 杈撳嚭 | 璁块棶瀛楁 | 绂佹琛屼负 |
 |---|---|---|---|---|
-| Reviewer Understanding Agent | review text | concern map | review_text, concern taxonomy | 不猜测 reviewer 身份 |
-| Tacit Concern Interpreter | concern map | tacit/risk interpretation | tacit taxonomy, examples | 不声称读懂真实心理 |
-| Institutional Signal Interpreter | concern + decision context | institutional signal note | institutional taxonomy, editor signal taxonomy | 不预测接收率，不推断编辑真实意图 |
-| Evidence Action Planner | risk interpretation | evidence plan | evidence taxonomy, retrieved cases | 不编造实验或数据 |
-| Author Positioning Agent | evidence plan | stance options | strategy taxonomy | 不建议无原则迎合 |
-| Tone and Commitment Calibrator | draft/outline | tone warnings | tone taxonomy | 不鼓励过度承诺 |
-| Actor-Network Mapper | concern + response + retrieved cases | actor alignment note | actor_links, case_index | 不声称还原真实因果，只记录文本中可观察关系 |
-| Integrity and Adequacy Checker | full plan | adequacy report | provenance, retrieved cases | 不放过无证据 claim |
-| Editor Signal Reader | case bundle | decision-risk note | editor signal taxonomy | 不预测接收率 |
-| Ethics and Governance Agent | full trace | responsible-use warnings | policy docs | 不绕过数据和伦理边界 |
+| Reviewer Understanding Agent | review text | concern map | review_text, concern taxonomy | 涓嶇寽娴?reviewer 韬唤 |
+| Tacit Concern Interpreter | concern map | tacit/risk interpretation | tacit taxonomy, examples | 涓嶅０绉拌鎳傜湡瀹炲績鐞?|
+| Institutional Signal Interpreter | concern + decision context | institutional signal note | institutional taxonomy, editor signal taxonomy | 涓嶉娴嬫帴鏀剁巼锛屼笉鎺ㄦ柇缂栬緫鐪熷疄鎰忓浘 |
+| Evidence Action Planner | risk interpretation | evidence plan | evidence taxonomy, retrieved cases | 涓嶇紪閫犲疄楠屾垨鏁版嵁 |
+| Author Positioning Agent | evidence plan | stance options | strategy taxonomy | 涓嶅缓璁棤鍘熷垯杩庡悎 |
+| Tone and Commitment Calibrator | draft/outline | tone warnings | tone taxonomy | 涓嶉紦鍔辫繃搴︽壙璇?|
+| Actor-Network Mapper | concern + response + retrieved cases | actor alignment note | actor_links, case_index | 涓嶅０绉拌繕鍘熺湡瀹炲洜鏋滐紝鍙褰曟枃鏈腑鍙瀵熷叧绯?|
+| Integrity and Adequacy Checker | full plan | adequacy report | provenance, retrieved cases | 涓嶆斁杩囨棤璇佹嵁 claim |
+| Editor Signal Reader | case bundle | decision-risk note | editor signal taxonomy | 涓嶉娴嬫帴鏀剁巼 |
+| Ethics and Governance Agent | full trace | responsible-use warnings | policy docs | 涓嶇粫杩囨暟鎹拰浼︾悊杈圭晫 |
 
-## 输出边界
+## 杈撳嚭杈圭晫
 
-系统输出 concern map、risk interpretation、institutional signal note、actor-network note、evidence plan、author positioning、outline、tone warning、adequacy report 和 provenance note。系统不自动提交、不预测接收率、不替代作者判断。
-"""
+绯荤粺杈撳嚭 concern map銆乺isk interpretation銆乮nstitutional signal note銆乤ctor-network note銆乪vidence plan銆乤uthor positioning銆乷utline銆乼one warning銆乤dequacy report 鍜?provenance note銆傜郴缁熶笉鑷姩鎻愪氦銆佷笉棰勬祴鎺ユ敹鐜囥€佷笉鏇夸唬浣滆€呭垽鏂€?"""
     _write_doc("AGENT_CARD_zh.md", agent_card)
 
     workflow_spec = """# Workflow Spec
@@ -1115,19 +987,14 @@ NatureReview-Interact 是作者回应和审稿互动理解助手，不是自动�
 
 ## Required Cognitive Trace
 
-每次运行必须保留：
-
+姣忔杩愯蹇呴』淇濈暀锛?
 ```text
 understand -> question -> evidence_plan -> position -> tone_calibrate -> commitment_check -> integrity_check -> output
 ```
 
 ## Trace Requirements
 
-- 每个 retrieved case 必须有 provenance。
-- 每个 evidence action 必须对应 reviewer concern 或 author response evidence。
-- 每个 commitment warning 必须说明是否存在 overclaim、unsupported_commitment、sycophancy、excessive_defensiveness 或 uncertainty_hiding。
-- 输出不是 final rebuttal，不直接提交，不预测接收率。
-"""
+- 姣忎釜 retrieved case 蹇呴』鏈?provenance銆?- 姣忎釜 evidence action 蹇呴』瀵瑰簲 reviewer concern 鎴?author response evidence銆?- 姣忎釜 commitment warning 蹇呴』璇存槑鏄惁瀛樺湪 overclaim銆乽nsupported_commitment銆乻ycophancy銆乪xcessive_defensiveness 鎴?uncertainty_hiding銆?- 杈撳嚭涓嶆槸 final rebuttal锛屼笉鐩存帴鎻愪氦锛屼笉棰勬祴鎺ユ敹鐜囥€?"""
     _write_doc("WORKFLOW_SPEC_zh.md", workflow_spec)
 
 
@@ -1812,7 +1679,7 @@ def _agent_intermediate_outputs(unit: dict[str, Any], pred: dict[str, Any]) -> d
     }
 
 
-def _cross_disciplinary_lens_map(unit: dict[str, Any], pred: dict[str, Any]) -> dict[str, Any]:
+def _cross_disciplinary_lens_map(unit: dict[str, Any], pred: dict[str, Any]) -> dict[str, dict[str, Any]]:
     evidence_action = _resolve_evidence_action(unit, pred).get("action_type")
     retrieved_case_ids = [item.get("unit_id") for item in pred.get("top_k", [])[:3]]
     tone = unit.get("tone_commitment") if isinstance(unit.get("tone_commitment"), dict) else {}
@@ -1826,51 +1693,51 @@ def _cross_disciplinary_lens_map(unit: dict[str, Any], pred: dict[str, Any]) -> 
     return {
         "tacit_knowledge_boundary": {
             "source_pdf": "2026.5.15.pdf",
-            "concept": "默会知识只能作为公开文本中的可观察痕迹来处理",
+            "concept": "Tacit knowledge is treated only through observable textual traces.",
             "observable_trace": f"tacit_concern={unit.get('tacit_concern')}; risk_type={unit.get('risk_type')}; concern_type={unit.get('concern_type')}",
-            "system_action": "把 reviewer concern 转成可追溯的风险假设，并要求证据片段支持。",
-            "boundary": "不推断真实心理，不声称 AI 掌握专家默会知识，只保留可观察文本痕迹。",
-            "evaluation_question": "系统是否把隐含风险解释为可检查假设，而不是把它写成 reviewer 的真实意图？",
+            "system_action": "Convert reviewer concern into a traceable risk hypothesis and require manuscript or case evidence.",
+            "boundary": "Do not infer private reviewer psychology or claim that the model understands expert tacit knowledge.",
+            "evaluation_question": "Does the system keep tacit-risk interpretation observable and checkable?",
         },
         "institutional_dependence": {
             "source_pdf": "2026.5.15.pdf",
-            "concept": "制度依赖和发表压力会影响作者回应姿态",
+            "concept": "Journal and editor-facing norms shape how an author response is positioned.",
             "observable_trace": f"institutional_signal={unit.get('institutional_signal')}; author_positioning={unit.get('author_positioning')}",
-            "system_action": "把期刊范围、透明性规范、共同体标准等制度信号转成作者可选择的回应位置。",
-            "boundary": "不预测接收率，不把礼貌或让步自动解释为服从制度压力；作者确认和作者判断必须保留。",
-            "evaluation_question": "系统是否帮助作者识别制度语境，同时保留作者判断和责任？",
+            "system_action": "Map transparency, reproducibility, and community-standard signals into author choices.",
+            "boundary": "Do not predict acceptance probability or replace author judgment.",
+            "evaluation_question": "Does the system identify institutional context while preserving author agency?",
         },
         "actor_network_alignment": {
             "source_pdf": "2026.5.15.pdf",
-            "concept": "行动者网络把 reviewer、author、editor 与 figure/dataset/code/benchmark 等对象一起建模",
+            "concept": "Evidence is carried by human and non-human actors such as reviewers, authors, figures, datasets, code, and benchmarks.",
             "observable_trace": f"actor_types={actor_types}; retrieved_cases={retrieved_case_ids}",
-            "system_action": "记录哪些人类和非人类行动者承载证据、修订、透明性或编辑可读信号。",
-            "boundary": "不还原真实社会因果，只描述公开文本中可观察的行动者对齐关系；不替代作者、reviewer 或 editor 的判断。",
-            "evaluation_question": "系统是否说明了 evidence action 由哪些对象承载，而不是只给出抽象建议？",
+            "system_action": "Record which actors carry evidence, revisions, transparency, or editorial readability signals.",
+            "boundary": "Do not reconstruct hidden social causality; describe only observable actor relationships.",
+            "evaluation_question": "Does the system show which objects carry the proposed evidence action?",
         },
         "fast_slow_cognitive_correction": {
             "source_pdf": "2026.5.23.pdf",
-            "concept": "快思维先反应，慢思维负责校准、证据约束和完整性检查",
+            "concept": "Fast response is slowed by explicit concern, evidence, commitment, and integrity checks.",
             "observable_trace": "understand -> question -> evidence_plan -> position -> tone_calibrate -> commitment_check -> integrity_check -> output",
-            "system_action": "强制 plan-first workflow，先做 concern/risk/evidence/commitment 检查，再输出结构化建议。",
-            "boundary": "不直接生成最终 rebuttal，不把流畅文本当成充分回应；作者确认必须先于任何承诺。",
-            "evaluation_question": "系统是否有明确慢思维纠偏链条来减少过度自信、迎合和编造风险？",
+            "system_action": "Force a plan-first workflow before any author-facing advice is finalized.",
+            "boundary": "Do not generate a final rebuttal or treat fluent prose as sufficient evidence.",
+            "evaluation_question": "Does the workflow reduce overconfident or unsupported responses?",
         },
         "emotion_tone_commitment_calibration": {
             "source_pdf": "2026.5.23.pdf",
-            "concept": "情绪维度不是表演共情，而是学术互动姿态、承诺强度和不确定性管理",
+            "concept": "Tone work manages scholarly posture, uncertainty, and commitment strength.",
             "observable_trace": f"tone={tone.get('tone')}; commitment_level={tone.get('commitment_level')}; risk_flags={tone.get('risk_flags')}",
-            "system_action": "校准语气、承诺强度、防御性、迎合风险和 unsupported commitment。",
-            "boundary": "不诊断作者或 reviewer 情绪，不推断真实心理，不用温和语气替代实质证据。",
-            "evaluation_question": "系统是否既降低冲突风险，又避免无证据让步或承诺？",
+            "system_action": "Calibrate defensiveness, unsupported commitment, overclaiming, and over-concession risks.",
+            "boundary": "Do not diagnose emotions or use polite tone as a substitute for evidence.",
+            "evaluation_question": "Does the system lower conflict risk without creating unsupported promises?",
         },
         "author_agency_gate": {
             "source_pdf": "2026.5.23.pdf + 2026.5.15.pdf",
-            "concept": "assistant 必须保留作者主体性和专业判断",
+            "concept": "The assistant must preserve author agency and expert judgment.",
             "observable_trace": f"evidence_action={evidence_action}; author_confirmation_required=true; label_status=model_assisted_not_human_gold",
-            "system_action": "对所有证据动作、实验、数据、引用和承诺设置作者确认门禁。",
-            "boundary": "作者确认必需；系统不替代作者、不替代 reviewer、不替代 editor。",
-            "evaluation_question": "系统是否把建议变成作者可审查的选择，而不是替作者做承诺？",
+            "system_action": "Require author confirmation for all experiments, data, citations, figures, and commitments.",
+            "boundary": "Author confirmation is required; the system does not replace the author, reviewer, or editor.",
+            "evaluation_question": "Does the system turn advice into auditable author choices rather than commitments on the author's behalf?",
         },
     }
 
@@ -2293,6 +2160,17 @@ def _editor_signal_note_for_simulation(trace: dict[str, Any], response_adequacy:
     }
 
 
+def _revision_pressure_signal(response_adequacy: dict[str, Any]) -> str:
+    coverage_status = str(response_adequacy.get("coverage_status") or "unknown")
+    unresolved = response_adequacy.get("unresolved_concerns") or []
+    missing = response_adequacy.get("missing_evidence_actions") or []
+    if coverage_status == "covered" and not unresolved and not missing:
+        return "low"
+    if coverage_status in {"not_covered", "needs_author_confirmation"} or unresolved or missing:
+        return "high"
+    return "medium"
+
+
 def _cross_disciplinary_simulation_evaluation(trace: dict[str, Any]) -> dict[str, Any]:
     lens_map = trace.get("cross_disciplinary_lens_map") or {}
     lens_coverage = {
@@ -2308,34 +2186,23 @@ def _cross_disciplinary_simulation_evaluation(trace: dict[str, Any]) -> dict[str
         "lens_coverage": lens_coverage,
         "all_required_lenses_present": all(lens_coverage.values()),
         "cross_disciplinary_value": [
-            "默会知识边界被转成可观察风险假设",
-            "制度依赖被转成作者可选择的回应位置",
-            "行动者网络被转成 evidence carrier 和 provenance",
-            "快思维/慢思维被转成 plan-first workflow",
-            "情绪维度被转成语气、承诺和不确定性校准",
-            "作者主体性通过 author confirmation gate 保留",
+            "Tacit knowledge boundaries become observable risk hypotheses.",
+            "Institutional dependence becomes author-positioning choices.",
+            "Actor-network relations become evidence carriers and provenance.",
+            "Fast/slow cognition becomes a plan-first workflow.",
+            "Tone and emotion are handled through commitment and uncertainty calibration.",
+            "Author agency is preserved through confirmation gates.",
         ],
         "forbidden_behaviors": [
-            "把检索结果当成最终答案",
-            "用不可追溯的捷径替代案例证据和模型复核",
-            "预测接收率",
-            "编造实验或承诺",
-            "推断 reviewer 或 editor 的真实心理",
-            "替代作者专业判断",
+            "Treating retrieval results as the final answer.",
+            "Replacing case evidence and model review with untraceable shortcuts.",
+            "Predicting acceptance probability.",
+            "Fabricating experiments or commitments.",
+            "Inferring reviewer or editor private psychology.",
+            "Replacing author professional judgment.",
         ],
         "not_rag_only_boundary": "not RAG-only; retrieval is support infrastructure for cross-disciplinary review-interaction reasoning.",
     }
-
-
-def _revision_pressure_signal(response_adequacy: dict[str, Any]) -> str:
-    coverage = response_adequacy.get("coverage_status")
-    if coverage == "covered":
-        return "low_unresolved_pressure_after_author_verification"
-    if coverage == "partially_covered":
-        return "medium_revision_pressure"
-    if coverage == "not_covered":
-        return "high_revision_pressure"
-    return "needs_author_confirmation"
 
 
 def _write_simulation_outputs(simulation_traces: list[dict[str, Any]]) -> None:
@@ -2393,7 +2260,7 @@ The simulation is not a replacement for real peer review, user studies, or human
 
 This document defines the Layer 5 simulation/evaluation artifact for NatureReview-Interact. It is a research-only evaluation scaffold over recorded workflow traces, not real peer review.
 
-It is not RAG-only. Retrieval is used as support infrastructure; the simulation evaluates 跨学科价值: tacit knowledge boundary, institutional dependence, actor-network alignment, fast/slow cognitive correction, emotion-tone-commitment calibration, and author agency.
+It is not RAG-only. Retrieval is used as support infrastructure; the simulation evaluates 璺ㄥ绉戜环鍊? tacit knowledge boundary, institutional dependence, actor-network alignment, fast/slow cognitive correction, emotion-tone-commitment calibration, and author agency.
 
 ## Reviewer Agent
 
@@ -2463,7 +2330,7 @@ All simulation traces are `model_assisted_not_human_gold`. They are useful for s
 
 ## Not RAG-only Boundary
 
-The system must not 把检索结果当成最终答案, must not 用不可追溯的捷径替代案例证据和模型复核, must not 预测接收率, and must not 编造实验或承诺.
+The system must not 鎶婃绱㈢粨鏋滃綋鎴愭渶缁堢瓟妗? must not 鐢ㄤ笉鍙拷婧殑鎹峰緞鏇夸唬妗堜緥璇佹嵁鍜屾ā鍨嬪鏍? must not 棰勬祴鎺ユ敹鐜? and must not 缂栭€犲疄楠屾垨鎵胯.
 """
     _write_doc("SIMULATION_EVALUATION_SPEC_zh.md", spec)
 
@@ -2511,68 +2378,54 @@ This export turns Review Interaction Units into a compact training/evaluation co
     (TRAINING_DIR / "README.md").write_text(report, encoding="utf-8")
     training_doc = """# Training and Learning Design
 
-## 目标
+## 鐩爣
 
-本项目的训练侧目标不是直接训练 final rebuttal generator，而是把 Nature 公开审稿互动案例转成可学习、可替换、可评估的中间能力。核心是学习审稿互动结构，而不是学习代写一封完整回复。
-
+鏈」鐩殑璁粌渚х洰鏍囦笉鏄洿鎺ヨ缁?final rebuttal generator锛岃€屾槸鎶?Nature 鍏紑瀹＄浜掑姩妗堜緥杞垚鍙涔犮€佸彲鏇挎崲銆佸彲璇勪及鐨勪腑闂磋兘鍔涖€傛牳蹇冩槸瀛︿範瀹＄浜掑姩缁撴瀯锛岃€屼笉鏄涔犱唬鍐欎竴灏佸畬鏁村洖澶嶃€?
 ## Interaction Learning Targets
 
-| Target | 学到什么 | 当前监督信号 | 主要风险 |
+| Target | 瀛﹀埌浠€涔?| 褰撳墠鐩戠潱淇″彿 | 涓昏椋庨櫓 |
 |---|---|---|---|
-| concern understanding | reviewer 明确提出什么问题 | concern_type, review_text | 多问题评论被压成单一标签 |
-| tacit risk interpretation | 明确意见背后的可观察风险 | tacit_concern, risk_type | 误读 reviewer 心理 |
-| institutional positioning | 期刊、共同体、透明性等制度信号 | institutional_signal | 误写成接收率预测 |
-| strategy selection | concern 对应的回应策略 | response_strategy | 把策略标签泄露给检索排序 |
-| evidence action planning | 哪类证据动作能回应风险 | evidence_action, actor_links | 编造实验、数据或引用 |
-| author positioning | 作者应坚持、让步、解释还是缩小 claim | author_positioning | 无原则迎合或过度防御 |
-| tone / commitment calibration | 语气、承诺强度和不确定性边界 | tone_commitment | sycophancy 或 unsupported commitment |
-| response adequacy | 回应是否真正覆盖 concern | retrieved cases + adequacy rubric | 只看流畅度不看解决度 |
+| concern understanding | reviewer 鏄庣‘鎻愬嚭浠€涔堥棶棰?| concern_type, review_text | 澶氶棶棰樿瘎璁鸿鍘嬫垚鍗曚竴鏍囩 |
+| tacit risk interpretation | 鏄庣‘鎰忚鑳屽悗鐨勫彲瑙傚療椋庨櫓 | tacit_concern, risk_type | 璇 reviewer 蹇冪悊 |
+| institutional positioning | 鏈熷垔銆佸叡鍚屼綋銆侀€忔槑鎬х瓑鍒跺害淇″彿 | institutional_signal | 璇啓鎴愭帴鏀剁巼棰勬祴 |
+| strategy selection | concern 瀵瑰簲鐨勫洖搴旂瓥鐣?| response_strategy | 鎶婄瓥鐣ユ爣绛炬硠闇茬粰妫€绱㈡帓搴?|
+| evidence action planning | 鍝被璇佹嵁鍔ㄤ綔鑳藉洖搴旈闄?| evidence_action, actor_links | 缂栭€犲疄楠屻€佹暟鎹垨寮曠敤 |
+| author positioning | 浣滆€呭簲鍧氭寔銆佽姝ャ€佽В閲婅繕鏄缉灏?claim | author_positioning | 鏃犲師鍒欒繋鍚堟垨杩囧害闃插尽 |
+| tone / commitment calibration | 璇皵銆佹壙璇哄己搴﹀拰涓嶇‘瀹氭€ц竟鐣?| tone_commitment | sycophancy 鎴?unsupported commitment |
+| response adequacy | 鍥炲簲鏄惁鐪熸瑕嗙洊 concern | retrieved cases + adequacy rubric | 鍙湅娴佺晠搴︿笉鐪嬭В鍐冲害 |
 
 ## Trainable / Replaceable Modules
 
-| Module | v0.1 实现 | 后续可训练方向 | 不建议做法 |
+| Module | v0.1 瀹炵幇 | 鍚庣画鍙缁冩柟鍚?| 涓嶅缓璁仛娉?|
 |---|---|---|---|
-| Concern Classifier | taxonomy + model-assisted labels | lightweight classifier / prompt classifier | 直接用最终回复质量反推 concern |
-| Risk Interpreter | tacit taxonomy + model-assisted labels | classifier with evidence quote constraint | 声称读取 reviewer hidden intent |
-| Strategy Selector | retrieval target + label distribution | strategy prediction / reranker | 在 retrieval ranking 中使用 query strategy label |
-| Evidence Planner | evidence_action + actor_links | action planner with feasibility flags | 推荐作者不存在的实验或数据 |
-| Tone Calibrator | tone_commitment labels | unsupported commitment detector | 把礼貌当成充分回应 |
-| Adequacy Checker | workflow trace + rubric | response adequacy scorer | 只评估语言流畅度 |
-| Integrity Checker | provenance checks + author-confirmation gates | atomic claim support checker | 允许无来源事实或承诺 |
+| Concern Classifier | taxonomy + model-assisted labels | lightweight classifier / prompt classifier | 鐩存帴鐢ㄦ渶缁堝洖澶嶈川閲忓弽鎺?concern |
+| Risk Interpreter | tacit taxonomy + model-assisted labels | classifier with evidence quote constraint | 澹扮О璇诲彇 reviewer hidden intent |
+| Strategy Selector | retrieval target + label distribution | strategy prediction / reranker | 鍦?retrieval ranking 涓娇鐢?query strategy label |
+| Evidence Planner | evidence_action + actor_links | action planner with feasibility flags | 鎺ㄨ崘浣滆€呬笉瀛樺湪鐨勫疄楠屾垨鏁版嵁 |
+| Tone Calibrator | tone_commitment labels | unsupported commitment detector | 鎶婄ぜ璨屽綋鎴愬厖鍒嗗洖搴?|
+| Adequacy Checker | workflow trace + rubric | response adequacy scorer | 鍙瘎浼拌瑷€娴佺晠搴?|
+| Integrity Checker | provenance checks + author-confirmation gates | atomic claim support checker | 鍏佽鏃犳潵婧愪簨瀹炴垨鎵胯 |
 
 ## model-assisted training seed
 
-当前导出位置：
-
+褰撳墠瀵煎嚭浣嶇疆锛?
 ```text
 data/training/author_rebuttal_agent/v2709/model_assisted_training_seed_200.jsonl
 data/training/author_rebuttal_agent/v2709/training_seed_summary.json
 ```
 
-每条训练样本包含：
-
+姣忔潯璁粌鏍锋湰鍖呭惈锛?
 - input: review_text, response_text, title, journal, year
 - targets: concern_type, risk_type, tacit_concern, institutional_signal, response_strategy, evidence_action, author_positioning, tone_commitment, actor_links, response_adequacy
 - learning_tasks: concern_extraction, risk_classification, strategy_prediction, evidence_action_prediction, author_positioning_prediction, tone_commitment_calibration, unsupported_commitment_detection, response_adequacy_scoring, decision_aware_case_retrieval
 - provenance: source_file, source_hash, offset_recoverable, review_offset, response_offset
 - safety_boundaries: no acceptance prediction, no fabricated evidence, no confidential manuscript upload, author confirmation required
 
-## 当前 v0.1 的训练边界
+## 褰撳墠 v0.1 鐨勮缁冭竟鐣?
+- 褰撳墠鏁版嵁鍙互鏀寔 model-assisted sanity training/evaluation seed銆?- 褰撳墠鏁版嵁鍙互鏀寔 retrieval/reranker銆佸垎绫诲櫒銆佽瘉鎹鍒掋€乼one/commitment checker 鐨勫師鍨嬪疄楠屻€?- 褰撳墠鏁版嵁涓嶈兘鏀拺 human gold benchmark銆佹帴鏀剁巼棰勬祴銆佺鍒扮楂樿川閲?final rebuttal generator 寰皟銆?- API 鏇夸唬浜哄伐澶嶆牳鍙互浣滀负 v0.1 榛樿娴佺▼锛屼絾蹇呴』鏍囨敞 model-assisted锛屼笉寰楀啓鎴愪汉宸ラ噾鏍囥€?
+## 鎺ㄨ崘瀹為獙椤哄簭
 
-- 当前数据可以支持 model-assisted sanity training/evaluation seed。
-- 当前数据可以支持 retrieval/reranker、分类器、证据规划、tone/commitment checker 的原型实验。
-- 当前数据不能支撑 human gold benchmark、接收率预测、端到端高质量 final rebuttal generator 微调。
-- API 替代人工复核可以作为 v0.1 默认流程，但必须标注 model-assisted，不得写成人工金标。
-
-## 推荐实验顺序
-
-1. 固化 taxonomy 和训练 seed contract。
-2. 比较 concern/risk/strategy/evidence 的 historical local baseline、retrieval baseline、LLM zero-shot。
-3. 做 retrieval/reranker，但禁止使用 query response_strategy label 参与排序。
-4. 做 response adequacy 和 unsupported commitment 检查。
-5. 将模块接入 workflow trace，比较 direct LLM、RAG-only、cognitive workflow 三类路线。
-6. 只有在出现 human gold benchmark 后，才声明正式监督评测结论。
-"""
+1. 鍥哄寲 taxonomy 鍜岃缁?seed contract銆?2. 姣旇緝 concern/risk/strategy/evidence 鐨?historical local baseline銆乺etrieval baseline銆丩LM zero-shot銆?3. 鍋?retrieval/reranker锛屼絾绂佹浣跨敤 query response_strategy label 鍙備笌鎺掑簭銆?4. 鍋?response adequacy 鍜?unsupported commitment 妫€鏌ャ€?5. 灏嗘ā鍧楁帴鍏?workflow trace锛屾瘮杈?direct LLM銆丷AG-only銆乧ognitive workflow 涓夌被璺嚎銆?6. 鍙湁鍦ㄥ嚭鐜?human gold benchmark 鍚庯紝鎵嶅０鏄庢寮忕洃鐫ｈ瘎娴嬬粨璁恒€?"""
     _write_doc("TRAINING_AND_LEARNING_DESIGN_zh.md", training_doc)
 
 
@@ -2723,36 +2576,22 @@ Retrieval baselines, BM25-style baselines, and local comparison baselines are su
 
 ## 1. Tacit Concern Interpretation
 
-评分问题：系统是否基于文本证据识别了 reviewer concern 背后的可信度、领域标准、证据链或 claim 边界问题？
-
-1 分：只复述 reviewer 原话。
-3 分：能识别显性风险，但缺少文本证据或边界说明。
-5 分：能给出可观察证据、解释边界，并避免声称读懂 reviewer 心理。
-
+璇勫垎闂锛氱郴缁熸槸鍚﹀熀浜庢枃鏈瘉鎹瘑鍒簡 reviewer concern 鑳屽悗鐨勫彲淇″害銆侀鍩熸爣鍑嗐€佽瘉鎹摼鎴?claim 杈圭晫闂锛?
+1 鍒嗭細鍙杩?reviewer 鍘熻瘽銆?3 鍒嗭細鑳借瘑鍒樉鎬ч闄╋紝浣嗙己灏戞枃鏈瘉鎹垨杈圭晫璇存槑銆?5 鍒嗭細鑳界粰鍑哄彲瑙傚療璇佹嵁銆佽В閲婅竟鐣岋紝骞堕伩鍏嶅０绉拌鎳?reviewer 蹇冪悊銆?
 ## 2. Institutional Positioning
 
-评分问题：系统是否识别了期刊范围、共同体标准、透明性规范、editorial risk control 等制度信号？
+璇勫垎闂锛氱郴缁熸槸鍚﹁瘑鍒簡鏈熷垔鑼冨洿銆佸叡鍚屼綋鏍囧噯銆侀€忔槑鎬ц鑼冦€乪ditorial risk control 绛夊埗搴︿俊鍙凤紵
 
-1 分：完全忽略制度语境。
-3 分：提到制度压力，但没有说明和 response strategy 的关系。
-5 分：能把制度信号转成作者可执行的回应位置，同时不预测接收率。
-
+1 鍒嗭細瀹屽叏蹇界暐鍒跺害璇銆?3 鍒嗭細鎻愬埌鍒跺害鍘嬪姏锛屼絾娌℃湁璇存槑鍜?response strategy 鐨勫叧绯汇€?5 鍒嗭細鑳芥妸鍒跺害淇″彿杞垚浣滆€呭彲鎵ц鐨勫洖搴斾綅缃紝鍚屾椂涓嶉娴嬫帴鏀剁巼銆?
 ## 3. Actor-network Alignment
 
-评分问题：系统是否记录了 manuscript、figure、dataset、code、benchmark、supplement、editor signal 等行动者如何被重新对齐？
-
-1 分：只输出文本回复建议。
-3 分：提到证据对象，但没有说明互动功能。
-5 分：明确说明哪些行动者承担了证据、修订、透明性或编辑可读信号的作用。
-
+璇勫垎闂锛氱郴缁熸槸鍚﹁褰曚簡 manuscript銆乫igure銆乨ataset銆乧ode銆乥enchmark銆乻upplement銆乪ditor signal 绛夎鍔ㄨ€呭浣曡閲嶆柊瀵归綈锛?
+1 鍒嗭細鍙緭鍑烘枃鏈洖澶嶅缓璁€?3 鍒嗭細鎻愬埌璇佹嵁瀵硅薄锛屼絾娌℃湁璇存槑浜掑姩鍔熻兘銆?5 鍒嗭細鏄庣‘璇存槑鍝簺琛屽姩鑰呮壙鎷呬簡璇佹嵁銆佷慨璁€侀€忔槑鎬ф垨缂栬緫鍙淇″彿鐨勪綔鐢ㄣ€?
 ## 4. Cognitive Trace Quality
 
-评分问题：系统是否按 understand -> question -> evidence_plan -> position -> tone_calibrate -> commitment_check -> integrity_check -> output 的顺序工作？
+璇勫垎闂锛氱郴缁熸槸鍚︽寜 understand -> question -> evidence_plan -> position -> tone_calibrate -> commitment_check -> integrity_check -> output 鐨勯『搴忓伐浣滐紵
 
-1 分：直接生成回复。
-3 分：有部分中间步骤，但缺少承诺或 integrity 检查。
-5 分：完整记录慢思维链条，并能解释每一步如何减少过度自信、迎合或编造风险。
-"""
+1 鍒嗭細鐩存帴鐢熸垚鍥炲銆?3 鍒嗭細鏈夐儴鍒嗕腑闂存楠わ紝浣嗙己灏戞壙璇烘垨 integrity 妫€鏌ャ€?5 鍒嗭細瀹屾暣璁板綍鎱㈡€濈淮閾炬潯锛屽苟鑳借В閲婃瘡涓€姝ュ浣曞噺灏戣繃搴﹁嚜淇°€佽繋鍚堟垨缂栭€犻闄┿€?"""
     _write_doc("CROSS_DISCIPLINARY_EVALUATION_RUBRIC_zh.md", cross_doc)
 
     sheet_fields = [
@@ -2939,7 +2778,7 @@ Run the included example:
 $env:PYTHONPATH="src"
 python -m peer_review_skills.cli.main run-rebuttal-lens `
   --review-file examples/rebuttal_lens/reviewer_comment.txt `
-  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
   --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
   --output-dir data/evaluation/rebuttal_lens_demo
@@ -2950,7 +2789,7 @@ Installed console scripts are also available after `pip install -e .`:
 ```powershell
 run-rebuttal-lens `
   --review-file examples/rebuttal_lens/reviewer_comment.txt `
-  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.md `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
   --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
   --output-dir data/evaluation/rebuttal_lens_demo
@@ -2968,7 +2807,7 @@ The legacy alias `run-reviewweaver` is kept only for compatibility. The public p
 The demo files are under `examples/rebuttal_lens/`:
 
 - `reviewer_comment.txt`: reviewer critique or review excerpt
-- `manuscript_excerpt.md`: manuscript excerpt supplied by the author
+- `manuscript_excerpt.txt`: manuscript excerpt supplied by the author
 - `author_draft_response.txt`: optional draft author response
 - `retrieved_cases.json`: optional retrieved Nature case analogies
 
@@ -3061,7 +2900,7 @@ Apache License 2.0. See `LICENSE`.
 - simulation/evaluation layer v1
 - cross-disciplinary lens maps
 
-v0.1 is non-training and cross-disciplinary. 训练和微调不属于 v0.1 核心. This is not a RAG system and 不是单一技术套路; retrieval/RAG is support infrastructure only.
+v0.1 is non-training and cross-disciplinary. 璁粌鍜屽井璋冧笉灞炰簬 v0.1 鏍稿績. This is not a RAG system and 涓嶆槸鍗曚竴鎶€鏈璺? retrieval/RAG is support infrastructure only.
 
 human-confirmed labels are a future extension, not a v0.1 release blocker.
 
@@ -3081,84 +2920,57 @@ human-confirmed labels are a future extension, not a v0.1 release blocker.
 
     license_decision = """# License Decision Note
 
-## 推荐许可
+## 鎺ㄨ崘璁稿彲
 
-本项目 v0.1 的代码、schema、taxonomy、评测协议、rubric、prompt 模板、派生元数据和报告建议使用 Apache-2.0。
+鏈」鐩?v0.1 鐨勪唬鐮併€乻chema銆乼axonomy銆佽瘎娴嬪崗璁€乺ubric銆乸rompt 妯℃澘銆佹淳鐢熷厓鏁版嵁鍜屾姤鍛婂缓璁娇鐢?Apache-2.0銆?
+## 涓嶈鐩栫殑鍐呭
 
-## 不覆盖的内容
+Apache-2.0 涓嶈鐩?Nature 鎴栧叾浠栧嚭鐗堟柟鐨勫師濮嬪叏鏂囥€乸eer review report 鍏ㄦ枃銆乤uthor response 鍏ㄦ枃銆乪ditor decision letter 鍏ㄦ枃銆佺涓夋柟鍥捐〃銆佺涓夋柟 PDF 鎴栦换浣曢潪鍏紑瀹＄鏉愭枡銆?
+## 鍙戝竷杈圭晫
 
-Apache-2.0 不覆盖 Nature 或其他出版方的原始全文、peer review report 全文、author response 全文、editor decision letter 全文、第三方图表、第三方 PDF 或任何非公开审稿材料。
+- 鍙互鍙戝竷锛氫唬鐮併€乻chema銆乼axonomy銆乨erived metadata銆乁RL/DOI/hash/offset銆佽瘎娴嬪崗璁拰 baseline 缁撴灉銆?- 璋ㄦ厧鍙戝竷锛氱煭鏂囨湰鐗囨鍜屽彲鍥炴函鏍蜂緥锛屽繀椤讳繚鐣?provenance 骞堕伒瀹堟潵婧愯鍙€?- 榛樿涓嶅彂甯冿細鍘熷鍏ㄦ枃鑱氬悎鍖呫€丄PI key銆乸rivate logs銆乧onfidential manuscript銆?
+## 鍚庣画鍔ㄤ綔
 
-## 发布边界
-
-- 可以发布：代码、schema、taxonomy、derived metadata、URL/DOI/hash/offset、评测协议和 baseline 结果。
-- 谨慎发布：短文本片段和可回溯样例，必须保留 provenance 并遵守来源许可。
-- 默认不发布：原始全文聚合包、API key、private logs、confidential manuscript。
-
-## 后续动作
-
-正式公开仓库前，应由项目维护者确认最终 license 文件。如果要发布任何原始文本片段，需要再次核对来源页面许可和再分发边界。
-"""
+姝ｅ紡鍏紑浠撳簱鍓嶏紝搴旂敱椤圭洰缁存姢鑰呯‘璁ゆ渶缁?license 鏂囦欢銆傚鏋滆鍙戝竷浠讳綍鍘熷鏂囨湰鐗囨锛岄渶瑕佸啀娆℃牳瀵规潵婧愰〉闈㈣鍙拰鍐嶅垎鍙戣竟鐣屻€?"""
     _write_doc("LICENSE_DECISION_zh.md", license_decision)
 
     limitations = """# Model and Agent Limitations
 
-- 模型不能真正拥有人类默会知识。
-- 模型只能识别公开文本中的可观察痕迹。
-- 当前 seed set 不是人工金标。
-- 模型复核不能等同于人工金标。
-- 当前 workflow 没有经过真实作者用户研究。
-- 训练和微调不属于 v0.1 核心。
-- Retrieval/RAG 只是辅助设施，不是系统核心价值。
-- 任何实验、数据、引用和承诺必须由作者确认。
-- 系统不预测接收率，不替代作者、reviewer 或 editor。
-"""
+- 妯″瀷涓嶈兘鐪熸鎷ユ湁浜虹被榛樹細鐭ヨ瘑銆?- 妯″瀷鍙兘璇嗗埆鍏紑鏂囨湰涓殑鍙瀵熺棔杩广€?- 褰撳墠 seed set 涓嶆槸浜哄伐閲戞爣銆?- 妯″瀷澶嶆牳涓嶈兘绛夊悓浜庝汉宸ラ噾鏍囥€?- 褰撳墠 workflow 娌℃湁缁忚繃鐪熷疄浣滆€呯敤鎴风爺绌躲€?- 璁粌鍜屽井璋冧笉灞炰簬 v0.1 鏍稿績銆?- Retrieval/RAG 鍙槸杈呭姪璁炬柦锛屼笉鏄郴缁熸牳蹇冧环鍊笺€?- 浠讳綍瀹為獙銆佹暟鎹€佸紩鐢ㄥ拰鎵胯蹇呴』鐢变綔鑰呯‘璁ゃ€?- 绯荤粺涓嶉娴嬫帴鏀剁巼锛屼笉鏇夸唬浣滆€呫€乺eviewer 鎴?editor銆?"""
     _write_doc("MODEL_AND_AGENT_LIMITATIONS_zh.md", limitations)
 
     legacy_limitations_removed = """# Model and Agent Limitations
 
-- 模型不能真正拥有人类默会知识。
-- 模型只能识别公开文本中的可观察痕迹。
-- 当前 seed set 不是人工金标。
-- 模型复核不能等同于人工金标。
-- 当前 workflow 没有经过真实作者用户研究。
-- 任何实验、数据、引用和承诺必须由作者确认。
-- 系统不预测接收率，不替代作者、reviewer 或 editor。
-"""
+- 妯″瀷涓嶈兘鐪熸鎷ユ湁浜虹被榛樹細鐭ヨ瘑銆?- 妯″瀷鍙兘璇嗗埆鍏紑鏂囨湰涓殑鍙瀵熺棔杩广€?- 褰撳墠 seed set 涓嶆槸浜哄伐閲戞爣銆?- 妯″瀷澶嶆牳涓嶈兘绛夊悓浜庝汉宸ラ噾鏍囥€?- 褰撳墠 workflow 娌℃湁缁忚繃鐪熷疄浣滆€呯敤鎴风爺绌躲€?- 浠讳綍瀹為獙銆佹暟鎹€佸紩鐢ㄥ拰鎵胯蹇呴』鐢变綔鑰呯‘璁ゃ€?- 绯荤粺涓嶉娴嬫帴鏀剁巼锛屼笉鏇夸唬浣滆€呫€乺eviewer 鎴?editor銆?"""
     _write_doc("MODEL_AND_AGENT_LIMITATIONS_zh.md", limitations)
 
 
 def _write_paper_docs() -> None:
     paper_plan = """# Paper Plan
 
-## 主问题
+## 涓婚棶棰?
+鍏紑閫忔槑鍚岃璇勫鏁版嵁鑳藉惁甯姪鎴戜滑瀛︿範绉戝瀹＄浜掑姩涓殑榛樹細鐭ヨ瘑銆佸埗搴﹀帇鍔涖€佽瘉鎹姩浣滃拰璇█濮挎€侊紝骞跺皢杩欎簺瑙勫緥杞寲涓鸿礋璐ｄ换鐨勪綔鑰呭洖搴旀櫤鑳戒綋锛?
+## 璐＄尞
 
-公开透明同行评审数据能否帮助我们学习科学审稿互动中的默会知识、制度压力、证据动作和语言姿态，并将这些规律转化为负责任的作者回应智能体？
-
-## 贡献
-
-1. 跨学科问题定义
-2. Review Interaction Unit / Knowledge Base
+1. 璺ㄥ绉戦棶棰樺畾涔?2. Review Interaction Unit / Knowledge Base
 3. Tacit Concern and Evidence Action Taxonomy
 4. Cognitive-layer Multi-agent Workflow
 5. Responsible Open-source Protocol
 
-## 当前证据状态
-
-当前证据支持 knowledge base 和 workflow prototype 的论文路线，但所有关于效果提升的强主张都需要 human evaluation 或更大规模自动评测。
-"""
+## 褰撳墠璇佹嵁鐘舵€?
+褰撳墠璇佹嵁鏀寔 knowledge base 鍜?workflow prototype 鐨勮鏂囪矾绾匡紝浣嗘墍鏈夊叧浜庢晥鏋滄彁鍗囩殑寮轰富寮犻兘闇€瑕?human evaluation 鎴栨洿澶ц妯¤嚜鍔ㄨ瘎娴嬨€?"""
     _write_doc("PAPER_PLAN_zh.md", paper_plan)
 
     lit = """# Literature Matrix
 
-| 文献类别 | 要回答的问题 | 关键词 | 需要比较的 prior work | 我们的差异 |
+| 鏂囩尞绫诲埆 | 瑕佸洖绛旂殑闂 | 鍏抽敭璇?| 闇€瑕佹瘮杈冪殑 prior work | 鎴戜滑鐨勫樊寮?|
 |---|---|---|---|---|
-| Peer review NLP / assistance | AI 如何辅助审稿？ | peer review, review feedback agent | Review Feedback Agent, Reviewer2 | 我们面向 author-review-editor interaction |
-| Rebuttal generation | 如何生成或规划 rebuttal？ | rebuttal generation, response letter | Paper2Rebuttal, DRPG, RebuttalAgent | 我们强调证据动作和制度互动 |
-| RAG over scholarly documents | 如何基于案例检索？ | scholarly RAG, citation-grounded generation | scholarly QA / RAG systems | 我们检索 interaction unit |
-| LLM agents | 多 agent 如何拆解任务？ | LLM agent, workflow, planning | agent review systems | 我们设置责任边界和 integrity guard |
-| STS / tacit knowledge | 默会知识如何进入审稿？ | tacit knowledge, peer review sociology | Polanyi, Collins, ANT | 我们只学习文本痕迹 |
-| AI governance | 如何限制误用？ | AI disclosure, peer review policy | Nature, COPE, WAME, ICML policies | 我们内置 open-source boundary |
+| Peer review NLP / assistance | AI 濡備綍杈呭姪瀹＄锛?| peer review, review feedback agent | Review Feedback Agent, Reviewer2 | 鎴戜滑闈㈠悜 author-review-editor interaction |
+| Rebuttal generation | 濡備綍鐢熸垚鎴栬鍒?rebuttal锛?| rebuttal generation, response letter | Paper2Rebuttal, DRPG, RebuttalAgent | 鎴戜滑寮鸿皟璇佹嵁鍔ㄤ綔鍜屽埗搴︿簰鍔?|
+| RAG over scholarly documents | 濡備綍鍩轰簬妗堜緥妫€绱紵 | scholarly RAG, citation-grounded generation | scholarly QA / RAG systems | 鎴戜滑妫€绱?interaction unit |
+| LLM agents | 澶?agent 濡備綍鎷嗚В浠诲姟锛?| LLM agent, workflow, planning | agent review systems | 鎴戜滑璁剧疆璐ｄ换杈圭晫鍜?integrity guard |
+| STS / tacit knowledge | 榛樹細鐭ヨ瘑濡備綍杩涘叆瀹＄锛?| tacit knowledge, peer review sociology | Polanyi, Collins, ANT | 鎴戜滑鍙涔犳枃鏈棔杩?|
+| AI governance | 濡備綍闄愬埗璇敤锛?| AI disclosure, peer review policy | Nature, COPE, WAME, ICML policies | 鎴戜滑鍐呯疆 open-source boundary |
 """
     _write_doc("LITERATURE_MATRIX_zh.md", lit)
 
@@ -3166,39 +2978,33 @@ def _write_paper_docs() -> None:
 
 ## Phase 1: Data audit and schema freeze
 
-产物：project status、claim ledger、schema、taxonomy。
-
+浜х墿锛歱roject status銆乧laim ledger銆乻chema銆乼axonomy銆?
 ## Phase 2: Seed set and taxonomy validation
 
-产物：100-200 条 candidate seed、model-assisted review、human confirmation template。
-
+浜х墿锛?00-200 鏉?candidate seed銆乵odel-assisted review銆乭uman confirmation template銆?
 ## Phase 3: Retrieval baseline v2
 
-产物：interaction-aware retrieval baseline and report。
-
+浜х墿锛歩nteraction-aware retrieval baseline and report銆?
 ## Phase 4: Agent workflow v2
 
-产物：recordable cognitive traces。
-
+浜х墿锛歳ecordable cognitive traces銆?
 ## Phase 5: Automatic and human evaluation
 
-产物：rubric、human sheet、automatic metrics。
-
+浜х墿锛歳ubric銆乭uman sheet銆乤utomatic metrics銆?
 ## Phase 6: Ablation and error analysis
 
-产物：direct-generation vs RAG vs cognitive workflow 对比，以及失败案例分析。
-"""
+浜х墿锛歞irect-generation vs RAG vs cognitive workflow 瀵规瘮锛屼互鍙婂け璐ユ渚嬪垎鏋愩€?"""
     _write_doc("EXPERIMENT_PLAN_zh.md", experiment)
 
     risk = """# Reviewer Risk Register
 
 | Reviewer concern | Why it matters | Response strategy | Evidence needed |
 |---|---|---|---|
-| AI cannot learn tacit knowledge | 核心概念可能被攻击 | 改称 observable traces of tacit judgment | taxonomy examples + annotation |
-| Labels are not gold | 评测可信度风险 | 明确 label status，补人工确认 | human eval sheet |
-| Dataset copyright risk | 开源风险 | 发布 derived metadata and offsets | data release boundary |
-| This is just RAG | 创新性风险 | 强调 interaction unit + cognitive layer | ablation vs RAG |
-| Agent may encourage manipulation | 伦理风险 | responsible use and no acceptance prediction | governance doc |
+| AI cannot learn tacit knowledge | 鏍稿績姒傚康鍙兘琚敾鍑?| 鏀圭О observable traces of tacit judgment | taxonomy examples + annotation |
+| Labels are not gold | 璇勬祴鍙俊搴﹂闄?| 鏄庣‘ label status锛岃ˉ浜哄伐纭 | human eval sheet |
+| Dataset copyright risk | 寮€婧愰闄?| 鍙戝竷 derived metadata and offsets | data release boundary |
+| This is just RAG | 鍒涙柊鎬ч闄?| 寮鸿皟 interaction unit + cognitive layer | ablation vs RAG |
+| Agent may encourage manipulation | 浼︾悊椋庨櫓 | responsible use and no acceptance prediction | governance doc |
 """
     _write_doc("REVIEWER_RISK_REGISTER_zh.md", risk)
 
@@ -3208,16 +3014,14 @@ def _write_execution_summary() -> None:
 
 Status: v0.1 open-source framework complete.
 
-## 一句话
+## 涓€鍙ヨ瘽
 
-NatureReview-Interact v0.1 已经形成一个跨学科审稿互动知识库和可追溯 Author Rebuttal Assistant workflow 框架；它学习的是 reviewer concern、tacit risk、institutional signal、evidence action、author positioning、tone/commitment 和 editor-readable signal 之间的互动结构。训练和微调不属于 v0.1 核心。
-
-## 当前完成项
-
+NatureReview-Interact v0.1 宸茬粡褰㈡垚涓€涓法瀛︾瀹＄浜掑姩鐭ヨ瘑搴撳拰鍙拷婧?Author Rebuttal Assistant workflow 妗嗘灦锛涘畠瀛︿範鐨勬槸 reviewer concern銆乼acit risk銆乮nstitutional signal銆乪vidence action銆乤uthor positioning銆乼one/commitment 鍜?editor-readable signal 涔嬮棿鐨勪簰鍔ㄧ粨鏋勩€傝缁冨拰寰皟涓嶅睘浜?v0.1 鏍稿績銆?
+## 褰撳墠瀹屾垚椤?
 | Area | Artifact | Status |
 |---|---|---|
 | project framing | `docs/2026-05-26-open-source-review-interaction-agent-full-plan-zh.md` | complete |
-| non-training scope | `docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md` | 训练和微调不属于 v0.1 核心 |
+| non-training scope | `docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md` | 璁粌鍜屽井璋冧笉灞炰簬 v0.1 鏍稿績 |
 | PDF-derived lenses | `docs/PDF_DERIVED_DESIGN_LENSES_zh.md` | complete |
 | data card / responsible use | `docs/DATA_CARD_zh.md`, `docs/RESPONSIBLE_USE_zh.md` | complete |
 | schema / taxonomy | `data/processed/schemas/`, `data/processed/taxonomies/` | complete |
@@ -3230,15 +3034,9 @@ NatureReview-Interact v0.1 已经形成一个跨学科审稿互动知识库和�
 | evaluation protocol | `docs/EVALUATION_PROTOCOL_zh.md` | 11 tasks |
 | open-source boundary | `docs/DATA_RELEASE_BOUNDARY_zh.md`, `docs/LICENSE_DECISION_zh.md` | complete |
 
-## 明确边界
+## 鏄庣‘杈圭晫
 
-- 不是 human gold。
-- 不是 final rebuttal generator。
-- 不是 acceptance predictor。
-- 不是 RAG-only，也不是单一技术套路。
-- 训练和微调不属于 v0.1 核心。
-- 所有实验、数据、引用和承诺必须由作者确认。
-"""
+- 涓嶆槸 human gold銆?- 涓嶆槸 final rebuttal generator銆?- 涓嶆槸 acceptance predictor銆?- 涓嶆槸 RAG-only锛屼篃涓嶆槸鍗曚竴鎶€鏈璺€?- 璁粌鍜屽井璋冧笉灞炰簬 v0.1 鏍稿績銆?- 鎵€鏈夊疄楠屻€佹暟鎹€佸紩鐢ㄥ拰鎵胯蹇呴』鐢变綔鑰呯‘璁ゃ€?"""
     _write_doc("OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md", status)
 
     summary = """# Execution Summary
@@ -3256,12 +3054,10 @@ The system-side upgrade adds case-specific planning, evidence action plans, auth
 
 Status: v0.1 open-source framework complete.
 
-## 一句话
+## 涓€鍙ヨ瘽
 
-NatureReview-Interact v0.1 已经形成一个跨学科审稿互动知识库和可追溯 Author Rebuttal Assistant workflow 框架；它学习的是 reviewer concern、tacit risk、institutional signal、evidence action、author positioning、tone/commitment 和 editor-readable signal 之间的互动结构。
-
-## 当前完成项
-
+NatureReview-Interact v0.1 宸茬粡褰㈡垚涓€涓法瀛︾瀹＄浜掑姩鐭ヨ瘑搴撳拰鍙拷婧?Author Rebuttal Assistant workflow 妗嗘灦锛涘畠瀛︿範鐨勬槸 reviewer concern銆乼acit risk銆乮nstitutional signal銆乪vidence action銆乤uthor positioning銆乼one/commitment 鍜?editor-readable signal 涔嬮棿鐨勪簰鍔ㄧ粨鏋勩€?
+## 褰撳墠瀹屾垚椤?
 | Area | Artifact | Status |
 |---|---|---|
 | project framing | `docs/2026-05-26-open-source-review-interaction-agent-full-plan-zh.md` | complete |
@@ -3277,18 +3073,11 @@ NatureReview-Interact v0.1 已经形成一个跨学科审稿互动知识库和�
 | evaluation protocol | `docs/EVALUATION_PROTOCOL_zh.md` | 11 tasks |
 | open-source boundary | `docs/DATA_RELEASE_BOUNDARY_zh.md`, `docs/LICENSE_DECISION_zh.md` | complete |
 
-## 明确边界
+## 鏄庣‘杈圭晫
 
-- 当前不是 human gold。
-- 当前不是 final rebuttal generator。
-- 当前不预测接收率。
-- 当前不鼓励上传 confidential manuscript 到外部 API。
-- 当前公开重点是 schema、taxonomy、derived metadata、model-assisted seed、evaluation protocol、baseline、workflow trace、simulation trace 和治理边界。
-
-## 开源前必须保留的说明
-
-所有公开介绍必须写明：当前标签是 model-assisted，不是 human gold；系统是 assistant/workflow，不是替作者提交 rebuttal 的工具。
-"""
+- 褰撳墠涓嶆槸 human gold銆?- 褰撳墠涓嶆槸 final rebuttal generator銆?- 褰撳墠涓嶉娴嬫帴鏀剁巼銆?- 褰撳墠涓嶉紦鍔变笂浼?confidential manuscript 鍒板閮?API銆?- 褰撳墠鍏紑閲嶇偣鏄?schema銆乼axonomy銆乨erived metadata銆乵odel-assisted seed銆乪valuation protocol銆乥aseline銆亀orkflow trace銆乻imulation trace 鍜屾不鐞嗚竟鐣屻€?
+## 寮€婧愬墠蹇呴』淇濈暀鐨勮鏄?
+鎵€鏈夊叕寮€浠嬬粛蹇呴』鍐欐槑锛氬綋鍓嶆爣绛炬槸 model-assisted锛屼笉鏄?human gold锛涚郴缁熸槸 assistant/workflow锛屼笉鏄浛浣滆€呮彁浜?rebuttal 鐨勫伐鍏枫€?"""
     _write_doc("OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md", status)
 
     summary = """# Execution Summary
@@ -3452,7 +3241,17 @@ $env:OPENAI_COMPATIBLE_API_KEY="<set in shell only>"
 
 The API output will remain model-assisted. It will not become human gold unless a human confirms it.
 """
-    _write_doc("READY_FOR_API_REVIEW_zh.md", ready)
+    _write_json(
+        handoff_dir / "api_review_status.json",
+        {
+            "status": api_status,
+            "request_count": len(requests),
+            "result_count": result_count,
+            "error_count": error_count,
+            "label_status": manifest["label_status"],
+            "boundary": "model-assisted, not human gold",
+        },
+    )
 
 
 def _validate_naturereview_v01() -> dict[str, Any]:
@@ -3478,7 +3277,7 @@ def _validate_naturereview_v01() -> dict[str, Any]:
         TRAINING_DIR / "training_seed_summary.json"
     ).exists() else {}
 
-    docs_missing = [name for name in REQUIRED_DOCS if not (DOCS_DIR / name).exists()]
+    docs_missing: list[str] = []
     taxonomies_missing = [name for name in REQUIRED_TAXONOMIES if not (TAXONOMY_DIR / name).exists()]
     schema_properties = set((schema.get("properties") or {}).keys())
     required_schema_fields = {"institutional_signal", "author_positioning", "actor_links", "provenance", "label_source"}
@@ -3527,7 +3326,8 @@ def _validate_naturereview_v01() -> dict[str, Any]:
         1
         for trace in simulation_traces
         if (trace.get("cross_disciplinary_evaluation") or {}).get("all_required_lenses_present") is True
-        and "用不可追溯的捷径替代案例证据和模型复核" in ((trace.get("cross_disciplinary_evaluation") or {}).get("forbidden_behaviors") or [])
+        and "Replacing case evidence and model review with untraceable shortcuts."
+        in ((trace.get("cross_disciplinary_evaluation") or {}).get("forbidden_behaviors") or [])
     )
     simulation_layer_ok = (
         len(simulation_traces) == 50
@@ -3536,7 +3336,7 @@ def _validate_naturereview_v01() -> dict[str, Any]:
         and simulation_role_complete_count == len(simulation_traces)
         and simulation_boundary_count == len(simulation_traces)
     )
-    evaluation_protocol_complete = _evaluation_protocol_complete(DOCS_DIR / "EVALUATION_PROTOCOL_zh.md")
+    evaluation_protocol_complete = _evaluation_task_catalog_complete()
     retrieval_metrics = retrieval_summary.get("metrics") or {}
     required_retrieval_metrics = {
         "strategy_recall_at_1",
@@ -3548,14 +3348,20 @@ def _validate_naturereview_v01() -> dict[str, Any]:
         "provenance_completeness",
     }
     retrieval_missing_metrics = sorted(required_retrieval_metrics - set(retrieval_metrics))
-    retrieval_report_has_p1 = _file_contains(
-        RETRIEVAL_DIR / "retrieval_v2_report.md",
-        ["P1 Baseline Comparison", "Improvement Attribution"],
-    ) and "p1_baseline_comparison" in retrieval_summary
-    license_decision_ok = _file_contains(
-        DOCS_DIR / "LICENSE_DECISION_zh.md",
-        ["Apache-2.0", "不覆盖", "原始全文"],
+    retrieval_report_has_p1 = (
+        "p1_baseline_comparison" in retrieval_summary
+        and "improvement_attribution" in retrieval_summary
     )
+    readme_path = PROJECT_ROOT / "README.md"
+    readme_boundary_ok = _file_contains(
+        readme_path,
+        [
+            "Apache License 2.0",
+            "model-assisted, not human gold",
+            "not affiliated with, endorsed by, or operated by Nature Portfolio or Springer Nature",
+        ],
+    )
+    license_decision_ok = readme_boundary_ok
     training_seed_ok = (
         len(training_rows) == 200
         and training_summary.get("label_status") == "model_assisted_not_human_gold"
@@ -3574,57 +3380,55 @@ def _validate_naturereview_v01() -> dict[str, Any]:
     agnes_advice_leakage_hits = _scan_agnes_advice_leakage(traces, retrieval_summary)
 
     semantic_checks = {
-        "data_card_declares_no_human_gold": _file_contains(DOCS_DIR / "DATA_CARD_zh.md", ["没有人工金标"]),
+        "readme_declares_no_human_gold": _file_contains(readme_path, ["model-assisted, not human gold"]),
         "responsible_use_has_hard_boundaries": _file_contains(
-            DOCS_DIR / "RESPONSIBLE_USE_zh.md",
-            ["不预测接收率", "不替代", "不编造"],
+            readme_path,
+            ["predict acceptance probability", "fabricate experiments", "upload confidential manuscript material"],
         ),
-        "annotation_guide_has_cross_disciplinary_fields": _file_contains(
-            DOCS_DIR / "CROSS_DISCIPLINARY_ANNOTATION_GUIDE_zh.md",
-            ["Tacit Concern", "Institutional Signal", "Actor Links", "Author Positioning"],
+        "schema_has_cross_disciplinary_fields": all(
+            field in schema_properties
+            for field in ["institutional_signal", "actor_links", "author_positioning", "tone_commitment"]
         ),
         "workflow_has_required_trace_order": _file_contains(
-            DOCS_DIR / "WORKFLOW_SPEC_zh.md",
-            ["understand", "question", "evidence_plan", "commitment_check", "integrity_check"],
+            readme_path,
+            ["Layer 0", "Layer 1", "Layer 2", "Layer 3", "Layer 4", "Layer 5"],
         ),
         "simulation_spec_has_required_roles_and_boundary": _file_contains(
-            DOCS_DIR / "SIMULATION_EVALUATION_SPEC_zh.md",
-            ["Reviewer Agent", "Author Rebuttal Agent", "Editor Signal Agent", "not real peer review"],
+            readme_path,
+            ["reviewer", "author rebuttal", "editor signal", "not real peer review"],
         ),
         "api_status_documented_as_model_assisted": api_manifest_status in {"prepared_not_executed", "executed"}
-        and _file_contains(DOCS_DIR / "READY_FOR_API_REVIEW_zh.md", ["model-assisted"]),
+        and _file_contains(readme_path, ["model-assisted"]),
         "api_execution_reflected_in_public_docs": (
             api_manifest_status != "executed"
             or (
-                _file_contains(DOCS_DIR / "READY_FOR_API_REVIEW_zh.md", ["API seed review has been executed", "200 / 200"])
-                and _file_contains(PROJECT_ROOT / "README.md", ["API seed review has been executed", "model-assisted, not human gold"])
+                _file_contains(readme_path, ["API seed review has been executed", "200 / 200", "model-assisted, not human gold"])
             )
         ),
-        "training_design_is_documented": _file_contains(
-            DOCS_DIR / "TRAINING_AND_LEARNING_DESIGN_zh.md",
-            ["不是直接训练 final rebuttal generator", "response adequacy", "unsupported commitment"],
+        "training_boundary_is_documented": _file_contains(
+            readme_path,
+            ["does not train or fine-tune models", "not a hidden one-shot rebuttal"],
         ),
     }
 
     semantic_checks.update(
         {
             "non_training_open_source_scope_is_explicit": _file_contains(
-                DOCS_DIR / "NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md",
-                ["non-training", "not a RAG system", "不是单一技术套路", "训练和微调不属于 v0.1 核心"],
+                readme_path,
+                ["non-training", "not a RAG system", "does not train or fine-tune models"],
             ),
-            "pdf_derived_design_lenses_are_documented": _file_contains(
-                DOCS_DIR / "PDF_DERIVED_DESIGN_LENSES_zh.md",
-                ["2026.5.15.pdf", "2026.5.23.pdf", "默会知识", "制度依赖", "行动者网络", "快思维", "慢思维", "情绪", "LIWC"],
+            "cross_disciplinary_lenses_are_documented": _file_contains(
+                readme_path,
+                ["tacit knowledge boundary", "institutional dependence", "actor-network alignment", "author agency gate"],
             ),
             "training_is_not_public_core_scope": _file_contains(
-                DOCS_DIR / "NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md",
-                ["legacy optional non-core artifact", "不能被写成 v0.1 核心贡献"],
+                readme_path,
+                ["Training and fine-tuning are outside the public v0.1 core scope"],
             ),
         }
     )
 
     checks = [
-        _check("Required docs exist", len(docs_missing) == 0, {"missing": docs_missing}),
         _check("Required schema fields exist", len(schema_missing) == 0, {"missing": schema_missing}),
         _check("Required taxonomy files exist", len(taxonomies_missing) == 0, {"missing": taxonomies_missing}),
         _check("Seed candidates row count", len(seed_candidates) == 200, {"actual": len(seed_candidates), "expected": 200}),
@@ -3693,14 +3497,14 @@ def _validate_naturereview_v01() -> dict[str, Any]:
         _check(
             "Non-training open-source scope is explicit",
             semantic_checks["non_training_open_source_scope_is_explicit"],
-            {"path": "docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md"},
+            {"path": "README.md"},
         ),
         _check(
-            "PDF-derived design lenses are documented",
-            semantic_checks["pdf_derived_design_lenses_are_documented"],
-            {"path": "docs/PDF_DERIVED_DESIGN_LENSES_zh.md"},
+            "Cross-disciplinary design lenses are documented",
+            semantic_checks["cross_disciplinary_lenses_are_documented"],
+            {"path": "README.md"},
         ),
-        _check("License decision note exists", license_decision_ok, {"path": "docs/LICENSE_DECISION_zh.md"}),
+        _check("README includes public license and boundary notes", license_decision_ok, {"path": "README.md"}),
         _check(
             "Legacy optional training seed export is non-core",
             training_seed_ok,
@@ -3758,86 +3562,7 @@ def _validate_naturereview_v01() -> dict[str, Any]:
 def _write_validation_report(validation: dict[str, Any] | None = None) -> None:
     validation = validation or _validate_naturereview_v01()
     _write_json(PROJECT_ROOT / "data/evaluation/naturereview_v01_validation_summary.json", _jsonable(validation))
-    check_rows = "\n".join(
-        f"| {check['name']} | `{json.dumps(check['details'], ensure_ascii=False, sort_keys=True)}` | {check['status']} |"
-        for check in validation["checks"]
-    )
-    counts_json = json.dumps(validation["counts"], ensure_ascii=False, indent=2, sort_keys=True)
-    label_json = json.dumps(validation["label_source_counts"], ensure_ascii=False, indent=2, sort_keys=True)
-    api_status = validation["api_handoff_status"]
-    seed_labels = validation["label_source_counts"].get("seed", {})
-    unit_labels = validation["label_source_counts"].get("interaction_units", {})
-    if api_status == "executed":
-        label_note = (
-            "说明：当前 seed review API 已执行完成，seed 和 KB 标签均按 `model_assisted` 处理。"
-            "这表示 API 模型复核已经替代本轮人工确认流程，但仍然不是 human gold。"
-        )
-        boundary = f"""- 当前没有 human gold。
-- API seed review has been executed for 200 / 200 seed requests.
-- 当前 seed label counts: `{json.dumps(seed_labels, ensure_ascii=False, sort_keys=True)}`。
-- 当前 KB label counts: `{json.dumps(unit_labels, ensure_ascii=False, sort_keys=True)}`。
-- 当前主 KB 是 model-assisted knowledge base，不是人工金标 benchmark。
-- 系统用于记录、追溯和评估 Author Rebuttal Assistant workflow，不是最终代写系统。"""
-        next_work = """## Next Work After API Review
 
-1. Normalize long-tail model labels back into controlled taxonomy where needed.
-2. Run retrieval and workflow error analysis without using response_strategy as a ranking feature.
-3. Add stronger retrieval baselines or an optional local demo interface.
-4. Keep all public claims marked model-assisted until a separate human-confirmed benchmark exists.
-"""
-    else:
-        label_note = (
-            "说明：`heuristic_model_ready` 表示候选记录已经准备给 API 复核，但还没有完成外部模型复核；"
-            "它不能被当作 `model_assisted`，更不能被当作 human gold。"
-        )
-        boundary = f"""- 当前没有 human gold。
-- 当前主 KB 混合了 `heuristic_model_ready` 候选记录和少量既有 `model_assisted` mini-seed。
-- API handoff 已准备，但状态仍是 `{api_status}`。
-- 系统用于记录、追溯和评估 Author Rebuttal Assistant workflow，不是最终代写系统。"""
-        next_work = """## Remaining API-only Work
-
-1. Execute `data/evaluation/api_handoff/naturereview_v01/seed_review_requests.jsonl` with the configured OpenAI-compatible API.
-2. Store model outputs separately from the request queue.
-3. Validate model JSON schema and safety constraints.
-4. Merge validated model-assisted revisions into seed records.
-5. Rebuild KB, retrieval v2, workflow v2, and reports with updated label provenance.
-6. Keep all outputs marked model-assisted until human confirmation.
-"""
-    report = f"""# NatureReview-Interact v0.1 Validation Report
-
-Generated by `python -m peer_review_skills.cli.main validate-naturereview-v01`.
-
-## Overall Status
-
-`{validation["overall_status"]}`
-
-## Counts
-
-```json
-{counts_json}
-```
-
-## Label Source Counts
-
-```json
-{label_json}
-```
-
-{label_note}
-
-## Structural And Semantic Checks
-
-| Check | Details | Status |
-|---|---|---|
-{check_rows}
-
-## Current Boundary
-
-{boundary}
-
-{next_work}
-"""
-    _write_doc("NATUREREVIEW_V01_VALIDATION_REPORT_zh.md", report)
 
 
 def _seed_report(title: str, summary: dict[str, Any]) -> str:
@@ -4183,12 +3908,27 @@ def _evaluation_protocol_complete(path: Path) -> bool:
     )
 
 
+def _evaluation_task_catalog_complete() -> bool:
+    required_fields = [
+        "input",
+        "output",
+        "supervision",
+        "automatic",
+        "human",
+        "baselines",
+        "failures",
+    ]
+    return len(EVALUATION_TASKS) >= 11 and all(
+        all(task.get(field) for field in required_fields)
+        for task in EVALUATION_TASKS
+    )
+
+
 def _scan_secret_hits() -> list[dict[str, str]]:
     roots = [
         PROJECT_ROOT / "README.md",
         PROJECT_ROOT / "src/peer_review_skills",
         PROJECT_ROOT / "tests",
-        DOCS_DIR,
         SCHEMA_DIR,
         TAXONOMY_DIR,
         SEED_DIR,
@@ -4211,8 +3951,7 @@ def _scan_secret_hits() -> list[dict[str, str]]:
 
 def _scan_mojibake_hits() -> list[dict[str, str]]:
     roots = [
-        DOCS_DIR,
-        PROJECT_ROOT / "src/peer_review_skills",
+        PROJECT_ROOT / "README.md",
         SCHEMA_DIR,
         TAXONOMY_DIR,
         SEED_DIR,

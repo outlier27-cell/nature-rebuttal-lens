@@ -1,4 +1,5 @@
 import json
+import subprocess
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile
 from typing import Any
@@ -738,7 +739,7 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
         "--review-file",
         "examples/rebuttal_lens/reviewer_comment.txt",
         "--manuscript-file",
-        "examples/rebuttal_lens/manuscript_excerpt.md",
+        "examples/rebuttal_lens/manuscript_excerpt.txt",
         "--response-file",
         "examples/rebuttal_lens/author_draft_response.txt",
         "--retrieved-cases-file",
@@ -751,7 +752,7 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
 
     assert args.command == "run-rebuttal-lens"
     assert str(args.review_file).endswith("reviewer_comment.txt")
-    assert str(args.manuscript_file).endswith("manuscript_excerpt.md")
+    assert str(args.manuscript_file).endswith("manuscript_excerpt.txt")
     assert str(args.response_file).endswith("author_draft_response.txt")
     assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
     assert args.limit_cases == 3
@@ -832,17 +833,26 @@ def test_public_config_lists_complete_rebuttal_lens_agent_set():
     assert 'mode: "rebuttal_lens"' in config_text
 
 
-def test_public_audit_docs_are_not_stale_rule_based_findings():
-    audit_paths = [
-        Path.cwd() / "docs/audit/FINAL-AUDIT-SUMMARY.md",
-        Path.cwd() / "docs/audit/agent-implementation-audit.md",
-    ]
-    combined = "\n".join(path.read_text(encoding="utf-8") for path in audit_paths)
+def test_public_repository_does_not_reference_internal_docs():
+    readme = (Path.cwd() / "README.md").read_text(encoding="utf-8")
+    tracked_markdown = set(
+        subprocess.run(
+            ["git", "ls-files", "*.md"],
+            cwd=Path.cwd(),
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+    )
 
-    assert "Nature RebuttalLens" in combined
-    assert "12 independent LLM calls" in combined
-    assert "rule-based workflow assembly" not in combined.lower()
-    assert "NOT independent LLM-based agents" not in combined
+    assert "README.md" in tracked_markdown
+    assert "examples/rebuttal_lens/WORKED_EXAMPLE_zh.md" not in tracked_markdown
+    assert "codex.md" not in tracked_markdown
+    assert "UPGRADE.md" not in tracked_markdown
+    assert "docs/" not in readme
+    assert "codex.md" not in readme
+    assert "UPGRADE.md" not in readme
+    assert ".understand-anything" not in readme
 
 
 def test_python_project_has_installable_package_metadata():
@@ -903,35 +913,25 @@ def test_readme_keeps_release_critical_open_source_sections():
         "python -m pip install -e .",
         'python -m pip install -e ".[pdf]"',
         "run-rebuttal-lens",
-        "docs/rebuttal_lens_system_flow.html",
-        "docs/assets/rebuttal-lens-workflow.svg",
-        "docs/DATA_CARD_zh.md",
-        "docs/AGENT_CARD_zh.md",
-        "docs/DATA_RELEASE_BOUNDARY_zh.md",
+        "Layer 0",
+        "Layer 5",
+        "tacit knowledge boundary",
+        "author agency gate",
         "python -m compileall -q src tests",
         "python -m pip install --dry-run -e .",
         "upload confidential manuscript material to an external API",
         "Apache License 2.0",
-        "| Capability | Output |",
-        "Layer 0: Manuscript context",
-        "Layer 5: Integrity gate",
         "extractable PDF text",
         "DOCX",
         "legacy DOC",
+        "model-assisted, not human gold",
+        "not a hidden one-shot rebuttal",
     ]:
         assert required in readme
 
 
-def test_core_public_chinese_docs_are_readable_not_mojibake():
-    public_docs = [
-        Path.cwd() / "docs/REBUTTAL_LENS_WORKFLOW_zh.md",
-        Path.cwd() / "docs/RESPONSIBLE_USE_zh.md",
-        Path.cwd() / "docs/DATA_CARD_zh.md",
-        Path.cwd() / "docs/AGENT_CARD_zh.md",
-        Path.cwd() / "docs/DATA_RELEASE_BOUNDARY_zh.md",
-        Path.cwd() / "docs/MODEL_AND_AGENT_LIMITATIONS_zh.md",
-        Path.cwd() / "docs/OPEN_SOURCE_V0_1_COMPLETION_STATUS_zh.md",
-    ]
+def test_public_readme_is_readable_not_mojibake():
+    text = (Path.cwd() / "README.md").read_text(encoding="utf-8")
     mojibake_markers = [
         "".join(chr(code) for code in [0x7F01, 0xE218, 0x5D35]),
         "".join(chr(code) for code in [0x943E, 0x7678]),
@@ -943,8 +943,6 @@ def test_core_public_chinese_docs_are_readable_not_mojibake():
         "".join(chr(code) for code in [0x6992, 0x6DBC, 0x7D31]),
     ]
 
-    for path in public_docs:
-        text = path.read_text(encoding="utf-8")
-        assert len(text.strip()) > 100, f"{path} unexpectedly short"
-        for marker in mojibake_markers:
-            assert marker not in text, f"{path} contains mojibake marker {marker!r}"
+    assert len(text.strip()) > 1000
+    for marker in mojibake_markers:
+        assert marker not in text, f"README.md contains mojibake marker {marker!r}"

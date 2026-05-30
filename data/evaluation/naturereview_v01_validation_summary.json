@@ -6,13 +6,6 @@
       "details": {
         "missing": []
       },
-      "name": "Required docs exist",
-      "status": "PASS"
-    },
-    {
-      "details": {
-        "missing": []
-      },
       "name": "Required schema fields exist",
       "status": "PASS"
     },
@@ -190,23 +183,23 @@
     },
     {
       "details": {
-        "path": "docs/NON_TRAINING_OPEN_SOURCE_SCOPE_zh.md"
+        "path": "README.md"
       },
       "name": "Non-training open-source scope is explicit",
       "status": "PASS"
     },
     {
       "details": {
-        "path": "docs/PDF_DERIVED_DESIGN_LENSES_zh.md"
+        "path": "README.md"
       },
-      "name": "PDF-derived design lenses are documented",
+      "name": "Cross-disciplinary design lenses are documented",
       "status": "PASS"
     },
     {
       "details": {
-        "path": "docs/LICENSE_DECISION_zh.md"
+        "path": "README.md"
       },
-      "name": "License decision note exists",
+      "name": "README includes public license and boundary notes",
       "status": "PASS"
     },
     {
@@ -261,7 +254,7 @@
       "details": {
         "expected": true
       },
-      "name": "data card declares no human gold",
+      "name": "readme declares no human gold",
       "status": "PASS"
     },
     {
@@ -275,7 +268,7 @@
       "details": {
         "expected": true
       },
-      "name": "annotation guide has cross disciplinary fields",
+      "name": "schema has cross disciplinary fields",
       "status": "PASS"
     },
     {
@@ -310,7 +303,7 @@
       "details": {
         "expected": true
       },
-      "name": "training design is documented",
+      "name": "training boundary is documented",
       "status": "PASS"
     },
     {
@@ -324,7 +317,7 @@
       "details": {
         "expected": true
       },
-      "name": "pdf derived design lenses are documented",
+      "name": "cross disciplinary lenses are documented",
       "status": "PASS"
     },
     {
@@ -361,15 +354,15 @@
   "overall_status": "PASS",
   "secret_hit_count": 0,
   "semantic_checks": {
-    "annotation_guide_has_cross_disciplinary_fields": true,
     "api_execution_reflected_in_public_docs": true,
     "api_status_documented_as_model_assisted": true,
-    "data_card_declares_no_human_gold": true,
+    "cross_disciplinary_lenses_are_documented": true,
     "non_training_open_source_scope_is_explicit": true,
-    "pdf_derived_design_lenses_are_documented": true,
+    "readme_declares_no_human_gold": true,
     "responsible_use_has_hard_boundaries": true,
+    "schema_has_cross_disciplinary_fields": true,
     "simulation_spec_has_required_roles_and_boundary": true,
-    "training_design_is_documented": true,
+    "training_boundary_is_documented": true,
     "training_is_not_public_core_scope": true,
     "workflow_has_required_trace_order": true
   }
