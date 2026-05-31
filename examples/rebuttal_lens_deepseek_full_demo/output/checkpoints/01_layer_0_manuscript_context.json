@@ -1,0 +1,110 @@
+{
+  "status": "checkpoint",
+  "layer": "Layer 0: Manuscript Context",
+  "partial_trace": {
+    "message_bus": [
+      {
+        "agent_id": "manuscript_context_extractor",
+        "timestamp": "2026-05-30T15:01:47.658949",
+        "message_type": "output",
+        "content": {
+          "manuscript_context_note": {
+            "mode": "manuscript_aware",
+            "usable_sections": [
+              "section_002",
+              "section_003",
+              "section_004",
+              "section_005",
+              "section_006",
+              "section_007",
+              "section_008"
+            ],
+            "limits": [
+              "No experimental results from temporal splits reported",
+              "Potential topical clustering across splits not quantified",
+              "Dataset includes partial records (response-only/review-only)"
+            ]
+          },
+          "section_inventory": [
+            {
+              "section_id": "section_002",
+              "heading": "Title",
+              "evidence_role": "Identifies core contribution (ReviewNet framework)"
+            },
+            {
+              "section_id": "section_003",
+              "heading": "Abstract",
+              "evidence_role": "Summary of framework capabilities and performance claims"
+            },
+            {
+              "section_id": "section_004",
+              "heading": "Data",
+              "evidence_role": "Describes corpus composition and partitioning approach"
+            },
+            {
+              "section_id": "section_005",
+              "heading": "Methods",
+              "evidence_role": "Explains system workflow and design constraints"
+            },
+            {
+              "section_id": "section_006",
+              "heading": "Results",
+              "evidence_role": "Current performance metrics on random split"
+            },
+            {
+              "section_id": "section_007",
+              "heading": "Limitations",
+              "evidence_role": "Identifies validity threats and coverage gaps"
+            },
+            {
+              "section_id": "section_008",
+              "heading": "Planned Additional Analysis",
+              "evidence_role": "Describes pending validation steps"
+            }
+          ],
+          "author_confirmation_questions": [
+            "Should we prioritize temporal split validation over other planned analyses?",
+            "Are there known topical clusters that require explicit stratification?",
+            "What proportion of records support full interaction chain analysis?"
+          ],
+          "reasoning": "The manuscript provides evidence about ReviewNet's architecture and current validation approach, but explicitly notes missing robustness checks. Usable sections focus on framework description rather than experimental results."
+        },
+        "metadata": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "execution_count": 1,
+          "prompt_tokens": 0,
+          "completion_tokens": 0
+        }
+      }
+    ],
+    "execution_trace": [
+      {
+        "layer": "Layer 0: Manuscript Context",
+        "agents": [
+          "manuscript_context_extractor"
+        ],
+        "success_count": 1,
+        "error_count": 0,
+        "errors": []
+      }
+    ],
+    "summary": {
+      "total_messages": 1,
+      "total_agents": 12,
+      "layers_executed": 1,
+      "errors": [],
+      "execution_trace": [
+        {
+          "layer": "Layer 0: Manuscript Context",
+          "agents": [
+            "manuscript_context_extractor"
+          ],
+          "success_count": 1,
+          "error_count": 0,
+          "errors": []
+        }
+      ]
+    }
+  }
+}

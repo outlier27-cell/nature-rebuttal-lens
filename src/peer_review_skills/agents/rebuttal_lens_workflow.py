@@ -4,10 +4,26 @@ import json
 from pathlib import Path
 from typing import Any
 
+from peer_review_skills.agents.base import (
+    agent_model_client,
+    agent_runtime_options,
+)
+from peer_review_skills.agents.final_report import (
+    compose_final_user_report,
+    write_final_user_report,
+)
 from peer_review_skills.agents.manuscript_context import build_rebuttal_lens_unit
 from peer_review_skills.agents.multi_agent_orchestrator import MultiAgentOrchestrator
 from peer_review_skills.agents.rebuttal_lens_agents import create_rebuttal_lens_frontend_agents
+from peer_review_skills.agents.committee_agents import (
+    CommitteeMetaReviewerAgent,
+    CommitteeReviewerAgent,
+)
 from peer_review_skills.agents.specialized_agents_part2 import create_all_specialized_agents
+from peer_review_skills.agents.strategy_tournament import (
+    StrategyMetaPlannerAgent,
+    StrategyTournamentAgent,
+)
 from peer_review_skills.agents.workflow_integration import (
     _create_model_client,
     _json_safe_config,
@@ -77,6 +93,8 @@ def run_rebuttal_lens_workflow(
         json.dumps(trace, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
+    final_report = compose_final_user_report(trace)
+    final_report_paths = write_final_user_report(final_report, output_dir)
     summary = {
         "system_name": "Nature RebuttalLens",
         "workflow_version": "rebuttal_lens_v1",
@@ -84,6 +102,9 @@ def run_rebuttal_lens_workflow(
         "total_llm_calls": trace.get("execution_metadata", {}).get("total_llm_calls", 0),
         "manuscript_mode": unit.get("manuscript_context", {}).get("mode"),
         "output_trace_path": str(trace_path),
+        "final_user_report_json": final_report_paths["final_user_report_json"],
+        "final_user_report_markdown": final_report_paths["final_user_report_markdown"],
+        "workflow_engine": config.get("workflow_engine", "layered"),
         "config": _json_safe_config(config),
     }
     (output_dir / "rebuttal_lens_summary.json").write_text(
@@ -106,6 +127,14 @@ def execute_rebuttal_lens_trace(
     if config.get("enable_refinement", False):
         raise ValueError(
             "Nature RebuttalLens refinement is not yet supported; run without enable_refinement."
+        )
+    if config.get("workflow_engine") == "dag":
+        return execute_rebuttal_lens_dag_trace(
+            unit=unit,
+            retrieval=retrieval,
+            taxonomies=taxonomies,
+            model_client=model_client,
+            config=config,
         )
     agents = {
         **create_rebuttal_lens_frontend_agents(model_client, config),
@@ -138,12 +167,290 @@ def execute_rebuttal_lens_trace(
     return trace
 
 
+def execute_rebuttal_lens_dag_trace(
+    *,
+    unit: dict[str, Any],
+    retrieval: dict[str, Any],
+    taxonomies: dict[str, Any],
+    model_client: Any,
+    config: dict[str, Any],
+) -> dict[str, Any]:
+    """Execute the optional DAG/committee/tournament RebuttalLens workflow."""
+    from peer_review_skills.agents.dag_runtime import (
+        WorkflowExecutionError,
+        run_workflow_graph,
+    )
+    from peer_review_skills.agents.rebuttal_lens_graph import build_rebuttal_lens_graph
+
+    agents = {
+        **create_rebuttal_lens_frontend_agents(model_client, config),
+        **create_all_specialized_agents(model_client, config),
+        **_create_optional_rebuttal_lens_agents(model_client, config),
+    }
+    graph = build_rebuttal_lens_graph(
+        enable_committee=bool(config.get("enable_committee", False)),
+        enable_strategy_tournament=bool(config.get("enable_strategy_tournament", False)),
+    )
+    base_inputs = {
+        "review_text": unit.get("review_text", ""),
+        "response_text": unit.get("response_text", ""),
+        "editor_text": unit.get("editor_text", ""),
+        "taxonomies": taxonomies,
+        "unit_id": unit.get("unit_id", "unknown"),
+        "unit": unit,
+        "retrieval": retrieval,
+        "manuscript_context": unit.get("manuscript_context", {}),
+    }
+    message_bus = []
+
+    def run_node(node, context):
+        if node.agent_id == "final_user_report_composer":
+            return {}
+        outputs = context["outputs"]
+        agent = agents[node.agent_id]
+        inputs = _build_rebuttal_lens_node_inputs(node.node_id, base_inputs, outputs, retrieval)
+        message = agent.execute(inputs)
+        message_bus.append(message)
+        return message.content
+
+    try:
+        graph_trace = run_workflow_graph(
+            graph,
+            run_node,
+            initial_context=base_inputs,
+            parallel=bool(config.get("dag_parallel", True)),
+            max_workers=int(config.get("dag_max_workers", 4)),
+        )
+    except WorkflowExecutionError as exc:
+        partial_graph_trace = exc.partial_trace
+        exc.partial_trace = _rebuttal_lens_dag_trace_from_graph_trace(
+            graph=graph,
+            graph_trace=partial_graph_trace,
+            message_bus=message_bus,
+            unit=unit,
+        )
+        raise
+    return _rebuttal_lens_dag_trace_from_graph_trace(
+        graph=graph,
+        graph_trace=graph_trace,
+        message_bus=message_bus,
+        unit=unit,
+    )
+
+
+def _rebuttal_lens_dag_trace_from_graph_trace(
+    *,
+    graph: Any,
+    graph_trace: dict[str, Any],
+    message_bus: list[Any],
+    unit: dict[str, Any],
+) -> dict[str, Any]:
+    node_outputs = graph_trace["outputs"]
+    agent_outputs = {
+        graph.node_by_id[node_id].agent_id: output
+        for node_id, output in node_outputs.items()
+        if graph.node_by_id[node_id].agent_id != "final_user_report_composer"
+    }
+    return {
+        "trace_id": f"rebuttal_lens_dag_{unit.get('unit_id', 'unknown')}",
+        "query_unit_id": unit.get("unit_id", "unknown"),
+        "agent_intermediate_outputs": agent_outputs,
+        "message_bus": [msg.to_dict() for msg in message_bus],
+        "execution_trace": graph_trace["execution_trace"],
+        "execution_metadata": {
+            **graph_trace["execution_metadata"],
+            "total_llm_calls": len(message_bus),
+            "workflow_engine": "dag",
+            "manuscript_mode": unit.get("manuscript_context", {}).get("mode"),
+        },
+    }
+
+
 def load_rebuttal_lens_config(path: str | Path) -> dict[str, Any]:
     """Load the small public RebuttalLens YAML config without adding a runtime YAML dependency."""
     config_path = Path(path)
     if not config_path.exists():
         return {}
     return _parse_simple_yaml(config_path.read_text(encoding="utf-8"))
+
+
+def _create_optional_rebuttal_lens_agents(
+    model_client: Any,
+    config: dict[str, Any],
+) -> dict[str, Any]:
+    def runtime_options(agent_id: str) -> dict[str, Any]:
+        return agent_runtime_options(config, agent_id)
+
+    def client(agent_id: str) -> Any:
+        return agent_model_client(model_client, config, agent_id)
+
+    optional_agents = {}
+    if config.get("enable_committee", False):
+        optional_agents.update({
+            "methodology_committee_reviewer": CommitteeReviewerAgent(
+                "methodology_committee_reviewer",
+                client("methodology_committee_reviewer"),
+                reviewer_role="methodology",
+                **runtime_options("methodology_committee_reviewer"),
+            ),
+            "claim_committee_reviewer": CommitteeReviewerAgent(
+                "claim_committee_reviewer",
+                client("claim_committee_reviewer"),
+                reviewer_role="claim_calibration",
+                **runtime_options("claim_committee_reviewer"),
+            ),
+            "tone_committee_reviewer": CommitteeReviewerAgent(
+                "tone_committee_reviewer",
+                client("tone_committee_reviewer"),
+                reviewer_role="tone_and_interaction",
+                **runtime_options("tone_committee_reviewer"),
+            ),
+            "committee_meta_reviewer": CommitteeMetaReviewerAgent(
+                "committee_meta_reviewer",
+                client("committee_meta_reviewer"),
+                **runtime_options("committee_meta_reviewer"),
+            ),
+        })
+    if config.get("enable_strategy_tournament", False):
+        optional_agents.update({
+            "strategy_tournament_agent": StrategyTournamentAgent(
+                "strategy_tournament_agent",
+                client("strategy_tournament_agent"),
+                **runtime_options("strategy_tournament_agent"),
+            ),
+            "strategy_meta_planner": StrategyMetaPlannerAgent(
+                "strategy_meta_planner",
+                client("strategy_meta_planner"),
+                **runtime_options("strategy_meta_planner"),
+            ),
+        })
+    return optional_agents
+
+
+def _build_rebuttal_lens_node_inputs(
+    node_id: str,
+    base_inputs: dict[str, Any],
+    outputs: dict[str, Any],
+    retrieval: dict[str, Any],
+) -> dict[str, Any]:
+    all_outputs = _agent_outputs_from_node_outputs(outputs)
+    common = {**base_inputs, "all_agent_outputs": all_outputs}
+    if node_id == "manuscript_context":
+        return common
+    if node_id == "reviewer_understanding":
+        return {**common, "manuscript_context_note": outputs.get("manuscript_context", {})}
+    if node_id == "tacit_concern":
+        return {**common, "concern_map": outputs.get("reviewer_understanding", {})}
+    if node_id == "manuscript_evidence":
+        return {
+            **common,
+            "manuscript_context_note": outputs.get("manuscript_context", {}),
+            "concern_map": outputs.get("reviewer_understanding", {}),
+        }
+    if node_id == "institutional_signal":
+        return {
+            **common,
+            "concern_map": outputs.get("reviewer_understanding", {}),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+        }
+    if node_id == "case_interpretation":
+        return {
+            **common,
+            "concern_map": outputs.get("reviewer_understanding", {}),
+            "risk_interpretation": outputs.get("tacit_concern", {}),
+            "retrieved_cases": retrieval.get("top_k", []),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+        }
+    if node_id == "evidence_action":
+        return {
+            **common,
+            "concern_map": outputs.get("reviewer_understanding", {}),
+            "risk_interpretation": outputs.get("tacit_concern", {}),
+            "retrieved_cases": retrieval.get("top_k", []),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+            "case_interpretation": outputs.get("case_interpretation", {}),
+        }
+    if node_id == "author_positioning":
+        return {
+            **common,
+            "institutional_signal": outputs.get("institutional_signal", {}),
+            "evidence_plan": outputs.get("evidence_action", {}),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+        }
+    if node_id == "tone_commitment":
+        return {
+            **common,
+            "evidence_plan": outputs.get("evidence_action", {}),
+            "author_positioning": outputs.get("author_positioning", {}),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+        }
+    if node_id == "actor_network":
+        return {
+            **common,
+            "evidence_plan": outputs.get("evidence_action", {}),
+            "retrieved_cases": retrieval.get("top_k", []),
+            "author_positioning": outputs.get("author_positioning", {}),
+            "tone_calibration": outputs.get("tone_commitment", {}),
+            "manuscript_evidence": outputs.get("manuscript_evidence", {}),
+        }
+    if node_id == "cross_disciplinary_lens":
+        return common
+    if node_id in {
+        "committee_methodology_review",
+        "committee_claim_review",
+        "committee_tone_review",
+        "strategy_tournament",
+        "integrity",
+    }:
+        return common
+    if node_id == "committee_meta_review":
+        return {
+            **common,
+            "committee_outputs": {
+                "methodology_committee_reviewer": outputs.get("committee_methodology_review", {}),
+                "claim_committee_reviewer": outputs.get("committee_claim_review", {}),
+                "tone_committee_reviewer": outputs.get("committee_tone_review", {}),
+            },
+        }
+    if node_id == "meta_synthesis":
+        return {
+            **common,
+            "strategy_candidates": outputs.get("strategy_tournament", {}).get(
+                "strategy_candidates",
+                [],
+            ),
+        }
+    if node_id == "final_user_report":
+        return common
+    raise ValueError(f"Unknown RebuttalLens graph node: {node_id}")
+
+
+def _agent_outputs_from_node_outputs(outputs: dict[str, Any]) -> dict[str, Any]:
+    mapping = {
+        "manuscript_context": "manuscript_context_extractor",
+        "reviewer_understanding": "reviewer_understanding_agent",
+        "tacit_concern": "tacit_concern_interpreter",
+        "manuscript_evidence": "manuscript_evidence_locator",
+        "institutional_signal": "institutional_signal_interpreter",
+        "case_interpretation": "case_retrieval_interpreter",
+        "evidence_action": "evidence_action_planner",
+        "author_positioning": "author_positioning_agent",
+        "tone_commitment": "tone_commitment_calibrator",
+        "actor_network": "actor_network_mapper",
+        "cross_disciplinary_lens": "cross_disciplinary_lens_interpreter",
+        "committee_methodology_review": "methodology_committee_reviewer",
+        "committee_claim_review": "claim_committee_reviewer",
+        "committee_tone_review": "tone_committee_reviewer",
+        "committee_meta_review": "committee_meta_reviewer",
+        "strategy_tournament": "strategy_tournament_agent",
+        "meta_synthesis": "strategy_meta_planner",
+        "integrity": "integrity_adequacy_checker",
+    }
+    return {
+        mapping.get(node_id, node_id): output
+        for node_id, output in outputs.items()
+        if node_id in mapping
+    }
 
 
 def _merged_rebuttal_lens_config(
@@ -163,6 +470,20 @@ def _merged_rebuttal_lens_config(
         for key in ["enable_refinement", "max_refinement_iterations"]:
             if key in multi_agent and key not in merged:
                 merged[key] = multi_agent[key]
+    workflow = merged.get("workflow")
+    if isinstance(workflow, dict) and "workflow_engine" not in merged:
+        engine = workflow.get("engine")
+        if engine:
+            merged["workflow_engine"] = engine
+    rebuttal_lens = merged.get("rebuttal_lens")
+    if isinstance(rebuttal_lens, dict):
+        for key in [
+            "enable_committee",
+            "enable_strategy_tournament",
+            "final_user_report",
+        ]:
+            if key in rebuttal_lens and key not in merged:
+                merged[key] = rebuttal_lens[key]
     return merged
 
 
@@ -253,6 +574,9 @@ def _write_failure_trace(output_dir: Path, exc: Exception) -> None:
                 "execution_trace": [],
                 "summary": {"checkpoint_read_error": str(checkpoint_files[-1])},
             }
+    exception_partial_trace = getattr(exc, "partial_trace", None)
+    if isinstance(exception_partial_trace, dict):
+        partial_trace = exception_partial_trace
     payload = {
         "status": "failed",
         "error": str(exc),

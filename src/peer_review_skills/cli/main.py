@@ -153,6 +153,21 @@ def build_parser() -> argparse.ArgumentParser:
     run_rebuttal_lens.add_argument("--retrieved-cases-file", type=config.Path, default=None)
     run_rebuttal_lens.add_argument("--output-dir", type=config.Path, default=None)
     run_rebuttal_lens.add_argument("--limit-cases", type=int, default=5)
+    run_rebuttal_lens.add_argument(
+        "--workflow-engine",
+        choices=("layered", "dag"),
+        default=None,
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-committee",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-strategy-tournament",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+    )
 
     return parser
 
@@ -517,6 +532,12 @@ def main(argv: list[str] | None = None) -> int:
             "max_refinement_iterations": 0,
             **_require_rebuttal_lens_api_config(parser),
         }
+        if args.workflow_engine is not None:
+            workflow_config["workflow_engine"] = args.workflow_engine
+        if args.enable_committee is not None:
+            workflow_config["enable_committee"] = args.enable_committee
+        if args.enable_strategy_tournament is not None:
+            workflow_config["enable_strategy_tournament"] = args.enable_strategy_tournament
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)
         retrieved_cases = []

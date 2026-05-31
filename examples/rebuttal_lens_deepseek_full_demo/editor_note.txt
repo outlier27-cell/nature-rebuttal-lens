@@ -1,0 +1,1 @@
+The revised manuscript should directly address the reviewer's concern about temporal leakage, duplicate or near-duplicate examples, and the strength of the generalization claim. Please avoid expanding claims unless the additional analyses support them.

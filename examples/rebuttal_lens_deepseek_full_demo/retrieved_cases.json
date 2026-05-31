@@ -1,0 +1,43 @@
+{
+  "top_k": [
+    {
+      "unit_id": "nature_case_temporal_split_017",
+      "score": 0.87,
+      "concern_type": "evaluation_validity",
+      "risk_type": "data_leakage_risk",
+      "response_strategy": "acknowledge_add_analysis_and_narrow_claim",
+      "evidence_action": "temporally_held_out_evaluation",
+      "institutional_signal": "generalization_claim_requires_robustness",
+      "provenance": {
+        "source": "derived_case_metadata",
+        "raw_text_not_redistributed": true
+      }
+    },
+    {
+      "unit_id": "nature_case_duplicate_control_044",
+      "score": 0.79,
+      "concern_type": "reproducibility",
+      "risk_type": "near_duplicate_bias",
+      "response_strategy": "add_deduplication_check_and_report_limit",
+      "evidence_action": "near_duplicate_removal_sensitivity",
+      "institutional_signal": "transparent_methods_norm",
+      "provenance": {
+        "source": "derived_case_metadata",
+        "raw_text_not_redistributed": true
+      }
+    },
+    {
+      "unit_id": "nature_case_overclaim_092",
+      "score": 0.73,
+      "concern_type": "claim_calibration",
+      "risk_type": "overclaiming_risk",
+      "response_strategy": "narrow_claim_scope_until_evidence_is_available",
+      "evidence_action": "revise_abstract_and_discussion_claims",
+      "institutional_signal": "editorial_caution_on_generalization",
+      "provenance": {
+        "source": "derived_case_metadata",
+        "raw_text_not_redistributed": true
+      }
+    }
+  ]
+}

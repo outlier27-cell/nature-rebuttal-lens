@@ -1,0 +1,1 @@
+We thank the reviewer for this helpful comment. We will clarify the dataset split in the Methods section and add additional robustness checks. The dataset was split at the paper level, and we believe this avoids leakage. We will also state that our method generalizes across Nature peer-review contexts.

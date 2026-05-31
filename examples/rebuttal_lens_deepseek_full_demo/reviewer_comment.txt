@@ -1,0 +1,7 @@
+Reviewer 2, major comment:
+
+The manuscript reports that ReviewNet substantially improves reproducibility of peer-review outcome modeling, but the evaluation design is not yet convincing. The dataset appears to be drawn from multiple Nature-family journals over several years, yet the manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits.
+
+The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed. Without this, the central claim that the method generalizes across peer-review contexts is overstated.
+
+The tone of the current response should be careful: this is not merely a request for wording clarification, but a concern about evidence adequacy and possible overclaiming.

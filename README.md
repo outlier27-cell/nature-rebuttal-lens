@@ -25,6 +25,30 @@ The system is a non-training, cross-disciplinary workflow. It does not train or 
 
 Each agent constructs its own prompt and calls the configured OpenAI-compatible model client. The final output is a structured trace, not a hidden one-shot rebuttal.
 
+## Output: Not a Trace Dump
+
+Nature RebuttalLens writes three levels of output:
+
+1. `rebuttal_lens_trace.json` - full auditable agent trace.
+2. `final_user_report.json` - structured author-facing report for downstream UI/API use.
+3. `final_user_report.md` - readable response-planning report for authors.
+
+The default `layered` workflow is stable and cost-conscious. For deeper research evaluation, the CLI also supports an experimental DAG/committee/tournament mode:
+
+```powershell
+run-rebuttal-lens `
+  --review-file examples/rebuttal_lens/reviewer_comment.txt `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
+  --response-file examples/rebuttal_lens/author_draft_response.txt `
+  --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --workflow-engine dag `
+  --enable-committee `
+  --enable-strategy-tournament `
+  --output-dir data/evaluation/rebuttal_lens_demo
+```
+
+In DAG mode, dependency-bound steps still run in order, but reviewer committee nodes and strategy analysis are represented as graph stages with explicit dependencies and meta-synthesis. This makes the workflow easier to audit and evaluate than a simple fixed chain.
+
 ## Repository Layout
 
 ```text
@@ -102,6 +126,8 @@ Main outputs:
 ```text
 data/evaluation/rebuttal_lens_demo/rebuttal_lens_trace.json
 data/evaluation/rebuttal_lens_demo/rebuttal_lens_summary.json
+data/evaluation/rebuttal_lens_demo/final_user_report.json
+data/evaluation/rebuttal_lens_demo/final_user_report.md
 data/evaluation/rebuttal_lens_demo/checkpoints/
 ```
 

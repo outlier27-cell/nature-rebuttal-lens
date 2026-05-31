@@ -1,0 +1,31 @@
+# Manuscript Excerpt
+
+## Title
+
+ReviewNet: Learning Review-Response Interaction Signals from Transparent Peer Review
+
+## Abstract
+
+We introduce ReviewNet, a framework for modeling reviewer concerns, author response strategies, and editorial signals from transparent peer-review documents. On a curated Nature-family corpus, ReviewNet improves macro-F1 for response strategy classification and produces more structured rebuttal plans than a direct prompting baseline.
+
+## Data
+
+The corpus contains public transparent peer-review files from Nature-family journals. Each record includes article metadata, reviewer reports when available, author response letters when available, and editorial decision text when publicly released. We normalize these materials into review interaction units that preserve source identifiers and provenance.
+
+We split the available interaction units into train, validation, and test partitions at the paper level. The current draft uses a random paper-level 80/10/10 split. We remove exact duplicate interaction units using normalized text hashes before model evaluation.
+
+## Methods
+
+ReviewNet first extracts atomic reviewer concerns, classifies risk type, retrieves bounded historical analogies, plans evidence actions, and then drafts a structured author-response outline. The system is designed as an assistant and does not predict acceptance or replace author judgment.
+
+## Results
+
+On the current random paper-level test split, ReviewNet improves response strategy classification from 0.51 to 0.62 macro-F1. It also improves concern coverage in a small model-assisted evaluation. We have not yet reported a temporal split experiment in the submitted draft.
+
+## Limitations
+
+The current version may still contain topical clustering across splits because related papers from the same journal family and publication period can share language patterns. We do not yet quantify robustness under a temporally held-out split. The dataset also includes response-only and review-only records, so not every record supports full reviewer-author-editor chain analysis.
+
+## Planned Additional Analysis
+
+We can construct a temporally held-out test split using publication year metadata where available. We can also run a stricter near-duplicate removal step using MinHash or embedding similarity before evaluation. These analyses have not been completed yet.

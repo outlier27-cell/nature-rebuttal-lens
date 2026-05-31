@@ -1,0 +1,93 @@
+{
+  "system_name": "Nature RebuttalLens",
+  "workflow_version": "rebuttal_lens_v1",
+  "total_traces": 1,
+  "total_llm_calls": 12,
+  "manuscript_mode": "manuscript_aware",
+  "output_trace_path": "examples/rebuttal_lens_deepseek_full_demo/output/rebuttal_lens_trace.json",
+  "config": {
+    "workflow": {
+      "mode": "rebuttal_lens"
+    },
+    "multi_agent": {
+      "enable_refinement": false,
+      "max_refinement_iterations": 2,
+      "sequential_dependency_layers": true,
+      "agents": {
+        "manuscript_context_extractor": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "manuscript_evidence_locator": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "case_retrieval_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "reviewer_understanding_agent": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "tacit_concern_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "institutional_signal_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "evidence_action_planner": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "author_positioning_agent": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "tone_commitment_calibrator": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "actor_network_mapper": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "cross_disciplinary_lens_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "integrity_adequacy_checker": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        }
+      }
+    },
+    "api": {},
+    "optimization": {
+      "use_tiered_models": true,
+      "enable_caching": true,
+      "batch_size": 10,
+      "selective_execution": false
+    },
+    "enable_refinement": false,
+    "max_refinement_iterations": 0,
+    "api_base": "<redacted-provider-url>",
+    "api_key": "<redacted>",
+    "model": "deepseek-v3",
+    "output_dir": "examples/rebuttal_lens_deepseek_full_demo/output"
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "report_type": "author_rebuttal_assistant_report",
+  "workflow_version": "rebuttal_lens_v1",
+  "query_unit_id": "rebuttal_lens_user_case",
+  "executive_summary": "系统识别出 3 个 reviewer concern。其中 1 个 claim 暂时不可追溯或证据不足。建议先补证据和缩窄承诺，再组织 rebuttal 草稿。",
+  "comment_cards": [
+    {
+      "comment_id": "comment_001",
+      "concern_type": "experimental_design",
+      "surface_request": "The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+      "implicit_risk": "The dataset appears to be drawn from multiple Nature-family journals over several years, yet the manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+      "confidence": "high",
+      "evidence_status": "partially_supported",
+      "manuscript_section": "section_004",
+      "evidence_gap": "No explanation of how temporal leakage was avoided or whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+      "recommended_action": "Explanation of how temporal leakage was avoided in dataset splits",
+      "action_type": "method_clarification",
+      "supporting_case_ids": [
+        "nature_case_temporal_split_017"
+      ],
+      "author_input_required": true,
+      "safe_response_language": "We will report this analysis if completed, or narrow the claim if it cannot be supported.",
+      "unsafe_language_to_avoid": "Avoid claiming that the concern is fully resolved before evidence is available."
+    },
+    {
+      "comment_id": "comment_002",
+      "concern_type": "generalization_scope",
+      "surface_request": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+      "implicit_risk": "The central claim that the method generalizes across peer-review contexts is overstated.",
+      "confidence": "high",
+      "evidence_status": "missing",
+      "manuscript_section": "none",
+      "evidence_gap": "No evidence provided to support the claim that the method generalizes across peer-review contexts, especially regarding temporal and topical robustness.",
+      "recommended_action": "Robustness checks under temporally held-out splits",
+      "action_type": "new_analysis",
+      "supporting_case_ids": [
+        "nature_case_temporal_split_017"
+      ],
+      "author_input_required": true,
+      "safe_response_language": "We will report this analysis if completed, or narrow the claim if it cannot be supported.",
+      "unsafe_language_to_avoid": "Avoid claiming that the concern is fully resolved before evidence is available."
+    },
+    {
+      "comment_id": "comment_003",
+      "concern_type": "clarity_presentation",
+      "surface_request": "The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits.",
+      "implicit_risk": "The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits.",
+      "confidence": "medium",
+      "evidence_status": "supported",
+      "manuscript_section": "section_007",
+      "evidence_gap": "The manuscript acknowledges the lack of temporal split validation and potential topical clustering, but does not provide detailed methods to address these issues.",
+      "recommended_action": "Revised claims about generalization scope",
+      "action_type": "claim_narrowing",
+      "supporting_case_ids": [
+        "nature_case_overclaim_092"
+      ],
+      "author_input_required": true,
+      "safe_response_language": "We will report this analysis if completed, or narrow the claim if it cannot be supported.",
+      "unsafe_language_to_avoid": "Avoid overstating implications beyond the supplied manuscript evidence."
+    }
+  ],
+  "recommended_rebuttal_outline": [
+    "Thank the reviewer and restate the concern as an evidence/validity issue.",
+    "Address comment_001 by explaining: Explanation of how temporal leakage was avoided in dataset splits.",
+    "Address comment_002 by explaining: Robustness checks under temporally held-out splits.",
+    "Address comment_003 by explaining: Revised claims about generalization scope.",
+    "Do not overclaim until this missing element is resolved: Specific details on how temporal leakage will be avoided in the new analyses.",
+    "Do not overclaim until this missing element is resolved: Quantitative evidence to support the narrowing of generalization claims.",
+    "Close by distinguishing completed revisions from analyses that require author confirmation."
+  ],
+  "author_confirmation_questions": [
+    "Should we prioritize temporal split validation over other planned analyses?",
+    "Are there known topical clusters that require explicit stratification?",
+    "What proportion of records support full interaction chain analysis?",
+    "Explanation of how temporal leakage was avoided in dataset splits",
+    "Robustness checks under temporally held-out splits",
+    "Revised claims about generalization scope"
+  ],
+  "tone_and_commitment_warnings": [
+    {
+      "tone": "cooperative",
+      "commitment_level": "promised_change",
+      "risk_flags": [
+        "unsupported_commitment"
+      ],
+      "boundary": "Not a psychological diagnosis; observable text only."
+    },
+    {
+      "tone": "assertive",
+      "commitment_level": "unknown",
+      "risk_flags": [
+        "overclaim"
+      ],
+      "boundary": "Not a psychological diagnosis; observable text only."
+    }
+  ],
+  "committee_synthesis": {},
+  "strategy_plan": {},
+  "unsafe_claims": [
+    {
+      "claim": "The method generalizes across peer-review contexts",
+      "source": "none",
+      "traceable": false
+    }
+  ],
+  "provenance_checks": [
+    {
+      "claim": "The dataset was split at the paper level",
+      "source": "section_004",
+      "traceable": true
+    },
+    {
+      "claim": "The manuscript acknowledges potential topical clustering across splits",
+      "source": "section_007",
+      "traceable": true
+    },
+    {
+      "claim": "The method generalizes across peer-review contexts",
+      "source": "none",
+      "traceable": false
+    }
+  ],
+  "responsible_use_warnings": [
+    "assistant_only",
+    "author_must_verify_all_claims",
+    "not_final_rebuttal_text",
+    "no_acceptance_prediction",
+    "no_confidential_upload_recommendation"
+  ],
+  "integrity_issues": [
+    {
+      "severity": "warning",
+      "agent_id": "tone_commitment_calibrator",
+      "description": "Potential overclaim in asserting current methodology avoids leakage without detailed evidence"
+    },
+    {
+      "severity": "info",
+      "agent_id": "evidence_action_planner",
+      "description": "Suggested new analyses require author confirmation of feasibility"
+    }
+  ],
+  "not_final_submission_text": true
+}

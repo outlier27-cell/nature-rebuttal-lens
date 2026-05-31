@@ -55,6 +55,70 @@ class RebuttalLensMockLLMClient:
                 },
                 "reasoning": "Cross-disciplinary lenses are grounded in observable traces.",
             }
+        elif "committee meta-reviewer" in system_prompt:
+            content = {
+                "committee_synthesis": {
+                    "highest_priority_risks": ["dataset split leakage"],
+                    "agreement": ["methodology and claim reviewers agree"],
+                    "disagreement": [],
+                    "recommended_focus": "clarify split and avoid overclaim",
+                },
+                "author_confirmation_questions": [
+                    "Can the temporal split validation be completed?"
+                ],
+                "reasoning": "The committee agrees the split evidence is central.",
+            }
+        elif "reviewer committee" in system_prompt:
+            content = {
+                "reviewer_role": "methodology",
+                "findings": [
+                    {
+                        "risk": "dataset split leakage",
+                        "severity": "high",
+                        "evidence": "random split without temporal validation",
+                        "recommendation": "add temporal validation or narrow the claim",
+                    }
+                ],
+                "author_confirmation_questions": [
+                    "Can the temporal split validation be completed?"
+                ],
+                "reasoning": "Committee reviewer focuses on split validity.",
+            }
+        elif "strategy meta-planner" in system_prompt:
+            content = {
+                "selected_strategy_id": "strategy_a",
+                "merged_plan": {
+                    "response_position": "accept_and_revise",
+                    "required_actions": ["clarify split", "narrow unsupported generalization"],
+                    "claim_adjustments": ["avoid claiming cross-context generalization"],
+                },
+                "rejection_reasons": [
+                    {"strategy_id": "strategy_b", "reason": "unsupported overclaim"}
+                ],
+                "author_confirmation_questions": [
+                    "Can the temporal split validation be completed?"
+                ],
+                "reasoning": "Strategy A best preserves evidence boundaries.",
+            }
+        elif "strategy tournament" in system_prompt:
+            content = {
+                "strategy_candidates": [
+                    {
+                        "strategy_id": "strategy_a",
+                        "name": "clarify split and narrow claim",
+                        "response_position": "accept_and_revise",
+                        "required_actions": ["clarify split"],
+                        "rubric_scores": {
+                            "concern_coverage": 5,
+                            "evidence_grounding": 4,
+                            "feasibility": 4,
+                            "overclaim_risk": 1,
+                        },
+                        "author_confirmation_required": True,
+                    }
+                ],
+                "reasoning": "The safest strategy avoids unsupported claims.",
+            }
         elif "manuscript context extractor" in system_prompt:
             content = {
                 "manuscript_context_note": {
@@ -390,6 +454,102 @@ def test_build_rebuttal_lens_unit_preserves_inputs_and_manuscript_context(tmp_pa
     assert unit["provenance"]["input_source"] == "user_supplied"
 
 
+def test_rebuttal_lens_final_report_composer_builds_user_package():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_type": "experimental_design",
+                        "surface_request": "clarify temporal split",
+                        "text_evidence": "temporal leakage was not explained",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "experimental_design",
+                        "status": "partially_supported",
+                        "section_id": "section_004",
+                        "text_evidence": "random paper-level split",
+                        "gap": "no temporal split result",
+                    }
+                ],
+                "evidence_gaps": ["no temporal split result"],
+                "author_confirmation_questions": ["Can you run a temporal split?"],
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "action_type": "new_analysis",
+                        "required_artifact": "temporally held-out split",
+                        "supporting_case_ids": ["nature_case_temporal_split_017"],
+                        "requires_author_confirmation": True,
+                    }
+                ]
+            },
+            "tone_commitment_calibrator": {
+                "tone_commitment_warnings": [
+                    {
+                        "tone": "assertive",
+                        "commitment_level": "unknown",
+                        "risk_flags": ["overclaim"],
+                        "boundary": "observable text only",
+                    }
+                ]
+            },
+            "integrity_adequacy_checker": {
+                "response_adequacy": {
+                    "is_adequate": True,
+                    "missing_elements": ["temporal split details"],
+                    "strengths": ["concern coverage"],
+                },
+                "provenance_checks": [
+                    {
+                        "claim": "generalizes across contexts",
+                        "source": "none",
+                        "traceable": False,
+                    }
+                ],
+                "responsible_use_warnings": [
+                    "assistant_only",
+                    "author_must_verify_all_claims",
+                    "not_final_rebuttal_text",
+                    "no_acceptance_prediction",
+                ],
+                "issues": [
+                    {
+                        "severity": "warning",
+                        "agent_id": "tone_commitment_calibrator",
+                        "description": "overclaim risk",
+                    }
+                ],
+            },
+        },
+        "responsible_use_boundary": {
+            "assistant_only": True,
+            "not_final_rebuttal_text": True,
+            "author_must_verify_all_claims": True,
+            "no_acceptance_prediction": True,
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert report["report_type"] == "author_rebuttal_assistant_report"
+    assert report["comment_cards"][0]["comment_id"] == "comment_001"
+    assert report["comment_cards"][0]["evidence_status"] == "partially_supported"
+    assert report["comment_cards"][0]["author_input_required"] is True
+    assert "generalizes across contexts" in report["unsafe_claims"][0]["claim"]
+    assert "assistant_only" in report["responsible_use_warnings"]
+    assert report["recommended_rebuttal_outline"]
+
+
 @pytest.mark.parametrize(
     ("agent_cls", "expected_field", "inputs"),
     [
@@ -482,6 +642,17 @@ def test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace(tmp_path):
     assert "integrity_adequacy_checker" in outputs
     assert outputs["manuscript_evidence_locator"]["manuscript_evidence_map"][0]["section_id"] == "section_002"
     assert "author_must_verify_all_claims" in outputs["integrity_adequacy_checker"]["responsible_use_warnings"]
+    final_report_path = output_dir / "final_user_report.json"
+    final_markdown_path = output_dir / "final_user_report.md"
+    assert final_report_path.exists()
+    assert final_markdown_path.exists()
+    final_report = json.loads(final_report_path.read_text(encoding="utf-8"))
+    assert summary["final_user_report_json"] == str(final_report_path)
+    assert summary["final_user_report_markdown"] == str(final_markdown_path)
+    assert final_report["report_type"] == "author_rebuttal_assistant_report"
+    assert final_report["not_final_submission_text"] is True
+    assert "assistant_only" in final_report["responsible_use_warnings"]
+    assert "最终作者回应辅助报告" in final_markdown_path.read_text(encoding="utf-8")
 
 
 def test_rebuttal_lens_refinement_flag_fails_fast_until_supported(tmp_path):
@@ -637,6 +808,37 @@ def test_rebuttal_lens_workflow_writes_failure_trace_on_agent_error(tmp_path):
     assert "api_key" not in json.dumps(failure_trace).lower()
 
 
+def test_rebuttal_lens_dag_failure_trace_preserves_partial_state(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "rebuttal_lens_dag_failure_output"
+
+    with pytest.raises(RuntimeError, match="simulated provider failure"):
+        run_rebuttal_lens_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=RebuttalLensFailingLLMClient(fail_on_call=3),
+            retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+            taxonomies={},
+            config={
+                "output_dir": output_dir,
+                "agent_max_retries": 1,
+                "workflow_engine": "dag",
+                "dag_parallel": False,
+            },
+        )
+
+    failure_trace = json.loads(
+        (output_dir / "rebuttal_lens_failure_trace.json").read_text(encoding="utf-8")
+    )
+    assert failure_trace["status"] == "failed"
+    assert failure_trace["partial_trace"]["message_bus"]
+    assert failure_trace["partial_trace"]["execution_trace"]
+    assert failure_trace["partial_trace"]["agent_intermediate_outputs"]
+    assert "api_key" not in json.dumps(failure_trace).lower()
+
+
 def test_rebuttal_lens_workflow_writes_layer_checkpoints(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
@@ -660,6 +862,36 @@ def test_rebuttal_lens_workflow_writes_layer_checkpoints(tmp_path):
     assert first_checkpoint["partial_trace"]["execution_trace"][0]["layer"] == "Layer 0: Manuscript Context"
 
 
+def test_run_rebuttal_lens_workflow_can_use_dag_committee_and_strategy(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used a random paper-level split.\n", encoding="utf-8")
+    output_dir = tmp_path / "dag_output"
+
+    summary = run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The temporal split is unclear.",
+        response_text="We will clarify.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={
+            "output_dir": output_dir,
+            "workflow_engine": "dag",
+            "enable_committee": True,
+            "enable_strategy_tournament": True,
+        },
+    )
+
+    trace = json.loads((output_dir / "rebuttal_lens_trace.json").read_text(encoding="utf-8"))
+    outputs = trace["agent_intermediate_outputs"]
+    assert summary["workflow_engine"] == "dag"
+    assert trace["execution_metadata"]["parallel_execution"] is True
+    assert "committee_meta_reviewer" in outputs
+    assert "strategy_meta_planner" in outputs
+    assert (output_dir / "final_user_report.md").exists()
+
+
 def test_rebuttal_lens_agent_config_controls_retry_and_temperature():
     agents = create_rebuttal_lens_frontend_agents(
         RebuttalLensMockLLMClient(),
@@ -679,6 +911,39 @@ def test_rebuttal_lens_agent_config_controls_retry_and_temperature():
     assert evidence_agent.max_retries == 5
     assert context_agent.temperature == 0.0
     assert context_agent.max_retries == 3
+
+
+def test_optional_rebuttal_lens_agents_apply_per_agent_runtime_config():
+    from peer_review_skills.agents.rebuttal_lens_workflow import (
+        _create_optional_rebuttal_lens_agents,
+    )
+
+    agents = _create_optional_rebuttal_lens_agents(
+        RebuttalLensMockLLMClient(),
+        {
+            "enable_committee": True,
+            "enable_strategy_tournament": True,
+            "agents": {
+                "methodology_committee_reviewer": {
+                    "temperature": 0.2,
+                    "max_retries": 4,
+                },
+                "strategy_tournament_agent": {
+                    "model": "deepseek-reasoner",
+                    "temperature": 0.3,
+                    "max_retries": 2,
+                },
+            },
+        },
+    )
+
+    committee_agent = agents["methodology_committee_reviewer"]
+    strategy_agent = agents["strategy_tournament_agent"]
+    assert committee_agent.temperature == 0.2
+    assert committee_agent.max_retries == 4
+    assert strategy_agent.client.model == "deepseek-reasoner"
+    assert strategy_agent.temperature == 0.3
+    assert strategy_agent.max_retries == 2
 
 
 def test_rebuttal_lens_config_loader_reads_public_agent_settings(tmp_path):
@@ -707,6 +972,33 @@ multi_agent:
     assert config["multi_agent"]["max_refinement_iterations"] == 2
     assert config["multi_agent"]["agents"]["manuscript_evidence_locator"]["temperature"] == 0.25
     assert config["multi_agent"]["agents"]["manuscript_evidence_locator"]["max_retries"] == 5
+
+
+def test_merged_rebuttal_lens_config_promotes_public_rebuttal_lens_flags(tmp_path):
+    config_dir = tmp_path / "config"
+    config_dir.mkdir()
+    (config_dir / "multi_agent_config.yaml").write_text(
+        """
+workflow:
+  mode: "rebuttal_lens"
+  engine: "dag"
+
+rebuttal_lens:
+  enable_committee: true
+  enable_strategy_tournament: true
+""".strip(),
+        encoding="utf-8",
+    )
+
+    from peer_review_skills.agents.rebuttal_lens_workflow import (
+        _merged_rebuttal_lens_config,
+    )
+
+    config = _merged_rebuttal_lens_config(tmp_path, {})
+
+    assert config["workflow_engine"] == "dag"
+    assert config["enable_committee"] is True
+    assert config["enable_strategy_tournament"] is True
 
 
 def test_integrity_prompt_receives_manuscript_context_boundary():
@@ -756,6 +1048,49 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
     assert str(args.response_file).endswith("author_draft_response.txt")
     assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
     assert args.limit_cases == 3
+
+
+def test_cli_parser_accepts_dag_committee_strategy_flags():
+    parser = build_parser()
+
+    args = parser.parse_args([
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--workflow-engine",
+        "dag",
+        "--enable-committee",
+        "--enable-strategy-tournament",
+    ])
+
+    assert args.workflow_engine == "dag"
+    assert args.enable_committee is True
+    assert args.enable_strategy_tournament is True
+
+
+def test_cli_omits_unset_rebuttal_lens_flags_so_yaml_defaults_can_apply(monkeypatch):
+    captured = {}
+
+    def fake_run_rebuttal_lens_workflow(**kwargs):
+        captured.update(kwargs)
+        return {"ok": True}
+
+    monkeypatch.setenv("PEER_REVIEW_API_KEY", "test-api-key")
+    monkeypatch.setattr(
+        "peer_review_skills.agents.rebuttal_lens_workflow.run_rebuttal_lens_workflow",
+        fake_run_rebuttal_lens_workflow,
+    )
+
+    main([
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+    ])
+
+    workflow_config = captured["config"]
+    assert "workflow_engine" not in workflow_config
+    assert "enable_committee" not in workflow_config
+    assert "enable_strategy_tournament" not in workflow_config
 
 
 def test_cross_disciplinary_prompt_uses_readable_chinese_lens_names():
@@ -919,6 +1254,11 @@ def test_readme_keeps_release_critical_open_source_sections():
         "author agency gate",
         "python -m compileall -q src tests",
         "python -m pip install --dry-run -e .",
+        "final_user_report.json",
+        "final_user_report.md",
+        "--workflow-engine dag",
+        "--enable-committee",
+        "--enable-strategy-tournament",
         "upload confidential manuscript material to an external API",
         "Apache License 2.0",
         "extractable PDF text",

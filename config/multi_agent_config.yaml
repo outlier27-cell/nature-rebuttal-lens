@@ -3,6 +3,13 @@
 # Workflow mode for the final public entry point.
 workflow:
   mode: "rebuttal_lens"
+  engine: "layered"
+  dag_available: true
+
+rebuttal_lens:
+  enable_committee: false
+  enable_strategy_tournament: false
+  final_user_report: true
 
 # Multi-agent settings for the 12-agent Nature RebuttalLens path.
 multi_agent:
