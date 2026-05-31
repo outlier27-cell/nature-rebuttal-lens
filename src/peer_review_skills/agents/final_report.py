@@ -18,7 +18,7 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
     strategy = _output_for(outputs, "strategy_meta_planner", "meta_synthesis")
     committee = _output_for(outputs, "committee_meta_reviewer", "committee_meta_review")
 
-    concern_map = _as_list(reviewer.get("concern_map", []))
+    concern_map = _dict_items(reviewer.get("concern_map", []))
     evidence_map = _as_list(evidence.get("manuscript_evidence_map", []))
     action_plan = _as_list(actions.get("evidence_action_plan", []))
     tone_warnings = _as_list(tone.get("tone_commitment_warnings", []))
@@ -26,15 +26,15 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
 
     comment_cards = []
     for index, concern in enumerate(concern_map, start=1):
-        linked_evidence = _select_by_index_or_type(
+        linked_evidence = _select_for_concern(
             evidence_map,
             index - 1,
-            concern.get("concern_type"),
+            concern,
         )
-        linked_action = _select_by_index_or_type(
+        linked_action = _select_for_concern(
             action_plan,
             index - 1,
-            concern.get("concern_type"),
+            concern,
         )
         card = {
             "comment_id": f"comment_{index:03d}",
@@ -47,7 +47,9 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
             "evidence_gap": str(linked_evidence.get("gap", "")),
             "recommended_action": str(linked_action.get("required_artifact", "")),
             "action_type": str(linked_action.get("action_type", "")),
-            "supporting_case_ids": list(linked_action.get("supporting_case_ids", [])),
+            "supporting_case_ids": _as_string_list(
+                linked_action.get("supporting_case_ids")
+            ),
             "author_input_required": bool(
                 linked_action.get("requires_author_confirmation", True)
             ),
@@ -196,18 +198,80 @@ def _as_list(value: Any) -> list[Any]:
     return value if isinstance(value, list) else []
 
 
-def _select_by_index_or_type(
+def _dict_items(value: Any) -> list[dict[str, Any]]:
+    return [item for item in _as_list(value) if isinstance(item, dict)]
+
+
+def _as_dict(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _as_string_list(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return _dedupe_strings(value)
+    if isinstance(value, (str, int, float, bool)):
+        return _dedupe_strings([value])
+    return []
+
+
+def _select_for_concern(
     items: list[Any],
     index: int,
-    concern_type: Any,
+    concern: dict[str, Any],
 ) -> dict[str, Any]:
     dict_items = [item for item in items if isinstance(item, dict)]
+    concern_id = _clean_match_value(concern.get("concern_id"))
+    concern_type = _clean_match_value(concern.get("concern_type"))
+    if concern_id:
+        matched = _find_exact_match(
+            dict_items,
+            concern_id,
+            ("concern_id", "reviewer_concern_id", "source_concern_id", "comment_id"),
+        )
+        if matched:
+            return matched
+    if concern_type:
+        matched = _find_exact_match(
+            dict_items,
+            concern_type,
+            (
+                "concern_type",
+                "risk_type",
+                "type",
+                "concern_id",
+                "reviewer_concern_id",
+                "source_concern_id",
+            ),
+        )
+        if matched:
+            return matched
+    for item in dict_items:
+        item_text = json.dumps(item, ensure_ascii=False)
+        if concern_type and concern_type in item_text:
+            return item
     if index < len(dict_items):
         return dict_items[index]
-    for item in dict_items:
-        if concern_type and concern_type in json.dumps(item, ensure_ascii=False):
-            return item
     return {}
+
+
+def _find_exact_match(
+    items: list[dict[str, Any]],
+    expected: str,
+    keys: tuple[str, ...],
+) -> dict[str, Any]:
+    for item in items:
+        for key in keys:
+            if _clean_match_value(item.get(key)) == expected:
+                return item
+    return {}
+
+
+def _clean_match_value(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).strip()
 
 
 def _safe_language_for(action: dict[str, Any], evidence: dict[str, Any]) -> str:
@@ -241,7 +305,7 @@ def _build_outline(
     outline = [
         "Thank the reviewer and restate the concern as an evidence/validity issue.",
     ]
-    merged_plan = strategy.get("merged_plan")
+    merged_plan = _as_dict(strategy.get("merged_plan"))
     if isinstance(merged_plan, dict):
         position = merged_plan.get("response_position")
         if position:
@@ -254,7 +318,7 @@ def _build_outline(
         action = card.get("recommended_action")
         if action:
             outline.append(f"Address {card.get('comment_id')} by explaining: {action}.")
-    missing = integrity.get("response_adequacy", {}).get("missing_elements", [])
+    missing = _as_dict(integrity.get("response_adequacy")).get("missing_elements", [])
     for item in _as_list(missing):
         outline.append(f"Do not overclaim until this missing element is resolved: {item}.")
     outline.append(

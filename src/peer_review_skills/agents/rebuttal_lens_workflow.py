@@ -73,6 +73,7 @@ def run_rebuttal_lens_workflow(
     output_dir = Path(config.get("output_dir") or root / DEFAULT_REBUTTAL_LENS_OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    trace_path = output_dir / "rebuttal_lens_trace.json"
     try:
         trace = execute_rebuttal_lens_trace(
             unit=unit,
@@ -84,17 +85,15 @@ def run_rebuttal_lens_workflow(
                 "checkpoint_dir": output_dir / "checkpoints",
             },
         )
+        trace_path.write_text(
+            json.dumps(trace, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        final_report = compose_final_user_report(trace)
+        final_report_paths = write_final_user_report(final_report, output_dir)
     except Exception as exc:
         _write_failure_trace(output_dir, exc)
         raise
-
-    trace_path = output_dir / "rebuttal_lens_trace.json"
-    trace_path.write_text(
-        json.dumps(trace, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    final_report = compose_final_user_report(trace)
-    final_report_paths = write_final_user_report(final_report, output_dir)
     summary = {
         "system_name": "Nature RebuttalLens",
         "workflow_version": "rebuttal_lens_v1",
@@ -154,17 +153,7 @@ def execute_rebuttal_lens_trace(
     )
 
     trace = orchestrator.execute_rebuttal_lens_workflow(unit, retrieval, taxonomies)
-    trace["system_name"] = "Nature RebuttalLens"
-    trace["workflow_version"] = "rebuttal_lens_v1"
-    trace["manuscript_context"] = unit.get("manuscript_context", {})
-    trace["responsible_use_boundary"] = {
-        "assistant_only": True,
-        "not_final_rebuttal_text": True,
-        "author_must_verify_all_claims": True,
-        "no_acceptance_prediction": True,
-        "no_confidential_upload_recommendation": True,
-    }
-    return trace
+    return _with_rebuttal_lens_trace_metadata(trace, unit)
 
 
 def execute_rebuttal_lens_dag_trace(
@@ -251,7 +240,7 @@ def _rebuttal_lens_dag_trace_from_graph_trace(
         for node_id, output in node_outputs.items()
         if graph.node_by_id[node_id].agent_id != "final_user_report_composer"
     }
-    return {
+    return _with_rebuttal_lens_trace_metadata({
         "trace_id": f"rebuttal_lens_dag_{unit.get('unit_id', 'unknown')}",
         "query_unit_id": unit.get("unit_id", "unknown"),
         "agent_intermediate_outputs": agent_outputs,
@@ -263,6 +252,27 @@ def _rebuttal_lens_dag_trace_from_graph_trace(
             "workflow_engine": "dag",
             "manuscript_mode": unit.get("manuscript_context", {}).get("mode"),
         },
+    }, unit)
+
+
+def _with_rebuttal_lens_trace_metadata(
+    trace: dict[str, Any],
+    unit: dict[str, Any],
+) -> dict[str, Any]:
+    trace["system_name"] = "Nature RebuttalLens"
+    trace["workflow_version"] = "rebuttal_lens_v1"
+    trace["manuscript_context"] = unit.get("manuscript_context", {})
+    trace["responsible_use_boundary"] = _rebuttal_lens_responsible_use_boundary()
+    return trace
+
+
+def _rebuttal_lens_responsible_use_boundary() -> dict[str, bool]:
+    return {
+        "assistant_only": True,
+        "not_final_rebuttal_text": True,
+        "author_must_verify_all_claims": True,
+        "no_acceptance_prediction": True,
+        "no_confidential_upload_recommendation": True,
     }
 
 
@@ -557,6 +567,7 @@ def _checkpoint_writer(checkpoint_dir: Path):
 
 
 def _write_failure_trace(output_dir: Path, exc: Exception) -> None:
+    trace_path = output_dir / "rebuttal_lens_trace.json"
     checkpoint_dir = output_dir / "checkpoints"
     checkpoint_files = sorted(checkpoint_dir.glob("*.json")) if checkpoint_dir.exists() else []
     partial_trace: dict[str, Any] = {
@@ -564,7 +575,12 @@ def _write_failure_trace(output_dir: Path, exc: Exception) -> None:
         "execution_trace": [],
         "summary": {},
     }
-    if checkpoint_files:
+    if trace_path.exists():
+        try:
+            partial_trace = json.loads(trace_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            partial_trace["summary"] = {"trace_read_error": str(trace_path)}
+    elif checkpoint_files:
         try:
             checkpoint = json.loads(checkpoint_files[-1].read_text(encoding="utf-8"))
             partial_trace = checkpoint.get("partial_trace", partial_trace)

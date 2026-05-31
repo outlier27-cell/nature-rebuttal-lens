@@ -303,6 +303,22 @@ class RebuttalLensFailingLLMClient(RebuttalLensMockLLMClient):
         return response
 
 
+class RebuttalLensNullableCaseIdsLLMClient(RebuttalLensMockLLMClient):
+    def create_chat_completion(
+        self,
+        messages: list[dict[str, str]],
+        response_format: dict[str, str] | None = None,
+        temperature: float = 0.0,
+    ) -> dict[str, Any]:
+        response = super().create_chat_completion(messages, response_format, temperature)
+        system_prompt = messages[0]["content"].lower()
+        if "evidence action" in system_prompt:
+            content = json.loads(response["choices"][0]["message"]["content"])
+            content["evidence_action_plan"][0]["supporting_case_ids"] = None
+            response["choices"][0]["message"]["content"] = json.dumps(content)
+        return response
+
+
 def test_load_manuscript_context_splits_markdown_sections(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text(
@@ -548,6 +564,224 @@ def test_rebuttal_lens_final_report_composer_builds_user_package():
     assert "generalizes across contexts" in report["unsafe_claims"][0]["claim"]
     assert "assistant_only" in report["responsible_use_warnings"]
     assert report["recommended_rebuttal_outline"]
+
+
+def test_final_report_matches_evidence_and_actions_by_concern_id():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_method",
+                        "concern_type": "experimental_design",
+                        "surface_request": "clarify temporal split",
+                        "text_evidence": "temporal leakage was not explained",
+                        "confidence": "high",
+                    },
+                    {
+                        "concern_id": "concern_clarity",
+                        "concern_type": "clarity_presentation",
+                        "surface_request": "clarify wording",
+                        "text_evidence": "wording is ambiguous",
+                        "confidence": "medium",
+                    },
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "concern_clarity",
+                        "status": "supported",
+                        "section_id": "section_001",
+                        "gap": "",
+                    },
+                    {
+                        "concern_id": "concern_method",
+                        "status": "partially_supported",
+                        "section_id": "section_004",
+                        "gap": "no temporal split result",
+                    },
+                ],
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "concern_clarity",
+                        "action_type": "text_revision",
+                        "required_artifact": "clarify wording",
+                        "supporting_case_ids": ["case_clarity"],
+                        "requires_author_confirmation": False,
+                    },
+                    {
+                        "concern_id": "concern_method",
+                        "action_type": "new_analysis",
+                        "required_artifact": "temporally held-out split",
+                        "supporting_case_ids": ["case_method"],
+                        "requires_author_confirmation": True,
+                    },
+                ],
+            },
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    method_card = report["comment_cards"][0]
+    clarity_card = report["comment_cards"][1]
+    assert method_card["recommended_action"] == "temporally held-out split"
+    assert method_card["manuscript_section"] == "section_004"
+    assert method_card["supporting_case_ids"] == ["case_method"]
+    assert clarity_card["recommended_action"] == "clarify wording"
+    assert clarity_card["manuscript_section"] == "section_001"
+    assert clarity_card["supporting_case_ids"] == ["case_clarity"]
+
+
+def test_final_report_accepts_nullable_supporting_case_ids():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "methodological_transparency",
+                        "surface_request": "clarify dataset split",
+                        "text_evidence": "dataset split is unclear",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "concern_001",
+                        "action_type": "clarify_existing_method",
+                        "required_artifact": "dataset split protocol",
+                        "supporting_case_ids": None,
+                        "requires_author_confirmation": True,
+                    }
+                ]
+            },
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert report["comment_cards"][0]["supporting_case_ids"] == []
+
+
+def test_final_report_does_not_fuzzy_match_prefix_concern_ids():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_1",
+                        "concern_type": "unknown",
+                        "surface_request": "first concern",
+                        "text_evidence": "first",
+                        "confidence": "medium",
+                    },
+                    {
+                        "concern_id": "concern_2",
+                        "concern_type": "unknown",
+                        "surface_request": "second concern",
+                        "text_evidence": "second",
+                        "confidence": "medium",
+                    }
+                ]
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "notes": "linked to concern_20 only",
+                        "action_type": "wrong_prefix_match",
+                        "required_artifact": "wrong action",
+                        "supporting_case_ids": ["wrong"],
+                        "requires_author_confirmation": True,
+                    },
+                    {
+                        "action_type": "correct_index_fallback",
+                        "required_artifact": "correct action",
+                        "supporting_case_ids": ["right"],
+                        "requires_author_confirmation": True,
+                    },
+                ]
+            },
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert report["comment_cards"][1]["recommended_action"] == "correct action"
+    assert report["comment_cards"][1]["supporting_case_ids"] == ["right"]
+
+
+def test_final_report_accepts_malformed_optional_integrity_sections():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "methodological_transparency",
+                        "surface_request": "clarify dataset split",
+                        "text_evidence": "dataset split is unclear",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "integrity_adequacy_checker": {
+                "response_adequacy": None,
+                "provenance_checks": [],
+                "responsible_use_warnings": ["assistant_only"],
+            },
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert report["recommended_rebuttal_outline"]
+    assert "assistant_only" in report["responsible_use_warnings"]
+
+
+def test_final_report_ignores_non_dict_concern_items():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    "malformed concern",
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "methodological_transparency",
+                        "surface_request": "clarify dataset split",
+                        "text_evidence": "dataset split is unclear",
+                        "confidence": "high",
+                    },
+                ]
+            }
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert len(report["comment_cards"]) == 1
+    assert report["comment_cards"][0]["comment_id"] == "comment_001"
+    assert report["comment_cards"][0]["surface_request"] == "clarify dataset split"
 
 
 @pytest.mark.parametrize(
@@ -839,6 +1073,41 @@ def test_rebuttal_lens_dag_failure_trace_preserves_partial_state(tmp_path):
     assert "api_key" not in json.dumps(failure_trace).lower()
 
 
+def test_rebuttal_lens_workflow_writes_failure_trace_on_final_report_error(
+    tmp_path,
+    monkeypatch,
+):
+    import peer_review_skills.agents.rebuttal_lens_workflow as workflow
+
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "rebuttal_lens_report_failure_output"
+
+    def fail_final_report(trace):
+        raise RuntimeError("simulated final report failure")
+
+    monkeypatch.setattr(workflow, "compose_final_user_report", fail_final_report)
+
+    with pytest.raises(RuntimeError, match="simulated final report failure"):
+        run_rebuttal_lens_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=RebuttalLensMockLLMClient(),
+            retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+            taxonomies={},
+            config={"output_dir": output_dir},
+        )
+
+    failure_trace_path = output_dir / "rebuttal_lens_failure_trace.json"
+    assert failure_trace_path.exists()
+    failure_trace = json.loads(failure_trace_path.read_text(encoding="utf-8"))
+    assert failure_trace["status"] == "failed"
+    assert (output_dir / "rebuttal_lens_trace.json").exists()
+    assert failure_trace["partial_trace"]["agent_intermediate_outputs"]
+    assert failure_trace["partial_trace"]["workflow_version"] == "rebuttal_lens_v1"
+
+
 def test_rebuttal_lens_workflow_writes_layer_checkpoints(tmp_path):
     manuscript = tmp_path / "manuscript.md"
     manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
@@ -890,6 +1159,12 @@ def test_run_rebuttal_lens_workflow_can_use_dag_committee_and_strategy(tmp_path)
     assert "committee_meta_reviewer" in outputs
     assert "strategy_meta_planner" in outputs
     assert (output_dir / "final_user_report.md").exists()
+    assert trace["system_name"] == "Nature RebuttalLens"
+    assert trace["workflow_version"] == "rebuttal_lens_v1"
+    assert trace["manuscript_context"]["mode"] == "manuscript_aware"
+    assert trace["responsible_use_boundary"]["no_confidential_upload_recommendation"] is True
+    final_report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
+    assert "no_confidential_upload_recommendation" in final_report["responsible_use_warnings"]
 
 
 def test_rebuttal_lens_agent_config_controls_retry_and_temperature():
