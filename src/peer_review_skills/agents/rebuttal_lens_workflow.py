@@ -1,6 +1,9 @@
 """Nature RebuttalLens manuscript-aware workflow entry point."""
 
+import hashlib
 import json
+import subprocess
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
@@ -8,6 +11,7 @@ from peer_review_skills.agents.base import (
     agent_model_client,
     agent_runtime_options,
 )
+from peer_review_skills.agents.author_workspace import write_author_workspace_html
 from peer_review_skills.agents.final_report import (
     compose_final_user_report,
     write_final_user_report,
@@ -64,6 +68,23 @@ def run_rebuttal_lens_workflow(
         editor_text=editor_text,
         unit_id=str(config.get("unit_id") or "rebuttal_lens_user_case"),
     )
+    privacy_manifest = _build_privacy_manifest(
+        review_text=review_text,
+        response_text=response_text,
+        editor_text=editor_text,
+        unit=unit,
+        config=config,
+        model_client=model_client,
+    )
+    if (
+        privacy_manifest["external_model_client"]
+        and privacy_manifest["contains_manuscript_text"]
+        and not privacy_manifest["allow_external_manuscript_upload"]
+    ):
+        raise ValueError(
+            "Refusing to send manuscript text to an external model client without "
+            "allow_external_manuscript_upload=True."
+        )
     taxonomies = taxonomies if taxonomies is not None else _load_taxonomies(root)
     model_client = model_client or _create_model_client(config)
     retrieval = {
@@ -72,6 +93,11 @@ def run_rebuttal_lens_workflow(
     }
     output_dir = Path(config.get("output_dir") or root / DEFAULT_REBUTTAL_LENS_OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
+    privacy_manifest_path = output_dir / "privacy_manifest.json"
+    privacy_manifest_path.write_text(
+        json.dumps(privacy_manifest, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
 
     trace_path = output_dir / "rebuttal_lens_trace.json"
     try:
@@ -91,6 +117,7 @@ def run_rebuttal_lens_workflow(
         )
         final_report = compose_final_user_report(trace)
         final_report_paths = write_final_user_report(final_report, output_dir)
+        author_workspace_path = write_author_workspace_html(final_report, output_dir)
     except Exception as exc:
         _write_failure_trace(output_dir, exc)
         raise
@@ -103,14 +130,150 @@ def run_rebuttal_lens_workflow(
         "output_trace_path": str(trace_path),
         "final_user_report_json": final_report_paths["final_user_report_json"],
         "final_user_report_markdown": final_report_paths["final_user_report_markdown"],
+        "author_workspace_html": str(author_workspace_path),
         "workflow_engine": config.get("workflow_engine", "layered"),
         "config": _json_safe_config(config),
     }
+    run_manifest = _build_run_manifest(
+        project_root=root,
+        unit=unit,
+        config=config,
+        model_client=model_client,
+        privacy_manifest_path=privacy_manifest_path,
+        workflow_engine=str(config.get("workflow_engine", "layered")),
+        input_hashes=privacy_manifest["input_hashes"],
+    )
+    run_manifest_path = output_dir / "run_manifest.json"
+    run_manifest_path.write_text(
+        json.dumps(run_manifest, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    summary["privacy_manifest_path"] = str(privacy_manifest_path)
+    summary["run_manifest_path"] = str(run_manifest_path)
     (output_dir / "rebuttal_lens_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
     return summary
+
+
+def _build_privacy_manifest(
+    *,
+    review_text: str,
+    response_text: str,
+    editor_text: str,
+    unit: dict[str, Any],
+    config: dict[str, Any],
+    model_client: Any | None,
+) -> dict[str, Any]:
+    manuscript_context = unit.get("manuscript_context", {})
+    contains_manuscript_text = bool(
+        manuscript_context.get("mode") == "manuscript_aware"
+        and manuscript_context.get("sections")
+    )
+    allow_external = bool(config.get("allow_external_manuscript_upload", False))
+    external_client = _is_external_model_client(model_client, config)
+    manuscript_text = "\n\n".join(
+        str(section.get("text", ""))
+        for section in manuscript_context.get("sections", [])
+        if isinstance(section, dict)
+    )
+    return {
+        "manifest_type": "rebuttal_lens_privacy_manifest",
+        "contains_manuscript_text": contains_manuscript_text,
+        "allow_external_manuscript_upload": allow_external,
+        "external_model_client": external_client,
+        "redaction_performed": False,
+        "confidentiality_boundary": (
+            "Do not upload confidential manuscript material to an external API without "
+            "policy approval and author consent."
+        ),
+        "input_hashes": {
+            "review_text_sha256": _sha256_text(review_text),
+            "response_text_sha256": _sha256_text(response_text),
+            "editor_text_sha256": _sha256_text(editor_text),
+            "manuscript_text_sha256": _sha256_text(manuscript_text),
+        },
+    }
+
+
+def _build_run_manifest(
+    *,
+    project_root: Path,
+    unit: dict[str, Any],
+    config: dict[str, Any],
+    model_client: Any,
+    privacy_manifest_path: Path,
+    workflow_engine: str,
+    input_hashes: dict[str, str],
+) -> dict[str, Any]:
+    json_safe_config = _json_safe_config(config)
+    return {
+        "manifest_type": "rebuttal_lens_run_manifest",
+        "system_name": "Nature RebuttalLens",
+        "package_name": "nature-rebuttal-lens",
+        "package_version": _package_version(),
+        "workflow_version": "rebuttal_lens_v1",
+        "workflow_engine": workflow_engine,
+        "git_commit_hash": _git_commit_hash(project_root),
+        "config_hash": _sha256_text(json.dumps(json_safe_config, sort_keys=True, default=str)),
+        "prompt_versions": {
+            "workflow_version": "rebuttal_lens_v1",
+            "agent_prompt_family": "rebuttal_lens_agents_v1",
+            "final_report_contract": "final_user_report_v1",
+        },
+        "input_hashes": input_hashes,
+        "model": getattr(model_client, "model_name", getattr(model_client, "model", "unknown")),
+        "provider": type(model_client).__name__,
+        "token_cost": {
+            "prompt_tokens": None,
+            "completion_tokens": None,
+            "estimated_cost_usd": None,
+            "source": "not_available_in_trace_summary",
+        },
+        "cache": {
+            "enabled": bool(config.get("cache_enabled", False)),
+            "hit_count": None,
+            "miss_count": None,
+        },
+        "privacy_manifest_path": str(privacy_manifest_path),
+        "unit_id": unit.get("unit_id", "unknown"),
+    }
+
+
+def _is_external_model_client(model_client: Any | None, config: dict[str, Any]) -> bool:
+    if model_client is None or bool(config.get("force_external_model_client", False)):
+        return True
+    client_type = type(model_client)
+    qualified_name = f"{client_type.__module__}.{client_type.__name__}".lower()
+    if "openaicompatiblechatclient" in qualified_name:
+        return True
+    if hasattr(model_client, "base_url") and hasattr(model_client, "api_key"):
+        return True
+    return False
+
+
+def _sha256_text(value: str) -> str:
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+
+
+def _git_commit_hash(project_root: Path) -> str:
+    try:
+        return subprocess.check_output(
+            ["git", "rev-parse", "HEAD"],
+            cwd=project_root,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+
+
+def _package_version() -> str:
+    try:
+        return version("nature-rebuttal-lens")
+    except PackageNotFoundError:
+        return "0.1.0"
 
 
 def execute_rebuttal_lens_trace(

@@ -566,6 +566,154 @@ def test_rebuttal_lens_final_report_composer_builds_user_package():
     assert report["recommended_rebuttal_outline"]
 
 
+def test_final_report_builds_machine_verifiable_evidence_ledger():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    trace = {
+        "query_unit_id": "case_ledger",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "methodological_transparency",
+                        "surface_request": "clarify split protocol",
+                        "text_evidence": "split protocol unclear",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "status": "partially_supported",
+                        "section_id": "section_002",
+                        "text_evidence": "80/10/10 split",
+                        "gap": "random seed missing",
+                    }
+                ],
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "concern_001",
+                        "action_type": "clarify_existing_method",
+                        "required_artifact": "random seed and stratification protocol",
+                        "supporting_case_ids": ["case_001"],
+                        "requires_author_confirmation": True,
+                    }
+                ]
+            },
+        },
+        "manuscript_context": {
+            "sections": [
+                {
+                    "section_id": "section_002",
+                    "heading": "Methods",
+                    "text": "We used an 80/10/10 split for train validation and test.",
+                }
+            ]
+        },
+    }
+
+    report = compose_final_user_report(trace)
+
+    assert report["evidence_ledger"]
+    ledger_entry = report["evidence_ledger"][0]
+    assert ledger_entry["ledger_id"] == "ledger_001"
+    assert ledger_entry["concern_id"] == "concern_001"
+    assert ledger_entry["manuscript_span"]["section_id"] == "section_002"
+    assert "80/10/10 split" in ledger_entry["manuscript_span"]["quote"]
+    assert ledger_entry["required_author_action"] == "random seed and stratification protocol"
+    assert ledger_entry["author_confirmation_required"] is True
+    assert report["comment_cards"][0]["ledger_id"] == "ledger_001"
+    assert report["comment_cards"][0]["provenance"]["ledger_id"] == "ledger_001"
+
+
+def test_final_report_contract_schema_rejects_orphan_comment_cards():
+    from peer_review_skills.agents.final_report import validate_final_user_report
+
+    report = {
+        "report_type": "author_rebuttal_assistant_report",
+        "workflow_version": "rebuttal_lens_v1",
+        "query_unit_id": "case_bad",
+        "executive_summary": "",
+        "evidence_ledger": [],
+        "comment_cards": [{"comment_id": "comment_001", "ledger_id": "missing"}],
+        "recommended_rebuttal_outline": [],
+        "author_confirmation_questions": [],
+        "tone_and_commitment_warnings": [],
+        "committee_synthesis": {},
+        "strategy_plan": {},
+        "unsafe_claims": [],
+        "provenance_checks": [],
+        "responsible_use_warnings": [],
+        "integrity_issues": [],
+        "not_final_submission_text": True,
+    }
+
+    is_valid, errors = validate_final_user_report(report)
+
+    assert is_valid is False
+    assert any("orphan ledger_id" in error for error in errors)
+
+
+def test_write_final_user_report_rejects_invalid_contract(tmp_path):
+    from peer_review_skills.agents.final_report import write_final_user_report
+
+    invalid_report = {
+        "report_type": "author_rebuttal_assistant_report",
+        "workflow_version": "rebuttal_lens_v1",
+        "query_unit_id": "case_bad",
+        "executive_summary": "",
+        "evidence_ledger": [],
+        "comment_cards": [{"comment_id": "comment_001", "ledger_id": "missing"}],
+        "recommended_rebuttal_outline": [],
+        "author_confirmation_questions": [],
+        "responsible_use_warnings": [],
+        "not_final_submission_text": True,
+    }
+
+    with pytest.raises(ValueError, match="final user report contract"):
+        write_final_user_report(invalid_report, tmp_path)
+
+    assert not (tmp_path / "final_user_report.json").exists()
+
+
+def test_final_report_markdown_uses_readable_chinese_contract_language():
+    from peer_review_skills.agents.final_report import render_final_user_report_markdown
+
+    markdown = render_final_user_report_markdown({
+        "executive_summary": "需要补证据。",
+        "comment_cards": [
+            {
+                "comment_id": "comment_001",
+                "concern_type": "methodological_transparency",
+                "surface_request": "clarify split",
+                "implicit_risk": "split unclear",
+                "evidence_status": "partially_supported",
+                "manuscript_section": "section_002",
+                "evidence_gap": "seed missing",
+                "recommended_action": "add seed",
+                "author_input_required": True,
+                "safe_response_language": "We will clarify.",
+                "unsafe_language_to_avoid": "Do not overclaim.",
+            }
+        ],
+        "recommended_rebuttal_outline": ["补充方法细节"],
+        "author_confirmation_questions": ["能否确认随机种子？"],
+        "unsafe_claims": [],
+        "responsible_use_warnings": ["assistant_only"],
+    })
+
+    assert "最终作者回应辅助报告" in markdown
+    assert "不是可直接提交的最终 rebuttal" in markdown
+    assert "作者必须确认的问题" in markdown
+    assert "鏈" not in markdown
+    assert "绯" not in markdown
+
+
 def test_final_report_matches_evidence_and_actions_by_concern_id():
     from peer_review_skills.agents.final_report import compose_final_user_report
 
@@ -885,8 +1033,77 @@ def test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace(tmp_path):
     assert summary["final_user_report_markdown"] == str(final_markdown_path)
     assert final_report["report_type"] == "author_rebuttal_assistant_report"
     assert final_report["not_final_submission_text"] is True
+    assert final_report["evidence_ledger"]
     assert "assistant_only" in final_report["responsible_use_warnings"]
     assert "最终作者回应辅助报告" in final_markdown_path.read_text(encoding="utf-8")
+
+
+def test_run_rebuttal_lens_workflow_requires_consent_for_external_manuscript(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="allow_external_manuscript_upload"):
+        run_rebuttal_lens_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=None,
+            config={"output_dir": tmp_path / "blocked"},
+        )
+
+
+def test_run_rebuttal_lens_workflow_blocks_explicit_external_client_without_consent(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+
+    class ExplicitExternalClient(RebuttalLensMockLLMClient):
+        base_url = "https://api.example.test"
+        api_key = "test-key"
+
+    with pytest.raises(ValueError, match="allow_external_manuscript_upload"):
+        run_rebuttal_lens_workflow(
+            project_root=Path.cwd(),
+            review_text="The dataset split is unclear.",
+            manuscript_path=manuscript,
+            model_client=ExplicitExternalClient(),
+            taxonomies={},
+            config={"output_dir": tmp_path / "blocked_explicit"},
+        )
+
+
+def test_run_rebuttal_lens_workflow_writes_privacy_manifest_and_run_manifest(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "manifest_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir},
+    )
+
+    privacy_manifest = json.loads(
+        (output_dir / "privacy_manifest.json").read_text(encoding="utf-8")
+    )
+    assert privacy_manifest["external_model_client"] is False
+    assert privacy_manifest["contains_manuscript_text"] is True
+    assert privacy_manifest["allow_external_manuscript_upload"] is False
+    assert privacy_manifest["input_hashes"]["manuscript_text_sha256"]
+
+    run_manifest = json.loads((output_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    assert run_manifest["workflow_engine"] == "layered"
+    assert run_manifest["git_commit_hash"]
+    assert run_manifest["config_hash"]
+    assert run_manifest["package_name"] == "nature-rebuttal-lens"
+    assert run_manifest["prompt_versions"]["workflow_version"] == "rebuttal_lens_v1"
+    assert "cache" in run_manifest
+    assert "token_cost" in run_manifest
+    assert run_manifest["input_hashes"]["review_text_sha256"]
+    assert run_manifest["privacy_manifest_path"].endswith("privacy_manifest.json")
 
 
 def test_rebuttal_lens_refinement_flag_fails_fast_until_supported(tmp_path):
@@ -1341,6 +1558,42 @@ def test_cli_parser_accepts_dag_committee_strategy_flags():
     assert args.workflow_engine == "dag"
     assert args.enable_committee is True
     assert args.enable_strategy_tournament is True
+
+
+def test_cli_parser_accepts_external_manuscript_upload_consent_flag():
+    parser = build_parser()
+
+    args = parser.parse_args([
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--allow-external-manuscript-upload",
+    ])
+
+    assert args.allow_external_manuscript_upload is True
+
+
+def test_cli_passes_external_manuscript_upload_consent(monkeypatch):
+    captured = {}
+
+    def fake_run_rebuttal_lens_workflow(**kwargs):
+        captured.update(kwargs)
+        return {"ok": True}
+
+    monkeypatch.setenv("PEER_REVIEW_API_KEY", "test-api-key")
+    monkeypatch.setattr(
+        "peer_review_skills.agents.rebuttal_lens_workflow.run_rebuttal_lens_workflow",
+        fake_run_rebuttal_lens_workflow,
+    )
+
+    main([
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--allow-external-manuscript-upload",
+    ])
+
+    assert captured["config"]["allow_external_manuscript_upload"] is True
 
 
 def test_cli_omits_unset_rebuttal_lens_flags_so_yaml_defaults_can_apply(monkeypatch):

@@ -6,6 +6,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+from peer_review_skills.agents.evidence_ledger import (
+    build_evidence_ledger,
+    validate_evidence_ledger,
+)
+
 
 def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
     """Build a stable user-facing report from a RebuttalLens trace."""
@@ -23,6 +28,13 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
     action_plan = _as_list(actions.get("evidence_action_plan", []))
     tone_warnings = _as_list(tone.get("tone_commitment_warnings", []))
     provenance_checks = _as_list(integrity.get("provenance_checks", []))
+    evidence_ledger = build_evidence_ledger(
+        concerns=concern_map,
+        evidence_items=evidence_map,
+        action_items=action_plan,
+        manuscript_context=_as_dict(trace.get("manuscript_context")),
+        select_item=_select_for_concern,
+    )
 
     comment_cards = []
     for index, concern in enumerate(concern_map, start=1):
@@ -56,6 +68,15 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
             "safe_response_language": _safe_language_for(linked_action, linked_evidence),
             "unsafe_language_to_avoid": _unsafe_language_for(linked_evidence),
         }
+        ledger_entry = evidence_ledger[index - 1] if index - 1 < len(evidence_ledger) else {}
+        if ledger_entry:
+            card["ledger_id"] = ledger_entry["ledger_id"]
+            card["provenance"] = {
+                "ledger_id": ledger_entry["ledger_id"],
+                "concern_id": ledger_entry["concern_id"],
+                "manuscript_span_id": ledger_entry["manuscript_span"]["span_id"],
+                "case_ids": ledger_entry["case_ids"],
+            }
         comment_cards.append(card)
 
     unsafe_claims = [
@@ -81,6 +102,7 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "workflow_version": trace.get("workflow_version", "rebuttal_lens_v1"),
         "query_unit_id": trace.get("query_unit_id", "unknown"),
         "executive_summary": _build_executive_summary(comment_cards, unsafe_claims),
+        "evidence_ledger": evidence_ledger,
         "comment_cards": comment_cards,
         "recommended_rebuttal_outline": recommended_outline,
         "author_confirmation_questions": confirmation_questions,
@@ -93,6 +115,33 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "integrity_issues": _as_list(integrity.get("issues", [])),
         "not_final_submission_text": True,
     }
+
+
+def validate_final_user_report(report: dict[str, Any]) -> tuple[bool, list[str]]:
+    """Validate the stable final report contract used by downstream UIs."""
+    errors: list[str] = []
+    required = [
+        "report_type",
+        "workflow_version",
+        "query_unit_id",
+        "executive_summary",
+        "evidence_ledger",
+        "comment_cards",
+        "recommended_rebuttal_outline",
+        "author_confirmation_questions",
+        "responsible_use_warnings",
+        "not_final_submission_text",
+    ]
+    for key in required:
+        if key not in report:
+            errors.append(f"missing required final report field: {key}")
+    if report.get("report_type") != "author_rebuttal_assistant_report":
+        errors.append("report_type must be author_rebuttal_assistant_report")
+    if report.get("not_final_submission_text") is not True:
+        errors.append("not_final_submission_text must be true")
+    ledger_valid, ledger_errors = validate_evidence_ledger(report)
+    errors.extend(ledger_errors)
+    return not errors and ledger_valid, errors
 
 
 def render_final_user_report_markdown(report: dict[str, Any]) -> str:
@@ -168,6 +217,11 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
 
 def write_final_user_report(report: dict[str, Any], output_dir: Path) -> dict[str, str]:
     """Write JSON and Markdown final report files."""
+    is_valid, errors = validate_final_user_report(report)
+    if not is_valid:
+        raise ValueError(
+            "final user report contract validation failed: " + "; ".join(errors)
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
     json_path = output_dir / "final_user_report.json"
     md_path = output_dir / "final_user_report.md"

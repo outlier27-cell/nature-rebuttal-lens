@@ -33,6 +33,14 @@ Nature RebuttalLens writes three levels of output:
 2. `final_user_report.json` - structured author-facing report for downstream UI/API use.
 3. `final_user_report.md` - readable response-planning report for authors.
 
+Current runs also write `privacy_manifest.json`, `run_manifest.json`, and
+`author_workspace.html`. The final report includes an `evidence_ledger` so each
+comment card can be checked against a concern id, manuscript span, support
+status, case ids, required author action, unsafe claim boundary, and author
+confirmation requirement. The HTML workspace is a planning surface with action
+statuses such as `needs evidence` and `needs author confirmation`; it is not
+final submission text.
+
 The default `layered` workflow is stable and cost-conscious. For deeper research evaluation, the CLI also supports an experimental DAG/committee/tournament mode:
 
 ```powershell
@@ -41,6 +49,7 @@ run-rebuttal-lens `
   --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
   --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --allow-external-manuscript-upload `
   --workflow-engine dag `
   --enable-committee `
   --enable-strategy-tournament `
@@ -97,6 +106,9 @@ $env:PEER_REVIEW_API_MODEL="deepseek-v3"
 ```
 
 If `PEER_REVIEW_API_KEY` is missing, the CLI fails fast instead of producing fake or partial model outputs.
+When using an external provider with manuscript text, the CLI also requires
+`--allow-external-manuscript-upload`; omit `--manuscript-file` if you do not
+have policy approval and author consent.
 
 ## Quick Start
 
@@ -107,6 +119,7 @@ python -m peer_review_skills.cli.main run-rebuttal-lens `
   --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
   --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --allow-external-manuscript-upload `
   --output-dir data/evaluation/rebuttal_lens_demo
 ```
 
@@ -118,6 +131,7 @@ run-rebuttal-lens `
   --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
   --response-file examples/rebuttal_lens/author_draft_response.txt `
   --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --allow-external-manuscript-upload `
   --output-dir data/evaluation/rebuttal_lens_demo
 ```
 
@@ -132,6 +146,30 @@ data/evaluation/rebuttal_lens_demo/checkpoints/
 ```
 
 If a later agent fails after the workflow has already produced state, the system writes `rebuttal_lens_failure_trace.json` with completed message bus entries, execution trace, and sanitized metadata.
+
+## Evaluation and Replay
+
+RebuttalLens includes offline utilities for reproducibility and benchmark work:
+
+```powershell
+python -m peer_review_skills.cli.main replay-rebuttal-lens-trace `
+  --trace-file data/evaluation/rebuttal_lens_demo/rebuttal_lens_trace.json `
+  --output-dir data/evaluation/rebuttal_lens_replay
+
+python -m peer_review_skills.cli.main build-rebuttal-lens-benchmark `
+  --input-file openreview_discussions.json `
+  --output-dir data/evaluation/rebuttal_lens_benchmark_v1
+
+python -m peer_review_skills.cli.main calibrate-rebuttal-lens-judge `
+  --human-file human_eval.csv `
+  --judge-file judge_scores.jsonl `
+  --output-dir data/evaluation/rebuttal_lens_judge_calibration
+```
+
+Replay is trace-only and makes no model calls. Benchmark adapters are
+evaluation-only and non-training by default. Judge calibration is diagnostic
+unless agreement and trace/ledger provenance are strong enough to justify a
+bounded assistive role.
 
 ## Worked Example
 
@@ -151,6 +189,7 @@ Supported manuscript inputs include plain text, Markdown, LaTeX-like text, extra
 - API seed review has been executed for 200 / 200 seed requests.
 - Current seed and KB labels are model-assisted, not human gold.
 - Workflow traces include agent intermediate outputs, case explanations, evidence action plans, author confirmation questions, response adequacy checks, and cross-disciplinary lens maps.
+- Final user reports include a machine-checkable evidence ledger, privacy manifest, run manifest, replay path, and HTML author workspace.
 - Simulation artifacts model reviewer, author rebuttal, and editor signal roles for evaluation only; they are not real peer review.
 - Training and fine-tuning are outside the public v0.1 core scope.
 

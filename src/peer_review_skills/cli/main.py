@@ -168,6 +168,37 @@ def build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=None,
     )
+    run_rebuttal_lens.add_argument(
+        "--allow-external-manuscript-upload",
+        action="store_true",
+        help=(
+            "Explicitly allow sending manuscript text to the configured external "
+            "model provider."
+        ),
+    )
+
+    replay_rebuttal_lens = subparsers.add_parser(
+        "replay-rebuttal-lens-trace",
+        help="Replay a stored RebuttalLens trace into final user reports without model calls",
+    )
+    replay_rebuttal_lens.add_argument("--trace-file", type=config.Path, required=True)
+    replay_rebuttal_lens.add_argument("--output-dir", type=config.Path, required=True)
+
+    benchmark_rebuttal_lens = subparsers.add_parser(
+        "build-rebuttal-lens-benchmark",
+        help="Build an evaluation-only RebuttalLens benchmark from OpenReview-style JSON",
+    )
+    benchmark_rebuttal_lens.add_argument("--input-file", type=config.Path, required=True)
+    benchmark_rebuttal_lens.add_argument("--output-dir", type=config.Path, required=True)
+
+    calibrate_rebuttal_lens_judge = subparsers.add_parser(
+        "calibrate-rebuttal-lens-judge",
+        help="Compare RebuttalLens judge scores against human calibration rows",
+    )
+    calibrate_rebuttal_lens_judge.add_argument("--human-file", type=config.Path, required=True)
+    calibrate_rebuttal_lens_judge.add_argument("--judge-file", type=config.Path, required=True)
+    calibrate_rebuttal_lens_judge.add_argument("--output-dir", type=config.Path, required=True)
+    calibrate_rebuttal_lens_judge.add_argument("--threshold", type=float, default=0.75)
 
     return parser
 
@@ -538,6 +569,8 @@ def main(argv: list[str] | None = None) -> int:
             workflow_config["enable_committee"] = args.enable_committee
         if args.enable_strategy_tournament is not None:
             workflow_config["enable_strategy_tournament"] = args.enable_strategy_tournament
+        if args.allow_external_manuscript_upload:
+            workflow_config["allow_external_manuscript_upload"] = True
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)
         retrieved_cases = []
@@ -565,6 +598,42 @@ def main(argv: list[str] | None = None) -> int:
             config=workflow_config,
         )
         print("Nature RebuttalLens workflow summary:")
+        print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+        return 0
+    if args.command == "replay-rebuttal-lens-trace":
+        from peer_review_skills.agents.rebuttal_lens_replay import replay_rebuttal_lens_trace
+
+        summary = replay_rebuttal_lens_trace(
+            config.resolve_project_path(args.trace_file),
+            config.resolve_project_path(args.output_dir),
+        )
+        print("Nature RebuttalLens replay summary:")
+        print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+        return 0
+    if args.command == "build-rebuttal-lens-benchmark":
+        from peer_review_skills.evaluation.rebuttal_lens_benchmark import (
+            build_rebuttal_lens_benchmark,
+        )
+
+        summary = build_rebuttal_lens_benchmark(
+            config.resolve_project_path(args.input_file),
+            config.resolve_project_path(args.output_dir),
+        )
+        print("Nature RebuttalLens benchmark summary:")
+        print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
+        return 0
+    if args.command == "calibrate-rebuttal-lens-judge":
+        from peer_review_skills.evaluation.judge_calibration import (
+            calibrate_rebuttal_lens_judge_files,
+        )
+
+        summary = calibrate_rebuttal_lens_judge_files(
+            config.resolve_project_path(args.human_file),
+            config.resolve_project_path(args.judge_file),
+            config.resolve_project_path(args.output_dir),
+            threshold=args.threshold,
+        )
+        print("Nature RebuttalLens judge calibration summary:")
         print(json.dumps(summary, ensure_ascii=False, sort_keys=True))
         return 0
     parser.error(f"command not implemented yet: {args.command}")

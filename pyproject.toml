@@ -50,6 +50,9 @@ package-dir = { "" = "src" }
 where = ["src"]
 include = ["peer_review_skills*"]
 
+[tool.setuptools.package-data]
+peer_review_skills = ["py.typed"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
