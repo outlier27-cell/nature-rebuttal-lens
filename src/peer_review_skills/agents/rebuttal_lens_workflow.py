@@ -16,6 +16,7 @@ from peer_review_skills.agents.final_report import (
     compose_final_user_report,
     write_final_user_report,
 )
+from peer_review_skills.agents.input_safety import build_input_safety_report
 from peer_review_skills.agents.manuscript_context import build_rebuttal_lens_unit
 from peer_review_skills.agents.multi_agent_orchestrator import MultiAgentOrchestrator
 from peer_review_skills.agents.rebuttal_lens_agents import create_rebuttal_lens_frontend_agents
@@ -93,6 +94,23 @@ def run_rebuttal_lens_workflow(
     }
     output_dir = Path(config.get("output_dir") or root / DEFAULT_REBUTTAL_LENS_OUTPUT_DIR)
     output_dir.mkdir(parents=True, exist_ok=True)
+    input_safety_report = build_input_safety_report(
+        review_text=review_text,
+        response_text=response_text,
+        editor_text=editor_text,
+        manuscript_context=unit.get("manuscript_context", {}),
+        retrieved_cases=retrieved_cases,
+    )
+    input_safety_report_path = output_dir / "input_safety_report.json"
+    input_safety_report_path.write_text(
+        json.dumps(input_safety_report, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    if input_safety_report["blocked"] and not config.get("allow_unsafe_input_override", False):
+        raise ValueError(
+            "input safety check blocked this run before model calls; inspect "
+            f"{input_safety_report_path}"
+        )
     privacy_manifest_path = output_dir / "privacy_manifest.json"
     privacy_manifest_path.write_text(
         json.dumps(privacy_manifest, ensure_ascii=False, indent=2),
@@ -140,6 +158,7 @@ def run_rebuttal_lens_workflow(
         config=config,
         model_client=model_client,
         privacy_manifest_path=privacy_manifest_path,
+        input_safety_report_path=input_safety_report_path,
         workflow_engine=str(config.get("workflow_engine", "layered")),
         input_hashes=privacy_manifest["input_hashes"],
     )
@@ -149,6 +168,7 @@ def run_rebuttal_lens_workflow(
         encoding="utf-8",
     )
     summary["privacy_manifest_path"] = str(privacy_manifest_path)
+    summary["input_safety_report_path"] = str(input_safety_report_path)
     summary["run_manifest_path"] = str(run_manifest_path)
     (output_dir / "rebuttal_lens_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2),
@@ -204,6 +224,7 @@ def _build_run_manifest(
     config: dict[str, Any],
     model_client: Any,
     privacy_manifest_path: Path,
+    input_safety_report_path: Path,
     workflow_engine: str,
     input_hashes: dict[str, str],
 ) -> dict[str, Any]:
@@ -237,6 +258,7 @@ def _build_run_manifest(
             "miss_count": None,
         },
         "privacy_manifest_path": str(privacy_manifest_path),
+        "input_safety_report_path": str(input_safety_report_path),
         "unit_id": unit.get("unit_id", "unknown"),
     }
 
@@ -657,7 +679,31 @@ def _merged_rebuttal_lens_config(
         ]:
             if key in rebuttal_lens and key not in merged:
                 merged[key] = rebuttal_lens[key]
+    _validate_rebuttal_lens_config(merged)
     return merged
+
+
+def _validate_rebuttal_lens_config(config: dict[str, Any]) -> None:
+    engine = config.get("workflow_engine", "layered")
+    if engine not in {"layered", "dag"}:
+        raise ValueError("workflow_engine must be 'layered' or 'dag'")
+    bool_fields = [
+        "enable_committee",
+        "enable_strategy_tournament",
+        "final_user_report",
+        "allow_external_manuscript_upload",
+        "allow_unsafe_input_override",
+        "force_external_model_client",
+    ]
+    for field in bool_fields:
+        if field in config and not isinstance(config[field], bool):
+            raise ValueError(f"{field} must be a boolean")
+    int_fields = ["max_refinement_iterations", "dag_max_workers", "agent_max_retries"]
+    for field in int_fields:
+        if field in config:
+            value = config[field]
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise ValueError(f"{field} must be a non-negative integer")
 
 
 def _deep_merge_dicts(base: dict[str, Any], override: dict[str, Any]) -> dict[str, Any]:

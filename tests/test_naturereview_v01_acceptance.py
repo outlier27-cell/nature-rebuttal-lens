@@ -187,6 +187,36 @@ def test_legacy_annotation_agent_does_not_run_under_public_model_provider(tmp_pa
         AnnotationAgent(provider).run(tmp_path, "mvp")
 
 
+def test_external_api_provider_reads_timeout_retry_count(monkeypatch):
+    monkeypatch.setenv("PEER_REVIEW_API_KEY", "test-key")
+    monkeypatch.setenv("PEER_REVIEW_API_TIMEOUT_SECONDS", "45")
+    monkeypatch.setenv("PEER_REVIEW_API_TIMEOUT_RETRY_COUNT", "2")
+
+    provider = ExternalAPIProvider(
+        base_url="https://xh.v1api.cc",
+        api_key_env="PEER_REVIEW_API_KEY",
+        model="deepseek-v3",
+    )
+    client = provider.create_client()
+
+    assert client.timeout_seconds == 45
+    assert client.timeout_retry_count == 2
+
+
+def test_external_api_provider_rejects_invalid_timeout_retry_count(monkeypatch):
+    monkeypatch.setenv("PEER_REVIEW_API_KEY", "test-key")
+    monkeypatch.setenv("PEER_REVIEW_API_TIMEOUT_RETRY_COUNT", "-1")
+
+    provider = ExternalAPIProvider(
+        base_url="https://xh.v1api.cc",
+        api_key_env="PEER_REVIEW_API_KEY",
+        model="deepseek-v3",
+    )
+
+    with pytest.raises(ValueError, match="PEER_REVIEW_API_TIMEOUT_RETRY_COUNT"):
+        provider.create_client()
+
+
 def test_python_agent_workflow_requires_explicit_legacy_baseline_flag(tmp_path):
     with pytest.raises(ValueError, match="allow_legacy_baseline"):
         run_agent_workflow(

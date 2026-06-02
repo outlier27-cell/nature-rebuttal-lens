@@ -102,10 +102,18 @@ class ExternalAPIProvider(ModelProvider):
             raise ValueError("PEER_REVIEW_API_TIMEOUT_SECONDS must be an integer") from exc
         if timeout_seconds <= 0:
             raise ValueError("PEER_REVIEW_API_TIMEOUT_SECONDS must be > 0")
+        retry_raw = environment.get("PEER_REVIEW_API_TIMEOUT_RETRY_COUNT", "1").strip()
+        try:
+            timeout_retry_count = int(retry_raw)
+        except ValueError as exc:
+            raise ValueError("PEER_REVIEW_API_TIMEOUT_RETRY_COUNT must be an integer") from exc
+        if timeout_retry_count < 0:
+            raise ValueError("PEER_REVIEW_API_TIMEOUT_RETRY_COUNT must be >= 0")
 
         return OpenAICompatibleChatClient(
             base_url=self.base_url,
             api_key=environment[self.api_key_env],
             model=self.model,
             timeout_seconds=timeout_seconds,
+            timeout_retry_count=timeout_retry_count,
         )
