@@ -1167,6 +1167,163 @@ def test_run_rebuttal_lens_workflow_can_use_dag_committee_and_strategy(tmp_path)
     assert "no_confidential_upload_recommendation" in final_report["responsible_use_warnings"]
 
 
+def test_final_report_comment_cards_include_nature_response_schema(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "schema_report_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir},
+    )
+
+    report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
+    card = report["comment_cards"][0]
+
+    for field in [
+        "severity",
+        "category",
+        "proposed_action",
+        "readiness",
+        "risk_level",
+        "missing_author_input",
+        "evidence_anchor",
+    ]:
+        assert field in card
+    assert report["package_readiness"] in {
+        "ready_to_submit",
+        "draft_with_placeholders",
+        "needs_author_input",
+        "blocked",
+    }
+    assert report["response_package_gate_issues"] == []
+
+
+def test_final_report_comment_cards_include_data_and_citation_checks(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Data Availability\n\nData are available on request.\n", encoding="utf-8")
+    output_dir = tmp_path / "adapter_report_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="Please provide source data, code availability, and relevant citations.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir},
+    )
+
+    report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
+    card = report["comment_cards"][0]
+
+    assert "data_availability_check" in card
+    assert "citation_support_check" in card
+    assert "applies" in card["data_availability_check"]
+    assert "support_grade" in card["citation_support_check"]
+
+
+def test_final_report_passes_evidence_refs_to_citation_support_check():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    report = compose_final_user_report({
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "R1.2",
+                        "concern_type": "citation_positioning",
+                        "surface_request": "Please cite the relevant prior work.",
+                        "text_evidence": "prior work citation missing",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "R1.2",
+                        "status": "supported",
+                        "section_id": "section_003",
+                        "evidence_refs": ["doi:10.1234/example"],
+                        "evidence_anchor": "doi:10.1234/example",
+                        "gap": "",
+                    }
+                ],
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "R1.2",
+                        "action_type": "literature_repositioning",
+                        "required_artifact": "add prior-work citation",
+                        "requires_author_confirmation": False,
+                    }
+                ],
+            },
+        },
+    })
+
+    card = report["comment_cards"][0]
+    assert card["evidence_refs"] == ["doi:10.1234/example"]
+    assert card["citation_support_check"]["support_grade"] == "supplied_anchor"
+    assert card["citation_support_check"]["can_be_used_as_evidence"] is True
+
+
+def test_final_report_markdown_renderer_is_readable_chinese():
+    from peer_review_skills.agents.final_report import render_final_user_report_markdown
+
+    markdown = render_final_user_report_markdown({
+        "executive_summary": "系统识别出 1 个 reviewer concern。",
+        "package_readiness": "needs_author_input",
+        "comment_cards": [
+            {
+                "comment_id": "R1.1",
+                "concern_type": "methodological_transparency",
+                "surface_request": "clarify split",
+                "implicit_risk": "dataset split is unclear",
+                "evidence_status": "partially_supported",
+                "manuscript_section": "section_002",
+                "evidence_gap": "random seed missing",
+                "recommended_action": "dataset split protocol",
+                "author_input_required": True,
+                "proposed_action": "AUTHOR_INPUT_NEEDED",
+                "readiness": "needs_author_input",
+                "risk_level": "high",
+                "missing_author_input": ["dataset split protocol"],
+                "evidence_anchor": "section_002",
+                "safe_response_language": "We will clarify after author confirmation.",
+                "unsafe_language_to_avoid": "Avoid claiming fully resolved.",
+            }
+        ],
+        "recommended_rebuttal_outline": [],
+        "author_confirmation_questions": [],
+        "responsible_use_warnings": [],
+        "unsafe_claims": [],
+    })
+
+    assert "最终作者回应辅助报告" in markdown
+    assert "Package readiness" in markdown
+    assert "AUTHOR_INPUT_NEEDED" in markdown
+    assert "鐨" not in markdown
+    assert "锛" not in markdown
+
+
+def test_nature_response_action_taxonomy_is_loadable():
+    path = Path.cwd() / "data/processed/taxonomies/nature_response_action_taxonomy.v1.json"
+    taxonomy = json.loads(path.read_text(encoding="utf-8"))
+
+    assert taxonomy["taxonomy_name"] == "nature_response_action_taxonomy"
+    assert "AUTHOR_INPUT_NEEDED" in taxonomy["action_labels"]
+    assert "blocked" in taxonomy["readiness_states"]
+
+
 def test_rebuttal_lens_agent_config_controls_retry_and_temperature():
     agents = create_rebuttal_lens_frontend_agents(
         RebuttalLensMockLLMClient(),
@@ -1296,6 +1453,76 @@ def test_integrity_prompt_receives_manuscript_context_boundary():
 
     assert user_payload["unit"]["manuscript_context"]["mode"] == "review_only"
     assert user_payload["unit"]["manuscript_context"]["evidence_boundary"]["can_locate_textual_evidence"] is False
+
+
+def test_reviewer_understanding_prompt_requests_stable_comment_schema():
+    from peer_review_skills.agents.specialized_agents import ReviewerUnderstandingAgent
+
+    agent = ReviewerUnderstandingAgent(
+        "reviewer_understanding_agent",
+        RebuttalLensMockLLMClient(),
+    )
+    prompt = agent.build_prompt({
+        "review_text": "Reviewer 1: The dataset split is unclear.",
+        "taxonomies": {},
+    })
+    system_prompt = prompt[0]["content"]
+
+    assert '"concern_id"' in system_prompt
+    assert '"severity"' in system_prompt
+    assert '"category"' in system_prompt
+    assert "minor|major|blocking|unclear" in system_prompt
+
+
+def test_manuscript_evidence_prompt_requests_evidence_refs():
+    agent = ManuscriptEvidenceLocatorAgent(
+        "manuscript_evidence_locator",
+        RebuttalLensMockLLMClient(),
+    )
+    prompt = agent.build_prompt({
+        "review_text": "The dataset split is unclear.",
+        "concern_map": {"concern_map": [{"concern_id": "R1.1"}]},
+        "manuscript_context": {
+            "mode": "manuscript_aware",
+            "sections": [
+                {
+                    "section_id": "section_001",
+                    "heading": "Methods",
+                    "text": "split",
+                }
+            ],
+        },
+    })
+
+    assert '"evidence_refs"' in prompt[0]["content"]
+    assert '"evidence_anchor"' in prompt[0]["content"]
+
+
+def test_evidence_action_prompt_includes_nature_action_labels():
+    agent = EvidenceActionPlannerAgent(
+        "evidence_action_planner",
+        RebuttalLensMockLLMClient(),
+    )
+    prompt = agent.build_prompt({
+        "concern_map": {},
+        "risk_interpretation": {},
+        "retrieved_cases": [],
+        "manuscript_evidence": {},
+        "case_interpretation": {},
+        "taxonomies": {},
+    })
+    system_prompt = prompt[0]["content"]
+
+    for label in [
+        "ACCEPT_TEXT",
+        "ACCEPT_ANALYSIS",
+        "SOFTEN_CLAIM",
+        "AUTHOR_INPUT_NEEDED",
+        "BLOCKING",
+    ]:
+        assert label in system_prompt
+    assert '"nature_action_hint"' in system_prompt
+    assert '"missing_author_input"' in system_prompt
 
 
 def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():

@@ -1,0 +1,31 @@
+{
+  "taxonomy_name": "nature_response_action_taxonomy",
+  "taxonomy_version": "v1",
+  "description": "Nature-response compatible action, readiness, severity, and risk labels for RebuttalLens response package cards.",
+  "action_labels": {
+    "ACCEPT_TEXT": "Text, structure, method description, discussion, title, abstract, or legend revision.",
+    "ACCEPT_ANALYSIS": "Added or revised analysis, benchmark, robustness check, statistical analysis, or comparison.",
+    "ACCEPT_EXPERIMENT": "Added experimental data supplied by the author.",
+    "ACCEPT_FIGURE": "Added or revised figure, table, panel, legend, or supplement.",
+    "CLARIFY_EXISTING": "Existing evidence addresses the concern but manuscript presentation needs clarification.",
+    "ADD_CITATION": "Add a verified citation with claim-level support.",
+    "SOFTEN_CLAIM": "Reduce claim strength or add a boundary/limitation.",
+    "PARTIAL": "Partly address the concern with explicit remaining limitation.",
+    "DISAGREE": "Respectfully disagree using supplied evidence or scope reasoning.",
+    "OUT_OF_SCOPE": "Scientifically valid request outside the current manuscript scope.",
+    "AUTHOR_INPUT_NEEDED": "Final wording is not credible until the author supplies real details.",
+    "BLOCKING": "Credible response is blocked by missing compliance, integrity, central evidence, or required data."
+  },
+  "readiness_states": {
+    "ready_to_submit": "Enough facts are supplied to draft final text with traceable manuscript location.",
+    "draft_with_placeholders": "Draft can proceed with visible placeholders.",
+    "needs_author_input": "The author must provide facts before final response wording is credible.",
+    "blocked": "A compliance, integrity, central-evidence, or appeal-like issue prevents normal final response drafting."
+  },
+  "risk_levels": {
+    "low": "Wording, format, or straightforward clarification.",
+    "medium": "Citation, figure, method detail, or presentation issue requiring verification.",
+    "high": "Evidence, statistics, validation, claim strength, or out-of-scope request.",
+    "blocking": "Ethics, compliance, data integrity, missing central evidence, or unsupported response."
+  }
+}

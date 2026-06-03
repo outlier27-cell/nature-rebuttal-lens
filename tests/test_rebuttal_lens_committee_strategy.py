@@ -100,6 +100,21 @@ def test_committee_reviewer_agent_returns_structured_findings():
     assert client.call_count == 1
 
 
+def test_committee_prompt_forbids_invented_reviewer_identity():
+    agent = CommitteeReviewerAgent(
+        "methodology_committee_reviewer",
+        CommitteeMockClient(),
+        reviewer_role="methodology",
+    )
+    prompt = agent.build_prompt({"review_text": "split unclear", "all_agent_outputs": {}})
+    system_prompt = prompt[0]["content"].lower()
+
+    assert "shared fact base" in system_prompt
+    assert "emphasis" in system_prompt
+    assert "do not invent reviewer identities" in system_prompt
+    assert "do not invent specialties" in system_prompt
+
+
 def test_committee_meta_reviewer_synthesizes_committee_outputs():
     client = CommitteeMockClient()
     agent = CommitteeMetaReviewerAgent("committee_meta_reviewer", client)
@@ -122,6 +137,17 @@ def test_strategy_tournament_agent_outputs_candidates_with_scores():
 
     assert message.content["strategy_candidates"][0]["strategy_id"] == "strategy_a"
     assert message.content["strategy_candidates"][0]["author_confirmation_required"] is True
+
+
+def test_strategy_tournament_prompt_includes_four_strategy_library_and_evidence_gate():
+    agent = StrategyTournamentAgent("strategy_tournament_agent", CommitteeMockClient())
+    prompt = agent.build_prompt({"all_agent_outputs": {}})
+    system_prompt = prompt[0]["content"]
+
+    for label in ["Accept", "Defend", "Clarify", "Experiment"]:
+        assert label in system_prompt
+    assert "evidence anchor" in system_prompt.lower()
+    assert "Do not invent completed experiments" in system_prompt
 
 
 def test_strategy_meta_planner_selects_safe_strategy():

@@ -34,11 +34,15 @@ class CommitteeReviewerAgent(BaseAgent):
             {
                 "role": "system",
                 "content": (
-                    f"You are the {self.reviewer_role} reviewer in a Nature RebuttalLens "
-                    "reviewer committee. Independently inspect the reviewer concern, manuscript "
-                    "evidence, author draft, editor note, retrieved cases, and prior agent "
-                    "outputs. Do not write a final rebuttal. Do not invent experiments, "
-                    "citations, manuscript locations, or editorial outcomes. Return only valid "
+                    "You are one committee lens in Nature RebuttalLens. Use the same "
+                    "shared fact base as the other reviewer committee lenses. Your difference is "
+                    f"emphasis only: {self.reviewer_role}. Independently inspect the "
+                    "reviewer concern, manuscript evidence, author draft, editor note, "
+                    "retrieved cases, and prior agent outputs. Do not invent reviewer "
+                    "identities, do not invent specialties, institutions, biographies, "
+                    "or selection history. Do not write a final rebuttal. Do not invent "
+                    "experiments, citations, manuscript locations, or editorial outcomes. "
+                    "Return only valid "
                     "JSON with: reviewer_role, findings[], author_confirmation_questions[], "
                     "reasoning. Each finding must include risk, severity, evidence, recommendation."
                 ),
@@ -81,6 +85,8 @@ class CommitteeMetaReviewerAgent(BaseAgent):
                 "content": (
                     "You are the Nature RebuttalLens committee meta-reviewer. Synthesize "
                     "independent committee outputs into a prioritized, non-duplicative plan. "
+                    "Preserve consensus and emphasis differences separately. "
+                    "Do not collapse all committee lenses into one invented reviewer persona. "
                     "Preserve disagreement. Do not predict acceptance. Do not write final "
                     "submission text. Preserve author confirmation gates. Return only valid "
                     "JSON with committee_synthesis, author_confirmation_questions, reasoning."

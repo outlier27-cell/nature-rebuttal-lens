@@ -6,6 +6,13 @@ import json
 from pathlib import Path
 from typing import Any
 
+from peer_review_skills.agents.citation_support_checks import grade_citation_support
+from peer_review_skills.agents.data_availability_checks import build_data_availability_check
+from peer_review_skills.agents.response_package import (
+    build_response_package_cards,
+    validate_response_package_cards,
+)
+
 
 def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
     """Build a stable user-facing report from a RebuttalLens trace."""
@@ -23,6 +30,12 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
     action_plan = _as_list(actions.get("evidence_action_plan", []))
     tone_warnings = _as_list(tone.get("tone_commitment_warnings", []))
     provenance_checks = _as_list(integrity.get("provenance_checks", []))
+    nature_cards = build_response_package_cards(
+        concern_map=concern_map,
+        evidence_map=[item for item in evidence_map if isinstance(item, dict)],
+        action_plan=[item for item in action_plan if isinstance(item, dict)],
+    )
+    nature_by_id = {card["comment_id"]: card for card in nature_cards}
 
     comment_cards = []
     for index, concern in enumerate(concern_map, start=1):
@@ -44,6 +57,7 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
             "confidence": str(concern.get("confidence", "unknown")),
             "evidence_status": str(linked_evidence.get("status", "uncertain")),
             "manuscript_section": str(linked_evidence.get("section_id", "none")),
+            "evidence_refs": _as_string_list(linked_evidence.get("evidence_refs")),
             "evidence_gap": str(linked_evidence.get("gap", "")),
             "recommended_action": str(linked_action.get("required_artifact", "")),
             "action_type": str(linked_action.get("action_type", "")),
@@ -56,6 +70,14 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
             "safe_response_language": _safe_language_for(linked_action, linked_evidence),
             "unsafe_language_to_avoid": _unsafe_language_for(linked_evidence),
         }
+        nature_card = nature_by_id.get(card["comment_id"]) or (
+            nature_cards[index - 1] if index - 1 < len(nature_cards) else {}
+        )
+        nature_fields = dict(nature_card)
+        nature_fields.pop("comment_id", None)
+        card.update(nature_fields)
+        card["data_availability_check"] = build_data_availability_check(card)
+        card["citation_support_check"] = grade_citation_support(card)
         comment_cards.append(card)
 
     unsafe_claims = [
@@ -81,6 +103,8 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "workflow_version": trace.get("workflow_version", "rebuttal_lens_v1"),
         "query_unit_id": trace.get("query_unit_id", "unknown"),
         "executive_summary": _build_executive_summary(comment_cards, unsafe_claims),
+        "package_readiness": _overall_package_readiness(comment_cards),
+        "response_package_gate_issues": validate_response_package_cards(comment_cards),
         "comment_cards": comment_cards,
         "recommended_rebuttal_outline": recommended_outline,
         "author_confirmation_questions": confirmation_questions,
@@ -105,6 +129,7 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
         "## 1. 核心判断",
         "",
         str(report.get("executive_summary", "")),
+        f"Package readiness: {report.get('package_readiness', 'unknown')}",
         "",
         "## 2. Reviewer Concern Cards",
         "",
@@ -120,6 +145,13 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
                 f"- 证据缺口：{card.get('evidence_gap')}",
                 f"- 建议动作：{card.get('recommended_action')}",
                 f"- 作者确认必需：{card.get('author_input_required')}",
+                f"- Severity: {card.get('severity')}",
+                f"- Category: {card.get('category')}",
+                f"- Proposed action: {card.get('proposed_action')}",
+                f"- Readiness: {card.get('readiness')}",
+                f"- Risk level: {card.get('risk_level')}",
+                f"- Evidence anchor: {card.get('evidence_anchor')}",
+                f"- Missing author input: {card.get('missing_author_input')}",
                 f"- 安全表达：{card.get('safe_response_language')}",
                 f"- 避免表达：{card.get('unsafe_language_to_avoid')}",
                 "",
@@ -326,6 +358,21 @@ def _build_outline(
         "author confirmation."
     )
     return outline
+
+
+def _overall_package_readiness(comment_cards: list[dict[str, Any]]) -> str:
+    order = {
+        "ready_to_submit": 1,
+        "draft_with_placeholders": 2,
+        "needs_author_input": 3,
+        "blocked": 4,
+    }
+    readiness = "ready_to_submit"
+    for card in comment_cards:
+        state = str(card.get("readiness", "needs_author_input"))
+        if order.get(state, 3) > order.get(readiness, 1):
+            readiness = state
+    return readiness
 
 
 def _build_executive_summary(

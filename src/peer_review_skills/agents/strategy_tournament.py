@@ -26,7 +26,16 @@ class StrategyTournamentAgent(BaseAgent):
                     "2-3 competing author response strategies. Score each strategy with "
                     "concern_coverage, evidence_grounding, feasibility, overclaim_risk, "
                     "tone_risk, and provenance_strength. Do not write final rebuttal text. "
-                    "Do not invent completed experiments. Return only valid JSON with "
+                    "Do not invent completed experiments. Use the strategy library as "
+                    "labels only: Accept means the reviewer is right and a concrete "
+                    "change is supported; Defend means the current design is justified "
+                    "by supplied facts; Clarify means the concern is addressed by "
+                    "existing manuscript evidence but presentation needs clarification; "
+                    "Experiment means additional analysis or experiment is needed and "
+                    "must be marked planned or author_input_required unless supplied. "
+                    "Every strategy must include an evidence anchor, a feasibility note, "
+                    "and an overclaim gate. Optional candidate fields may include "
+                    "strategy_family, evidence_anchor, and overclaim_gate. Return only valid JSON with "
                     "strategy_candidates[] and reasoning."
                 ),
             },

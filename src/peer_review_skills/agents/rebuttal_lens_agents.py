@@ -179,6 +179,8 @@ class ManuscriptEvidenceLocatorAgent(BaseAgent):
                     "      \"concern_id\": \"<id>\",\n"
                     "      \"status\": \"supported|partially_supported|missing|uncertain\",\n"
                     "      \"section_id\": \"<section id or none>\",\n"
+                    "      \"evidence_refs\": [\"<section id, figure, table, or supplied artifact id>\"],\n"
+                    "      \"evidence_anchor\": \"<primary section id or supplied artifact id>\",\n"
                     "      \"text_evidence\": \"<short supplied text evidence or empty>\",\n"
                     "      \"gap\": \"<what remains unresolved>\"\n"
                     "    }\n"
