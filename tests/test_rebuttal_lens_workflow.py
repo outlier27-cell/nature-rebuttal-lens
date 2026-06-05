@@ -886,6 +886,9 @@ def test_run_rebuttal_lens_workflow_returns_manuscript_aware_trace(tmp_path):
     assert final_report["report_type"] == "author_rebuttal_assistant_report"
     assert final_report["not_final_submission_text"] is True
     assert "assistant_only" in final_report["responsible_use_warnings"]
+    assert final_report["memory_ethics_boundary"]["justification_memory_not_conclusion_memory"] is True
+    assert final_report["memory_ethics_boundary"]["cross_run_strategy_memory_used"] is False
+    assert final_report["memory_ethics_boundary"]["author_decisions_reset_each_run"] is True
     assert "最终作者回应辅助报告" in final_markdown_path.read_text(encoding="utf-8")
 
 
@@ -1163,8 +1166,10 @@ def test_run_rebuttal_lens_workflow_can_use_dag_committee_and_strategy(tmp_path)
     assert trace["workflow_version"] == "rebuttal_lens_v1"
     assert trace["manuscript_context"]["mode"] == "manuscript_aware"
     assert trace["responsible_use_boundary"]["no_confidential_upload_recommendation"] is True
+    assert trace["memory_ethics_boundary"]["cross_run_strategy_memory_used"] is False
     final_report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
     assert "no_confidential_upload_recommendation" in final_report["responsible_use_warnings"]
+    assert final_report["memory_ethics_boundary"]["trace_bound_to_output"] is True
 
 
 def test_final_report_comment_cards_include_nature_response_schema(tmp_path):
@@ -1199,9 +1204,119 @@ def test_final_report_comment_cards_include_nature_response_schema(tmp_path):
         "ready_to_submit",
         "draft_with_placeholders",
         "needs_author_input",
+        "decision_deferred",
         "blocked",
     }
     assert report["response_package_gate_issues"] == []
+
+
+def test_final_report_uses_decision_deferred_for_unconfirmed_high_risk_actions():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    report = compose_final_user_report({
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "experimental_design",
+                        "surface_request": "Run temporal split validation.",
+                        "text_evidence": "temporal split missing",
+                        "confidence": "high",
+                    }
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "status": "partially_supported",
+                        "section_id": "section_002",
+                        "gap": "temporal split result not supplied",
+                    }
+                ]
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "concern_001",
+                        "action_type": "new_analysis",
+                        "required_artifact": "temporal split validation",
+                        "requires_author_confirmation": True,
+                    }
+                ]
+            },
+        },
+    })
+
+    card = report["comment_cards"][0]
+    assert card["readiness"] == "decision_deferred"
+    assert report["package_readiness"] == "decision_deferred"
+    assert card["memory_decision_boundary"]["author_decision_required"] is True
+    assert card["memory_decision_boundary"]["system_may_commit_for_author"] is False
+
+
+def test_package_readiness_preserves_decision_deferred_above_needs_author_input():
+    from peer_review_skills.agents.final_report import compose_final_user_report
+
+    report = compose_final_user_report({
+        "query_unit_id": "case_001",
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {
+                "concern_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "concern_type": "experimental_design",
+                        "surface_request": "Run temporal split validation.",
+                        "text_evidence": "temporal split missing",
+                        "confidence": "high",
+                    },
+                    {
+                        "concern_id": "concern_002",
+                        "concern_type": "method_clarification",
+                        "surface_request": "Clarify the random split procedure.",
+                        "text_evidence": "split procedure underspecified",
+                        "confidence": "high",
+                    },
+                ]
+            },
+            "manuscript_evidence_locator": {
+                "manuscript_evidence_map": [
+                    {
+                        "concern_id": "concern_001",
+                        "status": "partially_supported",
+                        "section_id": "section_002",
+                    },
+                    {
+                        "concern_id": "concern_002",
+                        "status": "partially_supported",
+                        "section_id": "section_002",
+                    },
+                ]
+            },
+            "evidence_action_planner": {
+                "evidence_action_plan": [
+                    {
+                        "concern_id": "concern_001",
+                        "action_type": "new_analysis",
+                        "required_artifact": "temporal split validation",
+                        "requires_author_confirmation": True,
+                    },
+                    {
+                        "concern_id": "concern_002",
+                        "action_type": "method_clarification",
+                        "required_artifact": "split randomization details",
+                        "requires_author_confirmation": True,
+                    },
+                ]
+            },
+        },
+    })
+
+    readiness = [card["readiness"] for card in report["comment_cards"]]
+    assert readiness == ["decision_deferred", "needs_author_input"]
+    assert report["package_readiness"] == "decision_deferred"
 
 
 def test_final_report_comment_cards_include_data_and_citation_checks(tmp_path):
@@ -1277,7 +1392,10 @@ def test_final_report_passes_evidence_refs_to_citation_support_check():
 
 
 def test_final_report_markdown_renderer_is_readable_chinese():
-    from peer_review_skills.agents.final_report import render_final_user_report_markdown
+    from peer_review_skills.agents.final_report import (
+        compose_final_user_report,
+        render_final_user_report_markdown,
+    )
 
     markdown = render_final_user_report_markdown({
         "executive_summary": "系统识别出 1 个 reviewer concern。",
@@ -1309,10 +1427,26 @@ def test_final_report_markdown_renderer_is_readable_chinese():
     })
 
     assert "最终作者回应辅助报告" in markdown
+    assert "表层要求" in markdown
+    assert "作者确认必需" in markdown
     assert "Package readiness" in markdown
     assert "AUTHOR_INPUT_NEEDED" in markdown
     assert "鐨" not in markdown
     assert "锛" not in markdown
+
+    report = compose_final_user_report({
+        "agent_intermediate_outputs": {
+            "reviewer_understanding_agent": {"concern_map": []},
+            "manuscript_evidence_locator": {
+                "author_confirmation_questions": [
+                    {"question": "Can the temporal split be completed?", "urgency": "high"}
+                ]
+            },
+        },
+    })
+    assert report["author_confirmation_questions"] == [
+        "Can the temporal split be completed?"
+    ]
 
 
 def test_nature_response_action_taxonomy_is_loadable():
@@ -1542,6 +1676,7 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
         "data/evaluation/rebuttal_lens_demo",
         "--limit-cases",
         "3",
+        "--reset-memory",
     ])
 
     assert args.command == "run-rebuttal-lens"
@@ -1550,6 +1685,7 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
     assert str(args.response_file).endswith("author_draft_response.txt")
     assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
     assert args.limit_cases == 3
+    assert args.reset_memory is True
 
 
 def test_cli_parser_accepts_dag_committee_strategy_flags():

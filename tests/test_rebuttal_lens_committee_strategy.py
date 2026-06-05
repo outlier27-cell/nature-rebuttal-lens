@@ -129,6 +129,43 @@ def test_committee_meta_reviewer_synthesizes_committee_outputs():
     assert "temporal leakage" in message.content["committee_synthesis"]["highest_priority_risks"]
 
 
+def test_committee_meta_reviewer_normalizes_structured_reasoning_from_provider():
+    class StructuredReasoningClient:
+        model = "mock-deepseek-v3"
+        model_name = "mock-deepseek-v3"
+
+        def create_chat_completion(
+            self,
+            messages: list[dict[str, str]],
+            response_format: dict[str, str] | None = None,
+            temperature: float = 0.0,
+        ) -> dict[str, Any]:
+            return {
+                "committee_synthesis": {
+                    "highest_priority_risks": ["temporal leakage"],
+                    "agreement": ["methodology and claim reviewers agree"],
+                    "disagreement": [],
+                    "recommended_focus": "add temporal split or narrow claim",
+                },
+                "author_confirmation_questions": ["Can the temporal split be completed?"],
+                "reasoning": {
+                    "consensus": "committee findings agree on split validity",
+                    "priority": ["temporal split", "claim narrowing"],
+                },
+            }
+
+    agent = CommitteeMetaReviewerAgent("committee_meta_reviewer", StructuredReasoningClient())
+
+    message = agent.execute({
+        "committee_outputs": {
+            "methodology_committee_reviewer": {"findings": [{"risk": "temporal leakage"}]}
+        }
+    })
+
+    assert isinstance(message.content["reasoning"], str)
+    assert "consensus" in message.content["reasoning"]
+
+
 def test_strategy_tournament_agent_outputs_candidates_with_scores():
     client = CommitteeMockClient()
     agent = StrategyTournamentAgent("strategy_tournament_agent", client)
@@ -137,6 +174,119 @@ def test_strategy_tournament_agent_outputs_candidates_with_scores():
 
     assert message.content["strategy_candidates"][0]["strategy_id"] == "strategy_a"
     assert message.content["strategy_candidates"][0]["author_confirmation_required"] is True
+
+
+def test_strategy_tournament_agent_fills_missing_candidate_ids():
+    class MissingStrategyIdClient:
+        model = "mock-deepseek-v3"
+        model_name = "mock-deepseek-v3"
+
+        def create_chat_completion(
+            self,
+            messages: list[dict[str, str]],
+            response_format: dict[str, str] | None = None,
+            temperature: float = 0.0,
+        ) -> dict[str, Any]:
+            return {
+                "strategy_candidates": [
+                    {
+                        "name": "add temporal split and narrow claim",
+                        "response_position": "accept_and_revise",
+                        "required_actions": ["temporal split"],
+                        "rubric_scores": {
+                            "concern_coverage": 5,
+                            "evidence_grounding": 4,
+                            "feasibility": 3,
+                            "overclaim_risk": 1,
+                        },
+                        "author_confirmation_required": True,
+                    }
+                ],
+                "reasoning": "Candidate A is strongest.",
+            }
+
+    agent = StrategyTournamentAgent("strategy_tournament_agent", MissingStrategyIdClient())
+
+    message = agent.execute({"all_agent_outputs": {}})
+
+    assert message.content["strategy_candidates"][0]["strategy_id"] == "strategy_001"
+
+
+def test_strategy_tournament_agent_normalizes_deepseek_flat_candidate_shape():
+    class FlatCandidateClient:
+        model = "mock-deepseek-v3"
+        model_name = "mock-deepseek-v3"
+
+        def create_chat_completion(
+            self,
+            messages: list[dict[str, str]],
+            response_format: dict[str, str] | None = None,
+            temperature: float = 0.0,
+        ) -> dict[str, Any]:
+            return {
+                "strategy_candidates": [
+                    {
+                        "strategy_family": "Experiment",
+                        "evidence_anchor": "section_008",
+                        "concern_coverage": 0.9,
+                        "evidence_grounding": 0.5,
+                        "feasibility": "Medium - requires new analysis",
+                        "overclaim_risk": "High - pending results",
+                        "tone_risk": "Medium - avoid overpromising",
+                        "provenance_strength": 0.6,
+                        "overclaim_gate": "Mark new analyses as planned",
+                    }
+                ],
+                "reasoning": "Experiment directly tackles reviewer requests.",
+            }
+
+    agent = StrategyTournamentAgent("strategy_tournament_agent", FlatCandidateClient())
+
+    message = agent.execute({"all_agent_outputs": {}})
+    candidate = message.content["strategy_candidates"][0]
+
+    assert candidate["strategy_id"] == "strategy_001"
+    assert candidate["name"] == "Experiment"
+    assert candidate["response_position"] == "experiment"
+    assert candidate["required_actions"] == ["Mark new analyses as planned"]
+    assert candidate["rubric_scores"]["concern_coverage"] == 0.9
+    assert candidate["author_confirmation_required"] is True
+
+
+def test_strategy_tournament_agent_does_not_turn_numeric_scores_into_actions():
+    class NumericScoreCandidateClient:
+        model = "mock-deepseek-v3"
+        model_name = "mock-deepseek-v3"
+
+        def create_chat_completion(
+            self,
+            messages: list[dict[str, str]],
+            response_format: dict[str, str] | None = None,
+            temperature: float = 0.0,
+        ) -> dict[str, Any]:
+            return {
+                "strategy_candidates": [
+                    {
+                        "strategy_family": "Clarify",
+                        "evidence_anchor": "section_002",
+                        "concern_coverage": 0.8,
+                        "evidence_grounding": 0.7,
+                        "feasibility": 0.9,
+                        "overclaim_risk": 0.2,
+                        "tone_risk": 0.1,
+                        "provenance_strength": 0.8,
+                    }
+                ],
+                "reasoning": "Clarification uses existing manuscript evidence.",
+            }
+
+    agent = StrategyTournamentAgent("strategy_tournament_agent", NumericScoreCandidateClient())
+
+    message = agent.execute({"all_agent_outputs": {}})
+    candidate = message.content["strategy_candidates"][0]
+
+    assert candidate["required_actions"] == []
+    assert candidate["rubric_scores"]["feasibility"] == 0.9
 
 
 def test_strategy_tournament_prompt_includes_four_strategy_library_and_evidence_gate():
@@ -158,3 +308,57 @@ def test_strategy_meta_planner_selects_safe_strategy():
 
     assert message.content["selected_strategy_id"] == "strategy_a"
     assert "narrow generalization" in message.content["merged_plan"]["claim_adjustments"]
+
+
+def test_strategy_meta_planner_normalizes_dict_rejection_reasons_and_question_objects():
+    class MetaPlannerDriftClient:
+        model = "mock-deepseek-v3"
+        model_name = "mock-deepseek-v3"
+
+        def create_chat_completion(
+            self,
+            messages: list[dict[str, str]],
+            response_format: dict[str, str] | None = None,
+            temperature: float = 0.0,
+        ) -> dict[str, Any]:
+            return {
+                "selected_strategy_id": "strategy_002",
+                "merged_plan": {
+                    "core_strategy": "add_new_analysis",
+                    "supporting_actions": [
+                        {
+                            "action_type": "new_analysis",
+                            "description": "Run temporal split validation",
+                        }
+                    ],
+                },
+                "rejection_reasons": {
+                    "strategy_001": "Insufficient direct response to temporal validation",
+                    "strategy_003": "Does not address robustness checks",
+                },
+                "author_confirmation_questions": [
+                    {
+                        "question": "Can the temporal split analysis be completed?",
+                        "urgency": "high",
+                    }
+                ],
+                "reasoning": "Strategy 002 covers the core concern.",
+            }
+
+    agent = StrategyMetaPlannerAgent("strategy_meta_planner", MetaPlannerDriftClient())
+
+    message = agent.execute({"strategy_candidates": []})
+
+    assert message.content["rejection_reasons"] == [
+        {
+            "strategy_id": "strategy_001",
+            "reason": "Insufficient direct response to temporal validation",
+        },
+        {
+            "strategy_id": "strategy_003",
+            "reason": "Does not address robustness checks",
+        },
+    ]
+    assert message.content["author_confirmation_questions"] == [
+        "Can the temporal split analysis be completed?"
+    ]

@@ -114,6 +114,7 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "unsafe_claims": unsafe_claims,
         "provenance_checks": provenance_checks,
         "responsible_use_warnings": _responsible_use_warnings(trace, integrity),
+        "memory_ethics_boundary": _memory_ethics_boundary(trace),
         "integrity_issues": _as_list(integrity.get("issues", [])),
         "not_final_submission_text": True,
     }
@@ -195,6 +196,17 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
     lines.extend(["", "## 8. Responsible Use", ""])
     for warning in report.get("responsible_use_warnings", []):
         lines.append(f"- {warning}")
+    if report.get("memory_ethics_boundary"):
+        lines.extend(
+            [
+                "",
+                "## 9. Memory Ethics Boundary",
+                "",
+                "```json",
+                json.dumps(report["memory_ethics_boundary"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -365,7 +377,8 @@ def _overall_package_readiness(comment_cards: list[dict[str, Any]]) -> str:
         "ready_to_submit": 1,
         "draft_with_placeholders": 2,
         "needs_author_input": 3,
-        "blocked": 4,
+        "decision_deferred": 4,
+        "blocked": 5,
     }
     readiness = "ready_to_submit"
     for card in comment_cards:
@@ -399,12 +412,36 @@ def _responsible_use_warnings(
     return _dedupe_strings(warnings)
 
 
+def _memory_ethics_boundary(trace: dict[str, Any]) -> dict[str, Any]:
+    boundary = trace.get("memory_ethics_boundary")
+    if isinstance(boundary, dict):
+        return dict(boundary)
+    return {
+        "justification_memory_not_conclusion_memory": True,
+        "cross_run_strategy_memory_used": False,
+        "author_decisions_reset_each_run": True,
+        "per_item_author_confirmation_required": True,
+        "trace_bound_to_output": True,
+        "reset_memory_requested": False,
+        "reset_memory_effect": "No cross-run strategy or author-preference memory is loaded by default.",
+    }
+
+
 def _dedupe_strings(values: list[Any]) -> list[str]:
     seen: set[str] = set()
     result: list[str] = []
     for value in values:
-        text = str(value).strip()
+        text = _string_value(value)
         if text and text not in seen:
             seen.add(text)
             result.append(text)
     return result
+
+
+def _string_value(value: Any) -> str:
+    if isinstance(value, dict):
+        for key in ("question", "text", "description", "required_artifact"):
+            if value.get(key):
+                return str(value[key]).strip()
+        return ""
+    return str(value).strip()

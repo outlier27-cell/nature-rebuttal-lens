@@ -24,6 +24,7 @@ READINESS_STATES = {
     "ready_to_submit",
     "draft_with_placeholders",
     "needs_author_input",
+    "decision_deferred",
     "blocked",
 }
 
@@ -119,9 +120,17 @@ def infer_readiness(
     evidence_status: str,
     author_input_required: bool,
     evidence_anchor: str,
+    action_type: str = "",
+    risk_level: str = "",
 ) -> str:
     if proposed_action == "BLOCKING":
         return "blocked"
+    if (
+        author_input_required
+        and str(risk_level) in {"high", "blocking"}
+        and _requires_author_decision(action_type)
+    ):
+        return "decision_deferred"
     if author_input_required or proposed_action == "AUTHOR_INPUT_NEEDED":
         return "needs_author_input"
     if evidence_status in {"missing", "uncertain"}:
@@ -173,6 +182,8 @@ def build_response_package_cards(
             evidence_status=evidence_status,
             author_input_required=author_input_required,
             evidence_anchor=evidence_anchor,
+            action_type=action_type,
+            risk_level=risk_level,
         )
         missing_author_input = (
             [required_artifact] if author_input_required and required_artifact else []
@@ -186,6 +197,11 @@ def build_response_package_cards(
             "risk_level": risk_level,
             "missing_author_input": missing_author_input,
             "evidence_anchor": evidence_anchor,
+            "memory_decision_boundary": build_memory_decision_boundary(
+                action_type=action_type,
+                author_input_required=author_input_required,
+                risk_level=risk_level,
+            ),
         })
     return cards
 
@@ -205,6 +221,38 @@ def validate_response_package_cards(cards: list[dict[str, Any]]) -> list[str]:
         if card.get("readiness") == "ready_to_submit" and not card.get("evidence_anchor"):
             issues.append(f"{comment_id}: ready_to_submit requires evidence_anchor")
     return issues
+
+
+def build_memory_decision_boundary(
+    *,
+    action_type: str,
+    author_input_required: bool,
+    risk_level: str,
+) -> dict[str, Any]:
+    high_risk_decision = author_input_required and _requires_author_decision(action_type)
+    return {
+        "author_decision_required": bool(author_input_required),
+        "system_may_commit_for_author": False,
+        "cross_run_preference_used": False,
+        "requires_independent_confirmation": bool(high_risk_decision or risk_level in {"high", "blocking"}),
+        "decision_class": "high_risk_author_decision" if high_risk_decision else "bounded_assistance",
+    }
+
+
+def _requires_author_decision(action_type: str) -> bool:
+    text = str(action_type or "").lower()
+    return any(
+        token in text
+        for token in [
+            "new_analysis",
+            "new_experiment",
+            "new_baseline",
+            "claim_narrowing",
+            "limitation_discussion",
+            "future_work_commitment",
+            "statistical_test",
+        ]
+    )
 
 
 def _select_for_concern(

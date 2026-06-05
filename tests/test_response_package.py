@@ -37,6 +37,17 @@ def test_readiness_never_ready_when_author_input_is_required():
     ) == "needs_author_input"
 
 
+def test_readiness_defers_high_risk_author_decisions():
+    assert infer_readiness(
+        proposed_action="AUTHOR_INPUT_NEEDED",
+        evidence_status="partially_supported",
+        author_input_required=True,
+        evidence_anchor="Methods",
+        action_type="new_analysis",
+        risk_level="high",
+    ) == "decision_deferred"
+
+
 def test_build_response_package_cards_adds_nature_schema_fields():
     cards = build_response_package_cards(
         concern_map=[

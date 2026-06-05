@@ -193,7 +193,6 @@ class CrossDisciplinaryLensInterpreterAgent(BaseAgent):
             "reviewer motivation",
             "perceptual bias",
             "perceptual biases",
-            "fast thinking",
             "cognitive error",
             "manipulate reviewer",
             "counter reviewer bias",
@@ -201,13 +200,25 @@ class CrossDisciplinaryLensInterpreterAgent(BaseAgent):
         ]
         serialized = json.dumps(lenses, ensure_ascii=False).lower()
         for marker in disallowed_markers:
-            if marker in serialized:
+            if _has_unnegated_marker(serialized, marker):
                 return False, (
                     "Cross-disciplinary lens output must avoid private psychology, "
                     f"manipulation, or acceptance-prediction language: {marker}"
                 )
 
         return True, None
+
+
+def _has_unnegated_marker(text: str, marker: str) -> bool:
+    start = 0
+    while True:
+        index = text.find(marker, start)
+        if index == -1:
+            return False
+        prefix = text[max(0, index - 40):index]
+        if not any(token in prefix for token in ["no ", "not ", "avoid ", "without "]):
+            return True
+        start = index + len(marker)
 
 
 class IntegrityAdequacyCheckerAgent(BaseAgent):

@@ -153,7 +153,7 @@ def execute_rebuttal_lens_trace(
     )
 
     trace = orchestrator.execute_rebuttal_lens_workflow(unit, retrieval, taxonomies)
-    return _with_rebuttal_lens_trace_metadata(trace, unit)
+    return _with_rebuttal_lens_trace_metadata(trace, unit, config)
 
 
 def execute_rebuttal_lens_dag_trace(
@@ -217,6 +217,7 @@ def execute_rebuttal_lens_dag_trace(
             graph_trace=partial_graph_trace,
             message_bus=message_bus,
             unit=unit,
+            config=config,
         )
         raise
     return _rebuttal_lens_dag_trace_from_graph_trace(
@@ -224,6 +225,7 @@ def execute_rebuttal_lens_dag_trace(
         graph_trace=graph_trace,
         message_bus=message_bus,
         unit=unit,
+        config=config,
     )
 
 
@@ -233,6 +235,7 @@ def _rebuttal_lens_dag_trace_from_graph_trace(
     graph_trace: dict[str, Any],
     message_bus: list[Any],
     unit: dict[str, Any],
+    config: dict[str, Any],
 ) -> dict[str, Any]:
     node_outputs = graph_trace["outputs"]
     agent_outputs = {
@@ -252,17 +255,22 @@ def _rebuttal_lens_dag_trace_from_graph_trace(
             "workflow_engine": "dag",
             "manuscript_mode": unit.get("manuscript_context", {}).get("mode"),
         },
-    }, unit)
+    }, unit, config=config)
 
 
 def _with_rebuttal_lens_trace_metadata(
     trace: dict[str, Any],
     unit: dict[str, Any],
+    config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
+    config = config or {}
     trace["system_name"] = "Nature RebuttalLens"
     trace["workflow_version"] = "rebuttal_lens_v1"
     trace["manuscript_context"] = unit.get("manuscript_context", {})
     trace["responsible_use_boundary"] = _rebuttal_lens_responsible_use_boundary()
+    trace["memory_ethics_boundary"] = _rebuttal_lens_memory_ethics_boundary(
+        reset_memory=bool(config.get("reset_memory", False))
+    )
     return trace
 
 
@@ -273,6 +281,22 @@ def _rebuttal_lens_responsible_use_boundary() -> dict[str, bool]:
         "author_must_verify_all_claims": True,
         "no_acceptance_prediction": True,
         "no_confidential_upload_recommendation": True,
+    }
+
+
+def _rebuttal_lens_memory_ethics_boundary(*, reset_memory: bool = False) -> dict[str, bool | str]:
+    return {
+        "justification_memory_not_conclusion_memory": True,
+        "cross_run_strategy_memory_used": False,
+        "author_decisions_reset_each_run": True,
+        "per_item_author_confirmation_required": True,
+        "trace_bound_to_output": True,
+        "reset_memory_requested": bool(reset_memory),
+        "reset_memory_effect": (
+            "No cross-run strategy or author-preference memory is loaded; this run is treated independently."
+            if reset_memory
+            else "No cross-run strategy or author-preference memory is loaded by default."
+        ),
     }
 
 

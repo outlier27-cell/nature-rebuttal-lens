@@ -154,6 +154,11 @@ def build_parser() -> argparse.ArgumentParser:
     run_rebuttal_lens.add_argument("--output-dir", type=config.Path, default=None)
     run_rebuttal_lens.add_argument("--limit-cases", type=int, default=5)
     run_rebuttal_lens.add_argument(
+        "--reset-memory",
+        action="store_true",
+        help="Declare this run independent from any cross-run strategy or author-preference memory.",
+    )
+    run_rebuttal_lens.add_argument(
         "--workflow-engine",
         choices=("layered", "dag"),
         default=None,
@@ -538,6 +543,8 @@ def main(argv: list[str] | None = None) -> int:
             workflow_config["enable_committee"] = args.enable_committee
         if args.enable_strategy_tournament is not None:
             workflow_config["enable_strategy_tournament"] = args.enable_strategy_tournament
+        if args.reset_memory:
+            workflow_config["reset_memory"] = True
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)
         retrieved_cases = []

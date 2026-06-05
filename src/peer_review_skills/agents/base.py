@@ -450,7 +450,7 @@ def parse_agent_json_response(response: dict[str, Any]) -> dict[str, Any]:
         raise ValueError("LLM response must be a dictionary")
 
     if "choices" not in response:
-        return response
+        return _normalize_agent_json_object(response)
 
     try:
         content = response["choices"][0]["message"]["content"]
@@ -468,4 +468,13 @@ def parse_agent_json_response(response: dict[str, Any]) -> dict[str, Any]:
         raise ValueError(f"Failed to parse LLM JSON response: {exc}") from exc
     if not isinstance(value, dict):
         raise ValueError("LLM JSON response must be an object")
-    return value
+    return _normalize_agent_json_object(value)
+
+
+def _normalize_agent_json_object(value: dict[str, Any]) -> dict[str, Any]:
+    """Normalize provider JSON drift while preserving strict agent schemas."""
+    normalized = dict(value)
+    reasoning = normalized.get("reasoning")
+    if isinstance(reasoning, (dict, list)):
+        normalized["reasoning"] = json.dumps(reasoning, ensure_ascii=False, sort_keys=True)
+    return normalized

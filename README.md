@@ -181,6 +181,30 @@ Nature RebuttalLens is intended to help authors think, organize, and check rebut
 
 When manuscript evidence is missing or uncertain, the system should state the gap and ask for author confirmation rather than inventing a claim.
 
+## Memory Ethics Boundary
+
+Nature RebuttalLens treats memory as justification, not conclusion. The system should preserve why a response plan is reasonable through evidence anchors, reasoning traces, and author-confirmation gates; it must not preserve an automatic preference for a past rebuttal strategy, author decision, or final submission wording.
+
+The runtime follows four memory-ethics rules:
+
+- remember evidence chains and reasoning steps, not final rebuttal conclusions;
+- reset author decision authority on every run and require per-item confirmation for high-risk actions;
+- distinguish low-risk wording assistance from commitments, new analyses, claim narrowing, and limitation admissions that only authors can choose;
+- bind final reports to traceable execution records so later edits can be audited against the original suggestion.
+
+For high-ethics or contamination-sensitive runs, pass `--reset-memory`:
+
+```powershell
+python -m peer_review_skills.cli.main run-rebuttal-lens `
+  --review-file examples/rebuttal_lens/reviewer_comment.txt `
+  --manuscript-file examples/rebuttal_lens/manuscript_excerpt.txt `
+  --retrieved-cases-file examples/rebuttal_lens/retrieved_cases.json `
+  --reset-memory `
+  --output-dir data/evaluation/rebuttal_lens_clean_run
+```
+
+The current public runtime does not load cross-run strategy memory or author-preference memory by default. The flag makes that boundary explicit in the trace, summary, and final user report.
+
 ## License
 
 Apache License 2.0. See `LICENSE`.

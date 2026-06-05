@@ -744,6 +744,32 @@ def test_cross_disciplinary_lens_rejects_private_psychology_language():
     assert "private psychology" in str(error)
 
 
+def test_cross_disciplinary_lens_allows_fast_slow_lens_without_private_psychology():
+    agent = CrossDisciplinaryLensInterpreterAgent(
+        "cross_disciplinary_lens_interpreter",
+        ParsedJsonMockLLMClient(),
+    )
+    output = {
+        "lens_interpretations": {
+            "tacit_knowledge_boundary": {"observable_trace": "x", "system_action": "x", "boundary": "x"},
+            "institutional_dependence": {"observable_trace": "x", "system_action": "x", "boundary": "x"},
+            "actor_network_alignment": {"observable_trace": "x", "system_action": "x", "boundary": "x"},
+            "fast_slow_cognitive_correction": {
+                "observable_trace": "Fast thinking / slow thinking lens used as an evidence-check label only.",
+                "system_action": "Slow down response planning by requiring evidence anchors.",
+                "boundary": "No private reviewer psychology or hidden motive claim.",
+            },
+            "emotion_tone_commitment_calibration": {"observable_trace": "x", "system_action": "x", "boundary": "x"},
+            "author_agency_gate": {"observable_trace": "x", "system_action": "x", "boundary": "x"},
+        }
+    }
+
+    valid, error = agent.validate_output(output)
+
+    assert valid
+    assert error is None
+
+
 def test_refinement_rechecks_integrity_and_preserves_original_agent_context():
     captured_evidence_inputs: list[dict[str, Any]] = []
 
