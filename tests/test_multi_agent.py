@@ -770,6 +770,43 @@ def test_cross_disciplinary_lens_allows_fast_slow_lens_without_private_psycholog
     assert error is None
 
 
+@pytest.mark.parametrize("alias_field", ["cross_disciplinary_lens_map", "lens_map"])
+def test_cross_disciplinary_lens_normalizes_deepseek_lens_map_alias(alias_field):
+    agent = CrossDisciplinaryLensInterpreterAgent(
+        "cross_disciplinary_lens_interpreter",
+        ParsedJsonMockLLMClient(),
+    )
+    lens_map = {
+        "tacit_knowledge_boundary": {"observable_trace": "reviewer asks for explicit evidence"},
+        "institutional_dependence": {"observable_trace": "editorial reproducibility norm"},
+        "actor_network_alignment": {"observable_trace": "dataset split carries validity"},
+        "fast_slow_cognitive_correction": {"observable_trace": "slow down claim checking"},
+        "emotion_tone_commitment_calibration": {"observable_trace": "avoid over-promising"},
+        "author_agency_gate": {"observable_trace": "author confirmation remains required"},
+    }
+    response = {
+        "choices": [
+            {
+                "message": {
+                    "content": json.dumps(
+                        {
+                            alias_field: lens_map,
+                            "reasoning": "Provider used a semantically equivalent lens map field.",
+                        }
+                    )
+                }
+            }
+        ]
+    }
+
+    output = agent.parse_response(response)
+    valid, error = agent.validate_output(output)
+
+    assert output["lens_interpretations"] == lens_map
+    assert valid
+    assert error is None
+
+
 def test_refinement_rechecks_integrity_and_preserves_original_agent_context():
     captured_evidence_inputs: list[dict[str, Any]] = []
 

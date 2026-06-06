@@ -1,0 +1,76 @@
+{
+  "audit_version": "v7_forgetting_ethics_deepseek_full_run",
+  "run_timestamp_from_trace": "2026-06-06T12:31:42.783759",
+  "workflow_engine": "dag",
+  "workflow_version": "rebuttal_lens_v1",
+  "model": "deepseek-v3",
+  "api_base": "https://xh.v1api.cc",
+  "api_key_redacted": true,
+  "manuscript_mode": "manuscript_aware",
+  "summary_total_llm_calls": 18,
+  "trace_total_llm_calls": 18,
+  "agent_output_count": 18,
+  "expected_agent_count": 18,
+  "all_expected_agents_present": true,
+  "missing_expected_agents": [],
+  "unexpected_agents": [],
+  "execution_levels": 11,
+  "execution_errors": 0,
+  "graph_node_count": 19,
+  "nodes_executed": 19,
+  "parallel_execution": true,
+  "package_readiness": "decision_deferred",
+  "response_package_gate_issues": [],
+  "comment_card_count": 2,
+  "comment_card_field_gaps": [],
+  "responsible_use_warnings": [
+    "assistant_only",
+    "author_must_verify_all_claims",
+    "not_final_rebuttal_text",
+    "no_acceptance_prediction",
+    "no_confidential_upload_recommendation"
+  ],
+  "responsible_use_complete": true,
+  "not_final_submission_text": true,
+  "memory_policy": "strict",
+  "reset_memory_requested": true,
+  "forgotten_memory_classes": [
+    "author_decision",
+    "final_wording",
+    "latent_commitment",
+    "strategy_preference",
+    "unsafe_claim"
+  ],
+  "forgetting_ledger_count": 5,
+  "irreversible_forgetting_statement_present": true,
+  "runtime_memory_after_forgetting_state": "empty_after_forgetting",
+  "runtime_memory_after_forgetting_trace_value": {},
+  "memory_ethics_sentence_present_in_markdown": true,
+  "final_markdown_utf8_chinese_header_present": true,
+  "integrity_issue_count": 2,
+  "integrity_issues": [
+    {
+      "severity": "warning",
+      "agent_id": "tone_commitment_calibrator",
+      "description": "Initial defensive language ('we believe this avoids leakage') lacks immediate evidence."
+    },
+    {
+      "severity": "warning",
+      "agent_id": "claim_committee_reviewer",
+      "description": "Generalization claims in abstract may be overreaching without specific supporting data."
+    }
+  ],
+  "artifact_sizes_bytes": {
+    "rebuttal_lens_trace.json": 106944,
+    "rebuttal_lens_summary.json": 3956,
+    "final_user_report.json": 15212,
+    "final_user_report.md": 11347
+  },
+  "checkpoint_count": 0,
+  "schema_drift_fix_verified_by_tests": {
+    "red_test_added": "test_cross_disciplinary_lens_normalizes_deepseek_lens_map_alias",
+    "targeted_tests": "4 passed",
+    "related_tests": "100 passed, 1 deselected",
+    "known_deselected_test": "test_public_repository_does_not_reference_internal_docs, unrelated to this DeepSeek schema drift run"
+  }
+}

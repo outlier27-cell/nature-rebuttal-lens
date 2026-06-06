@@ -165,24 +165,18 @@ class CrossDisciplinaryLensInterpreterAgent(BaseAgent):
         ]
 
     def parse_response(self, response: dict[str, Any]) -> dict[str, Any]:
-        return parse_agent_json_response(response)
+        output = parse_agent_json_response(response)
+        _normalize_cross_disciplinary_lens_output(output)
+        return output
 
     def validate_output(self, output: dict[str, Any]) -> tuple[bool, Optional[str]]:
+        _normalize_cross_disciplinary_lens_output(output)
         error = require_field(output, "lens_interpretations", dict)
         if error:
             return False, error
 
-        required_lenses = [
-            "tacit_knowledge_boundary",
-            "institutional_dependence",
-            "actor_network_alignment",
-            "fast_slow_cognitive_correction",
-            "emotion_tone_commitment_calibration",
-            "author_agency_gate"
-        ]
-
         lenses = output["lens_interpretations"]
-        missing = [lens for lens in required_lenses if lens not in lenses]
+        missing = [lens for lens in REQUIRED_CROSS_DISCIPLINARY_LENSES if lens not in lenses]
 
         if missing:
             return False, f"Missing lenses: {missing}"
@@ -207,6 +201,34 @@ class CrossDisciplinaryLensInterpreterAgent(BaseAgent):
                 )
 
         return True, None
+
+
+REQUIRED_CROSS_DISCIPLINARY_LENSES = [
+    "tacit_knowledge_boundary",
+    "institutional_dependence",
+    "actor_network_alignment",
+    "fast_slow_cognitive_correction",
+    "emotion_tone_commitment_calibration",
+    "author_agency_gate",
+]
+
+
+def _normalize_cross_disciplinary_lens_output(output: dict[str, Any]) -> None:
+    """Accept provider field-name drift without relaxing the required lens set."""
+    if "lens_interpretations" in output:
+        return
+    for alias in [
+        "cross_disciplinary_lens_map",
+        "cross_disciplinary_lenses",
+        "lens_map",
+        "lenses",
+        "lens_analysis",
+        "lens_interpretation",
+    ]:
+        candidate = output.get(alias)
+        if isinstance(candidate, dict):
+            output["lens_interpretations"] = candidate
+            return
 
 
 def _has_unnegated_marker(text: str, marker: str) -> bool:
