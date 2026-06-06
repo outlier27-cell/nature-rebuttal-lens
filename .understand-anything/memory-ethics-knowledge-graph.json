@@ -1,0 +1,425 @@
+{
+  "version": "1.0.0",
+  "kind": "knowledge",
+  "project": {
+    "name": "Nature RebuttalLens Active Forgetting Knowledge",
+    "languages": [
+      "Chinese",
+      "English"
+    ],
+    "frameworks": [
+      "Understand Anything Knowledge Graph"
+    ],
+    "description": "围绕“有遗忘才有记忆”的主动遗忘 runtime 知识图谱，连接 PDF 要求、哲学反思、工程机制和测试证据。",
+    "analyzedAt": "2026-06-06T03:42:17Z",
+    "gitCommitHash": "90f59ba4f7142ab30900f3783e1efdabc11d1bea"
+  },
+  "nodes": [
+    {
+      "id": "source:memory-ethics-pdf",
+      "type": "source",
+      "name": "捍卫智能体记忆的伦理纯粹性.pdf",
+      "summary": "PDF 提出 reset-memory、记忆边界、作者决策权和审计痕迹等要求。",
+      "tags": [
+        "PDF",
+        "记忆伦理"
+      ],
+      "complexity": "moderate",
+      "filePath": "D:/Yjw/Nature-comment/捍卫智能体记忆的伦理纯粹性.pdf",
+      "knowledgeMeta": {
+        "category": "来源"
+      }
+    },
+    {
+      "id": "reflection:forgetting-makes-memory-possible",
+      "type": "claim",
+      "name": "有遗忘才有记忆",
+      "summary": "遗忘不是能力损失，而是记忆成立和主体性边界成立的条件。",
+      "tags": [
+        "哲学反思",
+        "记忆"
+      ],
+      "complexity": "moderate",
+      "knowledgeMeta": {
+        "category": "反思"
+      }
+    },
+    {
+      "id": "principle:justification-memory",
+      "type": "claim",
+      "name": "证成记忆大于结论记忆",
+      "summary": "系统保留证据、推理和审计痕迹，但不保留替作者做出的最终决策。",
+      "tags": [
+        "原则",
+        "证成"
+      ],
+      "complexity": "moderate",
+      "knowledgeMeta": {
+        "category": "原则"
+      }
+    },
+    {
+      "id": "principle:author-agency-reset",
+      "type": "claim",
+      "name": "作者主体性每轮重置",
+      "summary": "claim narrowing、limitation admission、future work commitment 等作者性决定必须每轮重新确认。",
+      "tags": [
+        "原则",
+        "作者主体性"
+      ],
+      "complexity": "moderate",
+      "knowledgeMeta": {
+        "category": "原则"
+      }
+    },
+    {
+      "id": "principle:irreversible-forgetting",
+      "type": "claim",
+      "name": "不可逆遗忘",
+      "summary": "被遗忘内容不能从 checkpoint、cache、retrieved cases、旧报告或历史 summary 中重构。",
+      "tags": [
+        "原则",
+        "不可逆"
+      ],
+      "complexity": "moderate",
+      "knowledgeMeta": {
+        "category": "原则"
+      }
+    },
+    {
+      "id": "entity:memory-passport",
+      "type": "entity",
+      "name": "memory_passport",
+      "summary": "记录每次运行保留和遗忘的 memory classes、policy、reset 状态与 irreversible_forgetting 标志。",
+      "tags": [
+        "记忆护照",
+        "审计"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "entity:forgetting-ledger",
+      "type": "entity",
+      "name": "forgetting_ledger",
+      "summary": "记录每个被遗忘 memory class 的动作、策略、reset 状态和伦理理由。",
+      "tags": [
+        "遗忘账本",
+        "审计"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "entity:irreversible-forgetting-statement",
+      "type": "entity",
+      "name": "irreversible_forgetting_statement",
+      "summary": "声明 author_decision、strategy_preference、final_wording 不可被重构或重新注入。",
+      "tags": [
+        "不可逆遗忘声明",
+        "作者主体性"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "entity:runtime-memory-filter",
+      "type": "entity",
+      "name": "filter_runtime_memory",
+      "summary": "过滤 runtime memory 中的旧作者决策、策略偏好、最终措辞和 cache-like 来源。",
+      "tags": [
+        "过滤",
+        "污染防护"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "entity:memory-policy-cli",
+      "type": "entity",
+      "name": "--memory-policy / --forget-scope",
+      "summary": "CLI 暴露 --memory-policy 与 --forget-scope，用于配置遗忘强度和额外遗忘范围。",
+      "tags": [
+        "配置",
+        "CLI"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "entity:chinese-ethical-explanation",
+      "type": "entity",
+      "name": "中文伦理解释",
+      "summary": "final report Markdown 说明：遗忘不是能力损失，而是保护作者主体性的边界。",
+      "tags": [
+        "报告",
+        "中文伦理解释"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "knowledgeMeta": {
+        "category": "工程实现"
+      }
+    },
+    {
+      "id": "test:cross-run-author-decision",
+      "type": "test",
+      "name": "跨运行旧决策不复用回归测试",
+      "summary": "cross_run_author_decision_forgetting_test：前一轮作者选择 A 或 final wording 不会成为后一轮默认答案，后一轮应重新基于 evidence_trace 或进入 decision_deferred。",
+      "tags": [
+        "测试",
+        "跨运行",
+        "cross_run_author_decision_forgetting_test"
+      ],
+      "complexity": "moderate",
+      "filePath": "tests/test_rebuttal_lens_workflow.py",
+      "knowledgeMeta": {
+        "category": "测试证据"
+      }
+    },
+    {
+      "id": "test:cache-like-source-filtering",
+      "type": "test",
+      "name": "cache/checkpoint/retrieved-case-like 来源过滤测试",
+      "summary": "证明 checkpoint、cache、retrieved_cases、prior_final_report 等来源不会重新注入被遗忘记忆。",
+      "tags": [
+        "测试",
+        "污染防护"
+      ],
+      "complexity": "moderate",
+      "filePath": "tests/test_memory_ethics.py",
+      "knowledgeMeta": {
+        "category": "测试证据"
+      }
+    },
+    {
+      "id": "acceptance:three-supplemental-gates",
+      "type": "acceptance_gate",
+      "name": "三点补充落地要求",
+      "summary": "硬性验收门：不可逆遗忘声明、跨运行旧决策不复用回归测试、中文伦理解释进入用户可见报告。报告必须包含“遗忘不是能力损失，而是保护作者主体性的边界。”",
+      "tags": [
+        "不可逆遗忘声明",
+        "跨运行旧决策不复用",
+        "中文伦理解释"
+      ],
+      "complexity": "moderate",
+      "filePath": "docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+      "knowledgeMeta": {
+        "category": "验收"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "source": "source:memory-ethics-pdf",
+      "target": "reflection:forgetting-makes-memory-possible",
+      "type": "documents",
+      "direction": "forward",
+      "description": "PDF 与用户反思共同指向“有遗忘才有记忆”。",
+      "weight": 0.9
+    },
+    {
+      "source": "reflection:forgetting-makes-memory-possible",
+      "target": "principle:irreversible-forgetting",
+      "type": "implies",
+      "direction": "forward",
+      "description": "遗忘作为边界要求不可逆遗忘机制。",
+      "weight": 0.9
+    },
+    {
+      "source": "principle:justification-memory",
+      "target": "entity:memory-passport",
+      "type": "builds_on",
+      "direction": "forward",
+      "description": "memory_passport 记录证成记忆和遗忘边界。",
+      "weight": 0.8
+    },
+    {
+      "source": "principle:author-agency-reset",
+      "target": "entity:forgetting-ledger",
+      "type": "builds_on",
+      "direction": "forward",
+      "description": "forgetting_ledger 记录作者性记忆的遗忘。",
+      "weight": 0.8
+    },
+    {
+      "source": "principle:irreversible-forgetting",
+      "target": "entity:irreversible-forgetting-statement",
+      "type": "defines_schema",
+      "direction": "forward",
+      "description": "不可逆遗忘原则定义 irreversible_forgetting_statement。",
+      "weight": 0.9
+    },
+    {
+      "source": "entity:irreversible-forgetting-statement",
+      "target": "entity:runtime-memory-filter",
+      "type": "implemented_by",
+      "direction": "forward",
+      "description": "filter_runtime_memory 执行不可逆遗忘边界。",
+      "weight": 0.9
+    },
+    {
+      "source": "entity:memory-policy-cli",
+      "target": "entity:memory-passport",
+      "type": "configures",
+      "direction": "forward",
+      "description": "CLI policy 影响 memory passport。",
+      "weight": 0.7
+    },
+    {
+      "source": "entity:memory-policy-cli",
+      "target": "entity:forgetting-ledger",
+      "type": "configures",
+      "direction": "forward",
+      "description": "CLI policy 影响 forgetting ledger 范围。",
+      "weight": 0.7
+    },
+    {
+      "source": "entity:chinese-ethical-explanation",
+      "target": "reflection:forgetting-makes-memory-possible",
+      "type": "explains",
+      "direction": "forward",
+      "description": "中文解释把哲学反思转译为用户可见报告。",
+      "weight": 0.8
+    },
+    {
+      "source": "test:cross-run-author-decision",
+      "target": "entity:runtime-memory-filter",
+      "type": "tested_by",
+      "direction": "reverse",
+      "description": "跨运行测试验证旧作者决策不会复用。",
+      "weight": 0.9
+    },
+    {
+      "source": "test:cache-like-source-filtering",
+      "target": "entity:irreversible-forgetting-statement",
+      "type": "tested_by",
+      "direction": "reverse",
+      "description": "cache-like 来源过滤测试验证不可逆遗忘声明。",
+      "weight": 0.9
+    },
+    {
+      "source": "acceptance:three-supplemental-gates",
+      "target": "entity:irreversible-forgetting-statement",
+      "type": "requires",
+      "direction": "forward",
+      "description": "验收门要求 trace、final JSON、final Markdown 均输出不可逆遗忘声明。",
+      "weight": 0.95
+    },
+    {
+      "source": "acceptance:three-supplemental-gates",
+      "target": "test:cross-run-author-decision",
+      "type": "requires",
+      "direction": "forward",
+      "description": "验收门要求跨运行旧决策不复用回归测试。",
+      "weight": 0.95
+    },
+    {
+      "source": "acceptance:three-supplemental-gates",
+      "target": "entity:chinese-ethical-explanation",
+      "type": "requires",
+      "direction": "forward",
+      "description": "验收门要求中文伦理解释进入用户可见 Markdown 报告。",
+      "weight": 0.95
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:sources",
+      "name": "来源",
+      "description": "PDF 要求与用户哲学反思。",
+      "nodeIds": [
+        "source:memory-ethics-pdf",
+        "reflection:forgetting-makes-memory-possible"
+      ]
+    },
+    {
+      "id": "layer:principles",
+      "name": "原则",
+      "description": "记忆伦理原则。",
+      "nodeIds": [
+        "principle:justification-memory",
+        "principle:author-agency-reset",
+        "principle:irreversible-forgetting",
+        "acceptance:three-supplemental-gates"
+      ]
+    },
+    {
+      "id": "layer:implementation",
+      "name": "工程实现",
+      "description": "主动遗忘 runtime 的模块、报告和 CLI。",
+      "nodeIds": [
+        "entity:memory-passport",
+        "entity:forgetting-ledger",
+        "entity:irreversible-forgetting-statement",
+        "entity:runtime-memory-filter",
+        "entity:memory-policy-cli",
+        "entity:chinese-ethical-explanation"
+      ]
+    },
+    {
+      "id": "layer:evidence",
+      "name": "测试证据",
+      "description": "证明主动遗忘真的生效的测试。",
+      "nodeIds": [
+        "test:cross-run-author-decision",
+        "test:cache-like-source-filtering",
+        "acceptance:three-supplemental-gates"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "哲学来源",
+      "description": "从“有遗忘才有记忆”理解主动遗忘 runtime 的伦理理由。",
+      "nodeIds": [
+        "reflection:forgetting-makes-memory-possible",
+        "source:memory-ethics-pdf"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "三点验收门",
+      "description": "不可逆遗忘声明、跨运行旧决策不复用、中文伦理解释是本轮硬性验收门。",
+      "nodeIds": [
+        "acceptance:three-supplemental-gates"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "runtime 实现",
+      "description": "查看 memory_passport、forgetting_ledger 和 runtime-memory filter。",
+      "nodeIds": [
+        "entity:memory-passport",
+        "entity:forgetting-ledger",
+        "entity:irreversible-forgetting-statement",
+        "entity:runtime-memory-filter"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "测试证据",
+      "description": "跨运行旧决策不复用和 cache-like 来源过滤证明遗忘机制有效。",
+      "nodeIds": [
+        "test:cross-run-author-decision",
+        "test:cache-like-source-filtering"
+      ]
+    }
+  ]
+}

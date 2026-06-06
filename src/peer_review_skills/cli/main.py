@@ -159,6 +159,17 @@ def build_parser() -> argparse.ArgumentParser:
         help="Declare this run independent from any cross-run strategy or author-preference memory.",
     )
     run_rebuttal_lens.add_argument(
+        "--memory-policy",
+        choices=("default", "strict"),
+        default="default",
+        help="Select the forgetting policy used in memory passport and forgetting ledger.",
+    )
+    run_rebuttal_lens.add_argument(
+        "--forget-scope",
+        default="",
+        help="Comma-separated additional memory classes to mark as forgotten for this run.",
+    )
+    run_rebuttal_lens.add_argument(
         "--workflow-engine",
         choices=("layered", "dag"),
         default=None,
@@ -545,6 +556,13 @@ def main(argv: list[str] | None = None) -> int:
             workflow_config["enable_strategy_tournament"] = args.enable_strategy_tournament
         if args.reset_memory:
             workflow_config["reset_memory"] = True
+        workflow_config["memory_policy"] = args.memory_policy
+        if args.forget_scope:
+            workflow_config["forget_scope"] = [
+                item.strip()
+                for item in args.forget_scope.split(",")
+                if item.strip()
+            ]
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)
         retrieved_cases = []

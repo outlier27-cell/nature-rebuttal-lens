@@ -13,6 +13,10 @@ from peer_review_skills.agents.final_report import (
     write_final_user_report,
 )
 from peer_review_skills.agents.manuscript_context import build_rebuttal_lens_unit
+from peer_review_skills.agents.memory_ethics import (
+    build_memory_ethics_runtime,
+    filter_runtime_memory,
+)
 from peer_review_skills.agents.multi_agent_orchestrator import MultiAgentOrchestrator
 from peer_review_skills.agents.rebuttal_lens_agents import create_rebuttal_lens_frontend_agents
 from peer_review_skills.agents.committee_agents import (
@@ -264,12 +268,30 @@ def _with_rebuttal_lens_trace_metadata(
     config: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     config = config or {}
+    forget_scope = _as_forget_scope(config.get("forget_scope"))
+    memory_policy = str(config.get("memory_policy", "default"))
+    memory_runtime = build_memory_ethics_runtime(
+        reset_memory=bool(config.get("reset_memory", False)),
+        memory_policy=memory_policy,
+        forget_scope=forget_scope,
+    )
     trace["system_name"] = "Nature RebuttalLens"
     trace["workflow_version"] = "rebuttal_lens_v1"
     trace["manuscript_context"] = unit.get("manuscript_context", {})
     trace["responsible_use_boundary"] = _rebuttal_lens_responsible_use_boundary()
+    trace["memory_passport"] = memory_runtime["memory_passport"]
+    trace["forgetting_ledger"] = memory_runtime["forgetting_ledger"]
+    trace["irreversible_forgetting_statement"] = memory_runtime[
+        "irreversible_forgetting_statement"
+    ]
+    trace["runtime_memory_after_forgetting"] = filter_runtime_memory(
+        dict(config.get("runtime_memory") or {}),
+        memory_policy=memory_policy,
+        forget_scope=forget_scope,
+    )
     trace["memory_ethics_boundary"] = _rebuttal_lens_memory_ethics_boundary(
-        reset_memory=bool(config.get("reset_memory", False))
+        reset_memory=bool(config.get("reset_memory", False)),
+        forgetting_ledger_attached=True,
     )
     return trace
 
@@ -284,13 +306,28 @@ def _rebuttal_lens_responsible_use_boundary() -> dict[str, bool]:
     }
 
 
-def _rebuttal_lens_memory_ethics_boundary(*, reset_memory: bool = False) -> dict[str, bool | str]:
+def _as_forget_scope(value: Any) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [item.strip() for item in value.split(",") if item.strip()]
+    if isinstance(value, (list, tuple, set)):
+        return [str(item).strip() for item in value if str(item).strip()]
+    return [str(value).strip()]
+
+
+def _rebuttal_lens_memory_ethics_boundary(
+    *,
+    reset_memory: bool = False,
+    forgetting_ledger_attached: bool = False,
+) -> dict[str, bool | str]:
     return {
         "justification_memory_not_conclusion_memory": True,
         "cross_run_strategy_memory_used": False,
         "author_decisions_reset_each_run": True,
         "per_item_author_confirmation_required": True,
         "trace_bound_to_output": True,
+        "forgetting_ledger_attached": bool(forgetting_ledger_attached),
         "reset_memory_requested": bool(reset_memory),
         "reset_memory_effect": (
             "No cross-run strategy or author-preference memory is loaded; this run is treated independently."

@@ -1,0 +1,561 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "Nature RebuttalLens",
+    "languages": [
+      "Python",
+      "Markdown",
+      "YAML",
+      "JSON"
+    ],
+    "frameworks": [
+      "pytest",
+      "OpenAI-compatible API",
+      "Understand Anything"
+    ],
+    "description": "面向 Nature rebuttal 的 manuscript-aware 可审计回复规划系统，已加入主动遗忘 runtime、记忆护照、遗忘账本与不可逆遗忘声明。",
+    "analyzedAt": "2026-06-06T03:42:17Z",
+    "gitCommitHash": "90f59ba4f7142ab30900f3783e1efdabc11d1bea"
+  },
+  "nodes": [
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README 文档",
+      "summary": "介绍 Nature RebuttalLens 的工作流、Memory Ethics Boundary、主动遗忘 runtime、--reset-memory、--memory-policy 与 --forget-scope。",
+      "tags": [
+        "文档",
+        "入口",
+        "记忆伦理",
+        "主动遗忘"
+      ],
+      "complexity": "simple",
+      "filePath": "README.md"
+    },
+    {
+      "id": "document:UPGRADE.md",
+      "type": "document",
+      "name": "升级方案文档",
+      "summary": "记录 Active Forgetting Runtime、memory_passport、forgetting_ledger、irreversible_forgetting_statement 以及跨运行旧决策不复用测试。",
+      "tags": [
+        "文档",
+        "升级",
+        "主动遗忘"
+      ],
+      "complexity": "simple",
+      "filePath": "UPGRADE.md"
+    },
+    {
+      "id": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+      "type": "document",
+      "name": "主动遗忘 runtime 实施计划",
+      "summary": "把“有遗忘才有记忆”落成可测试、可审计、可解释的主动遗忘 runtime，并把三点补充落地要求提升为硬验收门。",
+      "tags": [
+        "计划",
+        "记忆伦理",
+        "三点补充落地要求"
+      ],
+      "complexity": "moderate",
+      "filePath": "docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "type": "file",
+      "name": "Memory Ethics Runtime",
+      "summary": "实现 memory object taxonomy、forgetting policy、memory_passport、forgetting_ledger、irreversible_forgetting_statement 与 runtime memory 过滤。",
+      "tags": [
+        "主动遗忘",
+        "记忆伦理",
+        "runtime"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "type": "function",
+      "name": "build_memory_ethics_runtime",
+      "summary": "根据 reset_memory、memory_policy 与 forget_scope 生成 memory_passport、forgetting_ledger 与 irreversible_forgetting_statement。",
+      "tags": [
+        "memory_passport",
+        "forgetting_ledger"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
+      "type": "function",
+      "name": "filter_runtime_memory",
+      "summary": "过滤 author_decision、strategy_preference、final_wording 等可遗忘 memory class，防止 cache、checkpoint、retrieved cases 重新注入旧作者决策。",
+      "tags": [
+        "运行时过滤",
+        "遗忘",
+        "污染防护"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "type": "file",
+      "name": "RebuttalLens 工作流",
+      "summary": "运行 manuscript-aware unit、layered/DAG workflow，并把 memory_passport、forgetting_ledger、irreversible_forgetting_statement、runtime_memory_after_forgetting 写入 trace。",
+      "tags": [
+        "工作流",
+        "trace",
+        "记忆伦理"
+      ],
+      "complexity": "complex",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "type": "function",
+      "name": "_with_rebuttal_lens_trace_metadata",
+      "summary": "汇总 system、workflow、responsible-use 与 memory ethics metadata，并接入主动遗忘后的 runtime memory。",
+      "tags": [
+        "trace",
+        "metadata",
+        "runtime_memory_after_forgetting"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/final_report.py",
+      "type": "file",
+      "name": "最终报告组合器",
+      "summary": "从 trace 生成 JSON/Markdown 最终报告，输出 memory_passport、forgetting_ledger、不可逆遗忘声明和中文伦理解释。",
+      "tags": [
+        "最终报告",
+        "Markdown",
+        "记忆伦理"
+      ],
+      "complexity": "complex",
+      "filePath": "src/peer_review_skills/agents/final_report.py"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
+      "type": "function",
+      "name": "render_final_user_report_markdown",
+      "summary": "渲染用户可见 Markdown 报告，包含“遗忘不是能力损失，而是保护作者主体性的边界。”这句中文伦理解释。",
+      "tags": [
+        "Markdown",
+        "中文伦理解释"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/agents/final_report.py"
+    },
+    {
+      "id": "file:src/peer_review_skills/cli/main.py",
+      "type": "file",
+      "name": "CLI Main",
+      "summary": "run-rebuttal-lens 支持 --reset-memory、--memory-policy、--forget-scope、DAG、committee 与 strategy tournament。",
+      "tags": [
+        "CLI",
+        "memory-policy",
+        "forget-scope"
+      ],
+      "complexity": "moderate",
+      "filePath": "src/peer_review_skills/cli/main.py"
+    },
+    {
+      "id": "file:tests/test_memory_ethics.py",
+      "type": "file",
+      "name": "Memory Ethics Tests",
+      "summary": "测试 taxonomy、forgetting runtime、不可逆声明、cache/checkpoint/retrieved-case-like 旧记忆过滤。",
+      "tags": [
+        "测试",
+        "污染防护",
+        "遗忘"
+      ],
+      "complexity": "moderate",
+      "filePath": "tests/test_memory_ethics.py"
+    },
+    {
+      "id": "file:tests/test_rebuttal_lens_workflow.py",
+      "type": "file",
+      "name": "RebuttalLens Workflow Tests",
+      "summary": "测试 trace/report/CLI/cross-run author decision 不复用，以及 DAG、decision_deferred、response package 兼容性。",
+      "tags": [
+        "测试",
+        "工作流",
+        "跨运行"
+      ],
+      "complexity": "complex",
+      "filePath": "tests/test_rebuttal_lens_workflow.py"
+    },
+    {
+      "id": "concept:active_forgetting_runtime",
+      "type": "concept",
+      "name": "主动遗忘 runtime",
+      "summary": "把遗忘变成可审计运行时机制：保留证成痕迹，遗忘作者决策、策略偏好和最终措辞。",
+      "tags": [
+        "记忆伦理",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "concept:memory_passport",
+      "type": "concept",
+      "name": "memory_passport",
+      "summary": "记录本次运行保留的 memory classes、遗忘的 memory classes、policy、reset memory 状态和不可逆遗忘标志。",
+      "tags": [
+        "记忆",
+        "审计"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "concept:forgetting_ledger",
+      "type": "concept",
+      "name": "forgetting_ledger",
+      "summary": "逐项记录被遗忘的 memory class、policy、reset 状态和伦理理由。",
+      "tags": [
+        "遗忘",
+        "审计"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "concept:irreversible_forgetting_statement",
+      "type": "concept",
+      "name": "irreversible_forgetting_statement",
+      "summary": "声明 author_decision、strategy_preference、final_wording 不得从 checkpoint、cache、retrieved cases、旧 final report 或历史 summary 中重构。",
+      "tags": [
+        "遗忘",
+        "不可逆遗忘声明"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "concept:cross_run_author_decision_forgetting_test",
+      "type": "concept",
+      "name": "cross_run_author_decision_forgetting_test",
+      "summary": "跨运行回归测试：旧作者选择 A 不会变成下一轮默认答案，后一轮必须重新证据驱动或 decision_deferred。",
+      "tags": [
+        "测试",
+        "跨运行",
+        "跨运行旧决策不复用"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "concept:three_supplemental_acceptance_gates",
+      "type": "concept",
+      "name": "三点补充落地要求",
+      "summary": "本轮计划的硬性验收门：不可逆遗忘声明、跨运行旧决策不复用回归测试、中文伦理解释进入用户可见报告。报告必须包含“遗忘不是能力损失，而是保护作者主体性的边界。”",
+      "tags": [
+        "验收门",
+        "不可逆遗忘声明",
+        "跨运行旧决策不复用",
+        "中文伦理解释"
+      ],
+      "complexity": "moderate",
+      "filePath": "docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md"
+    }
+  ],
+  "edges": [
+    {
+      "source": "document:README.md",
+      "target": "concept:active_forgetting_runtime",
+      "type": "documents",
+      "direction": "forward",
+      "description": "README 解释主动遗忘 runtime 的用户入口。",
+      "weight": 0.8
+    },
+    {
+      "source": "document:UPGRADE.md",
+      "target": "concept:active_forgetting_runtime",
+      "type": "documents",
+      "direction": "forward",
+      "description": "UPGRADE 记录主动遗忘 runtime 的升级内容。",
+      "weight": 0.8
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "documents",
+      "direction": "forward",
+      "description": "实施计划定义不可逆遗忘声明。",
+      "weight": 0.8
+    },
+    {
+      "source": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+      "target": "concept:three_supplemental_acceptance_gates",
+      "type": "defines_acceptance_gate",
+      "direction": "forward",
+      "description": "实施计划把三点补充落地要求提升为硬性验收门。",
+      "weight": 0.95
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "description": "文件包含 runtime builder。",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
+      "type": "contains",
+      "direction": "forward",
+      "description": "文件包含运行时记忆过滤器。",
+      "weight": 1
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "target": "concept:memory_passport",
+      "type": "produces",
+      "direction": "forward",
+      "description": "生成 memory_passport。",
+      "weight": 0.9
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "target": "concept:forgetting_ledger",
+      "type": "produces",
+      "direction": "forward",
+      "description": "生成 forgetting_ledger。",
+      "weight": 0.9
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "defines_schema",
+      "direction": "forward",
+      "description": "runtime builder 定义不可逆遗忘声明。",
+      "weight": 0.9
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "implements",
+      "direction": "forward",
+      "description": "过滤器落实不可逆遗忘边界。",
+      "weight": 0.9
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "type": "imports",
+      "direction": "forward",
+      "description": "工作流调用记忆伦理 runtime。",
+      "weight": 0.7
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "target": "concept:memory_passport",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "trace metadata 写入记忆护照。",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "target": "concept:forgetting_ledger",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "trace metadata 写入遗忘账本。",
+      "weight": 0.8
+    },
+    {
+      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "writes_to",
+      "direction": "forward",
+      "description": "trace metadata 写入不可逆遗忘声明。",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "concept:memory_passport",
+      "type": "renders",
+      "direction": "forward",
+      "description": "最终报告渲染记忆护照。",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "concept:forgetting_ledger",
+      "type": "renders",
+      "direction": "forward",
+      "description": "最终报告渲染遗忘账本。",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "renders",
+      "direction": "forward",
+      "description": "最终报告渲染不可逆遗忘声明。",
+      "weight": 0.8
+    },
+    {
+      "source": "file:src/peer_review_skills/cli/main.py",
+      "target": "concept:active_forgetting_runtime",
+      "type": "configures",
+      "direction": "forward",
+      "description": "CLI 通过 --memory-policy 与 --forget-scope 配置主动遗忘 runtime。",
+      "weight": 0.7
+    },
+    {
+      "source": "file:tests/test_memory_ethics.py",
+      "target": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "type": "tested_by",
+      "direction": "reverse",
+      "description": "memory_ethics.py 的记忆伦理单测。",
+      "weight": 0.8
+    },
+    {
+      "source": "file:tests/test_rebuttal_lens_workflow.py",
+      "target": "concept:cross_run_author_decision_forgetting_test",
+      "type": "contains",
+      "direction": "forward",
+      "description": "workflow 测试包含跨运行旧决策不复用断言。",
+      "weight": 0.9
+    },
+    {
+      "source": "concept:cross_run_author_decision_forgetting_test",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "validates",
+      "direction": "forward",
+      "description": "跨运行测试验证不可逆遗忘声明不只是文档声明。",
+      "weight": 0.9
+    },
+    {
+      "source": "concept:three_supplemental_acceptance_gates",
+      "target": "concept:irreversible_forgetting_statement",
+      "type": "requires",
+      "direction": "forward",
+      "description": "三点验收门要求 trace、final JSON、final Markdown 输出不可逆遗忘声明。",
+      "weight": 0.9
+    },
+    {
+      "source": "concept:three_supplemental_acceptance_gates",
+      "target": "concept:cross_run_author_decision_forgetting_test",
+      "type": "requires",
+      "direction": "forward",
+      "description": "三点验收门要求跨运行旧作者决策不复用回归测试。",
+      "weight": 0.9
+    },
+    {
+      "source": "concept:three_supplemental_acceptance_gates",
+      "target": "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
+      "type": "requires",
+      "direction": "forward",
+      "description": "三点验收门要求 Markdown 报告包含中文伦理解释。",
+      "weight": 0.9
+    }
+  ],
+  "layers": [
+    {
+      "id": "layer:docs",
+      "name": "文档与计划",
+      "description": "README、UPGRADE 与 superpowers plan 对主动遗忘的说明。",
+      "nodeIds": [
+        "document:README.md",
+        "document:UPGRADE.md",
+        "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+        "concept:three_supplemental_acceptance_gates"
+      ]
+    },
+    {
+      "id": "layer:runtime",
+      "name": "主动遗忘 runtime",
+      "description": "memory_ethics.py 与 workflow metadata 的遗忘机制。",
+      "nodeIds": [
+        "file:src/peer_review_skills/agents/memory_ethics.py",
+        "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+        "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
+        "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+        "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata"
+      ]
+    },
+    {
+      "id": "layer:reporting-cli",
+      "name": "报告与 CLI",
+      "description": "final_report 与 CLI 暴露记忆伦理控制和用户可见说明。",
+      "nodeIds": [
+        "file:src/peer_review_skills/agents/final_report.py",
+        "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
+        "file:src/peer_review_skills/cli/main.py"
+      ]
+    },
+    {
+      "id": "layer:tests",
+      "name": "测试",
+      "description": "覆盖 memory ethics、跨运行旧决策不复用和 CLI 参数。",
+      "nodeIds": [
+        "file:tests/test_memory_ethics.py",
+        "file:tests/test_rebuttal_lens_workflow.py",
+        "concept:cross_run_author_decision_forgetting_test"
+      ]
+    },
+    {
+      "id": "layer:concepts",
+      "name": "核心概念",
+      "description": "主动遗忘机制的关键概念。",
+      "nodeIds": [
+        "concept:active_forgetting_runtime",
+        "concept:memory_passport",
+        "concept:forgetting_ledger",
+        "concept:irreversible_forgetting_statement",
+        "concept:three_supplemental_acceptance_gates"
+      ]
+    }
+  ],
+  "tour": [
+    {
+      "order": 1,
+      "title": "从 README 理解边界",
+      "description": "先看 README 中的 Memory Ethics Boundary 和主动遗忘说明。",
+      "nodeIds": [
+        "document:README.md",
+        "concept:active_forgetting_runtime"
+      ]
+    },
+    {
+      "order": 2,
+      "title": "查看三点验收门",
+      "description": "实施计划把不可逆遗忘声明、跨运行旧决策不复用、中文伦理解释设为硬性验收门。",
+      "nodeIds": [
+        "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
+        "concept:three_supplemental_acceptance_gates"
+      ]
+    },
+    {
+      "order": 3,
+      "title": "进入主动遗忘 runtime",
+      "description": "查看 memory_ethics.py 如何生成 memory_passport、forgetting_ledger 并过滤旧作者决策。",
+      "nodeIds": [
+        "file:src/peer_review_skills/agents/memory_ethics.py",
+        "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+        "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory"
+      ]
+    },
+    {
+      "order": 4,
+      "title": "查看 final report 输出",
+      "description": "final report 输出 memory passport、不可逆遗忘声明、遗忘账本和中文伦理解释。",
+      "nodeIds": [
+        "file:src/peer_review_skills/agents/final_report.py",
+        "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown"
+      ]
+    },
+    {
+      "order": 5,
+      "title": "验证旧决策不复用",
+      "description": "测试证明旧作者选择不会成为下一轮默认答案。",
+      "nodeIds": [
+        "file:tests/test_memory_ethics.py",
+        "file:tests/test_rebuttal_lens_workflow.py",
+        "concept:cross_run_author_decision_forgetting_test"
+      ]
+    }
+  ]
+}

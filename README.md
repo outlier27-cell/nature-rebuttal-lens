@@ -205,6 +205,10 @@ python -m peer_review_skills.cli.main run-rebuttal-lens `
 
 The current public runtime does not load cross-run strategy memory or author-preference memory by default. The flag makes that boundary explicit in the trace, summary, and final user report.
 
+The active forgetting runtime makes this boundary observable. Each run emits a memory passport and forgetting ledger: evidence, reasoning, and audit traces are retained as justification memory, while author decisions, strategy preferences, and final wording are forgotten by default. This implements the principle that forgetting is not a loss of intelligence; it is what prevents memory from becoming unauthorized commitment.
+
+For contamination-sensitive runs, forgotten author decisions, strategy preferences, and final wording are irreversible runtime boundaries. They must not be reconstructed from checkpoints, cache, retrieved cases, prior final reports, or historical run summaries. The final Markdown report also explains this in Chinese so authors can see why the system forgets: 遗忘不是能力损失，而是保护作者主体性的边界。
+
 ## License
 
 Apache License 2.0. See `LICENSE`.

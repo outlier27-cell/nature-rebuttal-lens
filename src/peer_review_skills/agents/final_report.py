@@ -115,6 +115,9 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "provenance_checks": provenance_checks,
         "responsible_use_warnings": _responsible_use_warnings(trace, integrity),
         "memory_ethics_boundary": _memory_ethics_boundary(trace),
+        "memory_passport": _memory_passport(trace),
+        "forgetting_ledger": _forgetting_ledger(trace),
+        "irreversible_forgetting_statement": _irreversible_forgetting_statement(trace),
         "integrity_issues": _as_list(integrity.get("issues", [])),
         "not_final_submission_text": True,
     }
@@ -204,6 +207,48 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
                 "",
                 "```json",
                 json.dumps(report["memory_ethics_boundary"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("memory_passport"):
+        lines.extend(
+            [
+                "",
+                "## 10. Memory Passport",
+                "",
+                (
+                    "遗忘不是能力损失，而是保护作者主体性的边界。系统保留证据、推理和审计痕迹，"
+                    "但遗忘作者历史决策、策略偏好和最终措辞，避免旧选择在新运行中变成未经确认的承诺。"
+                ),
+                "",
+                "```json",
+                json.dumps(report["memory_passport"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("irreversible_forgetting_statement"):
+        lines.extend(
+            [
+                "",
+                "## 11. Irreversible Forgetting Statement",
+                "",
+                "```json",
+                json.dumps(
+                    report["irreversible_forgetting_statement"],
+                    ensure_ascii=False,
+                    indent=2,
+                ),
+                "```",
+            ]
+        )
+    if report.get("forgetting_ledger"):
+        lines.extend(
+            [
+                "",
+                "## 12. Forgetting Ledger",
+                "",
+                "```json",
+                json.dumps(report["forgetting_ledger"], ensure_ascii=False, indent=2),
                 "```",
             ]
         )
@@ -424,6 +469,50 @@ def _memory_ethics_boundary(trace: dict[str, Any]) -> dict[str, Any]:
         "trace_bound_to_output": True,
         "reset_memory_requested": False,
         "reset_memory_effect": "No cross-run strategy or author-preference memory is loaded by default.",
+    }
+
+
+def _memory_passport(trace: dict[str, Any]) -> dict[str, Any]:
+    passport = trace.get("memory_passport")
+    if isinstance(passport, dict):
+        return dict(passport)
+    return {
+        "policy": "default",
+        "reset_memory_requested": False,
+        "retained_memory_classes": ["evidence_trace", "reasoning_trace", "audit_trace"],
+        "forgotten_memory_classes": [
+            "author_decision",
+            "final_wording",
+            "strategy_preference",
+        ],
+        "justification_memory_not_conclusion_memory": True,
+        "forgetting_is_active_boundary": True,
+        "irreversible_forgetting": True,
+    }
+
+
+def _forgetting_ledger(trace: dict[str, Any]) -> list[dict[str, Any]]:
+    ledger = trace.get("forgetting_ledger")
+    if isinstance(ledger, list):
+        return [dict(item) for item in ledger if isinstance(item, dict)]
+    return []
+
+
+def _irreversible_forgetting_statement(trace: dict[str, Any]) -> dict[str, str]:
+    statement = trace.get("irreversible_forgetting_statement")
+    if isinstance(statement, dict):
+        return {str(key): str(value) for key, value in statement.items()}
+    return {
+        "author_decision": (
+            "Forgotten author decisions must not be reconstructed from checkpoints, "
+            "cache, retrieved cases, prior final reports, or historical run summaries."
+        ),
+        "strategy_preference": (
+            "Forgotten strategy preferences must not become defaults for later runs."
+        ),
+        "final_wording": (
+            "Forgotten final wording must not be reused as submission-ready author expression."
+        ),
     }
 
 

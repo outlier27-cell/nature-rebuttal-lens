@@ -303,6 +303,32 @@ class RebuttalLensFailingLLMClient(RebuttalLensMockLLMClient):
         return response
 
 
+class RebuttalLensNewAnalysisMockLLMClient(RebuttalLensMockLLMClient):
+    def create_chat_completion(
+        self,
+        messages: list[dict[str, str]],
+        response_format: dict[str, str] | None = None,
+        temperature: float = 0.0,
+    ) -> dict[str, Any]:
+        response = super().create_chat_completion(messages, response_format, temperature)
+        system_prompt = messages[0]["content"].lower()
+        if "evidence action planner" in system_prompt:
+            content = {
+                "evidence_action_plan": [{
+                    "action_type": "new_analysis",
+                    "required_artifact": "temporal validation",
+                    "supporting_case_ids": ["case_001"],
+                    "requires_author_confirmation": True,
+                }],
+                "author_confirmation_questions": [
+                    "Can the temporal validation be completed?"
+                ],
+                "reasoning": "Temporal validation is a new analysis that requires author confirmation.",
+            }
+            response["choices"][0]["message"]["content"] = json.dumps(content)
+        return response
+
+
 class RebuttalLensNullableCaseIdsLLMClient(RebuttalLensMockLLMClient):
     def create_chat_completion(
         self,
@@ -1210,6 +1236,70 @@ def test_final_report_comment_cards_include_nature_response_schema(tmp_path):
     assert report["response_package_gate_issues"] == []
 
 
+def test_trace_includes_memory_passport_and_forgetting_ledger(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "memory_ethics_runtime_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={
+            "output_dir": output_dir,
+            "reset_memory": True,
+            "memory_policy": "strict",
+            "forget_scope": ["latent_commitment"],
+        },
+    )
+
+    trace = json.loads((output_dir / "rebuttal_lens_trace.json").read_text(encoding="utf-8"))
+
+    assert trace["memory_passport"]["policy"] == "strict"
+    assert trace["memory_passport"]["reset_memory_requested"] is True
+    assert "author_decision" in trace["memory_passport"]["forgotten_memory_classes"]
+    assert "latent_commitment" in trace["memory_passport"]["forgotten_memory_classes"]
+    assert any(
+        event["memory_class"] == "strategy_preference"
+        and event["action"] == "forgotten"
+        for event in trace["forgetting_ledger"]
+    )
+    assert trace["memory_ethics_boundary"]["forgetting_ledger_attached"] is True
+
+
+def test_final_report_surfaces_forgetting_ledger(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nWe used an 80/10/10 split.\n", encoding="utf-8")
+    output_dir = tmp_path / "forgetting_report_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="The dataset split is unclear.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={"output_dir": output_dir, "reset_memory": True},
+    )
+
+    report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
+    markdown = (output_dir / "final_user_report.md").read_text(encoding="utf-8")
+
+    assert report["memory_passport"]["forgetting_is_active_boundary"] is True
+    assert any(
+        event["memory_class"] == "author_decision"
+        and event["action"] == "forgotten"
+        for event in report["forgetting_ledger"]
+    )
+    assert "Forgetting Ledger" in markdown
+    assert "author_decision" in markdown
+    assert "遗忘不是能力损失" in markdown
+    assert "保护作者主体性" in markdown
+
+
 def test_final_report_uses_decision_deferred_for_unconfirmed_high_risk_actions():
     from peer_review_skills.agents.final_report import compose_final_user_report
 
@@ -1317,6 +1407,41 @@ def test_package_readiness_preserves_decision_deferred_above_needs_author_input(
     readiness = [card["readiness"] for card in report["comment_cards"]]
     assert readiness == ["decision_deferred", "needs_author_input"]
     assert report["package_readiness"] == "decision_deferred"
+
+
+def test_cross_run_author_decision_is_not_reused_as_default(tmp_path):
+    manuscript = tmp_path / "manuscript.md"
+    manuscript.write_text("## Methods\n\nTemporal validation is not yet reported.\n", encoding="utf-8")
+    prior_memory = {
+        "author_decision": [{"decision": "accept temporal validation commitment"}],
+        "strategy_preference": [{"strategy": "promise_new_analysis"}],
+        "final_wording": [{"text": "We have now completed temporal validation."}],
+        "evidence_trace": [{"evidence_ref": "section_002"}],
+    }
+    output_dir = tmp_path / "cross_run_forgetting_output"
+
+    run_rebuttal_lens_workflow(
+        project_root=Path.cwd(),
+        review_text="Please add temporal validation.",
+        manuscript_path=manuscript,
+        model_client=RebuttalLensNewAnalysisMockLLMClient(),
+        retrieved_cases=[{"unit_id": "case_001", "score": 0.8}],
+        taxonomies={},
+        config={
+            "output_dir": output_dir,
+            "reset_memory": True,
+            "runtime_memory": prior_memory,
+        },
+    )
+
+    trace = json.loads((output_dir / "rebuttal_lens_trace.json").read_text(encoding="utf-8"))
+    report = json.loads((output_dir / "final_user_report.json").read_text(encoding="utf-8"))
+
+    assert trace["runtime_memory_after_forgetting"] == {
+        "evidence_trace": [{"evidence_ref": "section_002"}]
+    }
+    assert report["package_readiness"] == "decision_deferred"
+    assert "We have now completed temporal validation." not in json.dumps(report, ensure_ascii=False)
 
 
 def test_final_report_comment_cards_include_data_and_citation_checks(tmp_path):
@@ -1686,6 +1811,23 @@ def test_cli_parser_accepts_run_rebuttal_lens_file_inputs():
     assert str(args.retrieved_cases_file).endswith("retrieved_cases.json")
     assert args.limit_cases == 3
     assert args.reset_memory is True
+
+
+def test_cli_parser_accepts_memory_policy_and_forget_scope():
+    parser = build_parser()
+
+    args = parser.parse_args([
+        "run-rebuttal-lens",
+        "--review-file",
+        "examples/rebuttal_lens/reviewer_comment.txt",
+        "--memory-policy",
+        "strict",
+        "--forget-scope",
+        "latent_commitment,unsafe_claim",
+    ])
+
+    assert args.memory_policy == "strict"
+    assert args.forget_scope == "latent_commitment,unsafe_claim"
 
 
 def test_cli_parser_accepts_dag_committee_strategy_flags():
