@@ -1,0 +1,667 @@
+{
+  "report_type": "author_rebuttal_assistant_report",
+  "workflow_version": "rebuttal_lens_v1",
+  "query_unit_id": "rebuttal_lens_user_case",
+  "executive_summary": "系统识别出 2 个 reviewer concern。其中 0 个 claim 暂时不可追溯或证据不足。建议先补证据和缩窄承诺，再组织 rebuttal 草稿。",
+  "package_readiness": "decision_deferred",
+  "response_package_gate_issues": [],
+  "comment_cards": [
+    {
+      "comment_id": "comment_001",
+      "concern_type": "experimental_design",
+      "surface_request": "Provide a transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether reported gains remain when near-duplicate review-response pairs are removed.",
+      "implicit_risk": "The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits. The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+      "confidence": "high",
+      "evidence_status": "partially_supported",
+      "manuscript_section": "section_004",
+      "evidence_refs": [
+        "section_004",
+        "section_007",
+        "section_008"
+      ],
+      "evidence_gap": "The manuscript does not explain how temporal leakage was avoided. It acknowledges potential topical clustering across splits and explicitly states a temporal split experiment has not been reported. It also states stricter near-duplicate removal (e.g., MinHash) has not been completed.",
+      "recommended_action": "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits.",
+      "action_type": "method_clarification",
+      "supporting_case_ids": [
+        "nature_case_temporal_split_017"
+      ],
+      "author_input_required": true,
+      "safe_response_language": "We will report this analysis if completed, or narrow the claim if it cannot be supported.",
+      "unsafe_language_to_avoid": "Avoid claiming that the concern is fully resolved before evidence is available.",
+      "severity": "major",
+      "category": "methodological",
+      "proposed_action": "AUTHOR_INPUT_NEEDED",
+      "readiness": "decision_deferred",
+      "risk_level": "high",
+      "missing_author_input": [
+        "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits."
+      ],
+      "evidence_anchor": "section_004",
+      "memory_decision_boundary": {
+        "author_decision_required": true,
+        "system_may_commit_for_author": false,
+        "cross_run_preference_used": false,
+        "requires_independent_confirmation": true,
+        "decision_class": "bounded_assistance"
+      },
+      "data_availability_check": {
+        "applies": false,
+        "required_fields": [],
+        "readiness_impact": "none"
+      },
+      "citation_support_check": {
+        "applies": false,
+        "support_grade": "not_applicable",
+        "can_be_used_as_evidence": false
+      },
+      "ethical_defer_reason": "A high-risk author decision must be renewed by the author instead of automated."
+    },
+    {
+      "comment_id": "comment_002",
+      "concern_type": "generalization_scope",
+      "surface_request": "Clarify whether the central claim that the method generalizes across peer-review contexts is overstated.",
+      "implicit_risk": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+      "confidence": "high",
+      "evidence_status": "supported",
+      "manuscript_section": "section_007",
+      "evidence_refs": [
+        "section_006",
+        "section_007"
+      ],
+      "evidence_gap": "The manuscript explicitly states the lack of temporal split evaluation and acknowledges potential topical clustering, which directly supports the concern that the generalization claim may be overstated without these checks.",
+      "recommended_action": "Results of a robustness check using a temporally held-out split.",
+      "action_type": "new_analysis",
+      "supporting_case_ids": [
+        "nature_case_temporal_split_017"
+      ],
+      "author_input_required": true,
+      "safe_response_language": "We will report this analysis if completed, or narrow the claim if it cannot be supported.",
+      "unsafe_language_to_avoid": "Avoid overstating implications beyond the supplied manuscript evidence.",
+      "severity": "minor",
+      "category": "editorial_presentation",
+      "proposed_action": "AUTHOR_INPUT_NEEDED",
+      "readiness": "needs_author_input",
+      "risk_level": "low",
+      "missing_author_input": [
+        "Results of a robustness check using a temporally held-out split."
+      ],
+      "evidence_anchor": "section_007",
+      "memory_decision_boundary": {
+        "author_decision_required": true,
+        "system_may_commit_for_author": false,
+        "cross_run_preference_used": false,
+        "requires_independent_confirmation": true,
+        "decision_class": "high_risk_author_decision"
+      },
+      "data_availability_check": {
+        "applies": false,
+        "required_fields": [],
+        "readiness_impact": "none"
+      },
+      "citation_support_check": {
+        "applies": false,
+        "support_grade": "not_applicable",
+        "can_be_used_as_evidence": false
+      }
+    }
+  ],
+  "recommended_rebuttal_outline": [
+    "Thank the reviewer and restate the concern as an evidence/validity issue.",
+    "Address comment_001 by explaining: A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits..",
+    "Address comment_002 by explaining: Results of a robustness check using a temporally held-out split..",
+    "Close by distinguishing completed revisions from analyses that require author confirmation."
+  ],
+  "author_confirmation_questions": [
+    "Can you confirm the exact composition and size of the 'curated Nature-family corpus' mentioned in the Abstract and Data sections?",
+    "The Methods section preview describes a pipeline. Are there specific model architectures, training procedures, or hyperparameters detailed in the full manuscript?",
+    "The Results mention a 'small model-assisted evaluation' for concern coverage. What was the evaluation protocol and what were the specific results?",
+    "The Limitations section mentions related papers sharing language patterns. Was any analysis done to quantify this potential clustering in the current random split?",
+    "Can you provide the detailed methodology for constructing the data splits to ensure no temporal leakage?",
+    "Can you perform and report the results of an evaluation using a temporally held-out test split?",
+    "Can you perform and report the results of an analysis that removes near-duplicate pairs (beyond exact duplicates) and shows the impact on performance gains?",
+    "Given the results of the above analyses, are you willing to revise the central claim about generalization across peer-review contexts to be more precise?",
+    "Can you perform and report the results of the two specific robustness checks requested by the reviewer: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+    "Can you provide the detailed, step-by-step protocol for constructing the train/validation/test splits, including how papers were ordered (e.g., by publication date) and whether any measures were taken to isolate papers from the same journal issue, topic cluster, or review round?",
+    "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization? Specifically, will you narrow the claim in the Abstract and Discussion to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+    "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting the new robustness check results?",
+    "Can you perform and report the results of the two specific robustness checks: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+    "Can you provide the detailed, step-by-step protocol for constructing train/validation/test splits, including how papers were ordered and whether measures were taken to isolate papers from same journal issue, topic cluster, or review round?",
+    "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+    "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting new robustness check results?",
+    "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits.",
+    "Results of a robustness check using a temporally held-out split."
+  ],
+  "tone_and_commitment_warnings": [
+    {
+      "tone": "cooperative",
+      "commitment_level": "promised_change",
+      "risk_flags": [
+        "unsupported_commitment",
+        "overclaim"
+      ],
+      "boundary": "Not a psychological diagnosis; observable text only."
+    }
+  ],
+  "committee_synthesis": {
+    "prioritized_plan": [
+      {
+        "action": "Perform and report the requested robustness checks.",
+        "priority": "highest",
+        "consensus": "All three committee lenses (methodology, claim, tone) identify this as a critical, high-severity risk. The manuscript explicitly states these analyses are not yet done. The reviewer and editor explicitly demand them.",
+        "committee_emphasis": {
+          "methodology": "Essential to address data leakage and inflated metric risks.",
+          "claim": "Required to provide evidence for or against the generalization claim.",
+          "tone": "Necessary to avoid unsupported commitment and align with reviewer/editor expectations."
+        },
+        "specific_subtasks": [
+          "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+          "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+        ]
+      },
+      {
+        "action": "Provide a detailed, transparent account of the data split construction protocol in the Methods section.",
+        "priority": "high",
+        "consensus": "All three lenses agree this is a major requirement for methodological transparency and reproducibility. The current description is insufficient.",
+        "committee_emphasis": {
+          "methodology": "Core to experimental design integrity; must detail temporal ordering and cluster isolation.",
+          "claim": "Necessary to clarify the scope of the evidence and support claim calibration.",
+          "tone": "Directly addresses the reviewer's specific request and demonstrates substantive engagement."
+        },
+        "specific_subtasks": [
+          "Describe the step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+          "Explicitly state whether measures were taken to prevent papers from the same journal issue, topic cluster, or review round from appearing in different splits."
+        ]
+      },
+      {
+        "action": "Calibrate all claims about generalization in the manuscript (Abstract, Results, Discussion) based on the new evidence.",
+        "priority": "high",
+        "consensus": "Methodology and claim lenses strongly emphasize this as a high-risk overclaim. Tone lens flags the author's current response as reinforcing the overclaim.",
+        "committee_emphasis": {
+          "methodology": "Claims must precisely reflect the evaluation scope (e.g., 'within a random split' or 'across temporally held-out reviews').",
+          "claim": "The central claim is currently overstated; must be narrowed to match demonstrated evidence.",
+          "tone": "Must avoid restating broad generalization prematurely; commit to evidence-based revision."
+        },
+        "specific_subtasks": [
+          "Revise the Abstract to state the conditions of the evaluation clearly.",
+          "Update the Results and Discussion to reflect performance on the new robustness checks and discuss limitations.",
+          "Remove or qualify any language implying broad generalization across peer-review contexts unless explicitly supported by new analyses."
+        ]
+      },
+      {
+        "action": "Revise the author response text to align with the above actions and avoid interactional risks.",
+        "priority": "medium",
+        "consensus": "Tone lens identifies specific high and medium risks in the draft response. Methodology and claim lenses support the need for a credible, evidence-focused response.",
+        "committee_emphasis": {
+          "methodology": "Response should commit to providing concrete methodological details and new results.",
+          "claim": "Response should not repeat the broad generalization claim; should focus on evidence-based calibration.",
+          "tone": "Must remove the overclaim statement, clarify the status of robustness checks, and adopt a substantive, cooperative tone."
+        },
+        "specific_subtasks": [
+          "Remove the line: 'We will also state that our method generalizes across Nature peer-review contexts.'",
+          "Clarify whether the robustness checks are planned, in progress, or completed, and summarize key outcomes if available.",
+          "Replace defensive justification ('and we believe this avoids leakage') with an acknowledgment of the reviewer's point and a commitment to provide the transparent account.",
+          "Anchor gratitude to the substance of the critique (e.g., '...for raising these important points about evaluation design...')."
+        ]
+      }
+    ],
+    "preserved_disagreement": {
+      "note": "No fundamental disagreement on required actions. Differences are in emphasis and framing.",
+      "methodology_vs_claim": "Methodology lens emphasizes the structural integrity of the experimental design as the primary issue. Claim lens frames the same issues as risks to the credibility and scope of the central claim. Both agree on the same corrective actions.",
+      "tone_vs_others": "Tone lens uniquely highlights the interactional risks in the author's draft response (overclaim, unsupported commitment), which the other lenses do not explicitly address. However, the recommended actions from methodology and claim lenses inherently mitigate these tone risks if followed."
+    }
+  },
+  "strategy_plan": {
+    "core_actions": [
+      {
+        "action": "Perform and report robustness checks",
+        "subtasks": [
+          "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+          "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+        ],
+        "evidence_anchor": "section_007, section_008",
+        "nature_action_hint": "ACCEPT_ANALYSIS"
+      },
+      {
+        "action": "Provide detailed split construction protocol",
+        "subtasks": [
+          "Describe step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+          "Explicitly state whether measures were taken to prevent papers from same journal issue, topic cluster, or review round from appearing in different splits."
+        ],
+        "evidence_anchor": "section_004",
+        "nature_action_hint": "CLARIFY_EXISTING"
+      },
+      {
+        "action": "Calibrate generalization claims based on new evidence",
+        "subtasks": [
+          "Revise Abstract to state evaluation conditions clearly.",
+          "Update Results and Discussion to reflect performance on new robustness checks.",
+          "Remove or qualify language implying broad generalization across peer-review contexts unless explicitly supported."
+        ],
+        "evidence_anchor": "section_003, section_006, section_007",
+        "nature_action_hint": "SOFTEN_CLAIM"
+      },
+      {
+        "action": "Revise author response text",
+        "subtasks": [
+          "Remove statement about asserting generalization across Nature peer-review contexts.",
+          "Clarify status of robustness checks (planned/in progress/completed).",
+          "Replace defensive justification with acknowledgment of reviewer's point.",
+          "Anchor gratitude to substance of critique."
+        ],
+        "evidence_anchor": "response_text",
+        "nature_action_hint": "ACCEPT_TEXT"
+      }
+    ],
+    "skill_families": [
+      "evidence_upgrade",
+      "scope_calibration",
+      "presentation_repair"
+    ],
+    "institutional_signals_addressed": [
+      "replicability_norm",
+      "transparency_norm",
+      "editorial_risk_control"
+    ]
+  },
+  "unsafe_claims": [],
+  "provenance_checks": [
+    {
+      "claim": "Manuscript uses a random paper-level 80/10/10 split and removes exact duplicates.",
+      "source": "section_004 (Data section preview)",
+      "traceable": true
+    },
+    {
+      "claim": "Manuscript acknowledges potential topical clustering and lack of temporal split evaluation.",
+      "source": "section_007 (Limitations section preview)",
+      "traceable": true
+    },
+    {
+      "claim": "Stricter near-duplicate removal (e.g., MinHash) has not been completed.",
+      "source": "section_008 (Planned Additional Analysis preview)",
+      "traceable": true
+    },
+    {
+      "claim": "Reviewer requests transparent split construction, temporal robustness checks, and near-duplicate analysis.",
+      "source": "Reviewer text in unit",
+      "traceable": true
+    },
+    {
+      "claim": "Author's draft response promises clarification and asserts generalization.",
+      "source": "response_text in unit",
+      "traceable": true
+    }
+  ],
+  "responsible_use_warnings": [
+    "assistant_only",
+    "author_must_verify_all_claims",
+    "not_final_rebuttal_text",
+    "no_acceptance_prediction",
+    "no_confidential_upload_recommendation"
+  ],
+  "memory_ethics_boundary": {
+    "justification_memory_not_conclusion_memory": true,
+    "cross_run_strategy_memory_used": false,
+    "author_decisions_reset_each_run": true,
+    "per_item_author_confirmation_required": true,
+    "trace_bound_to_output": true,
+    "forgetting_ledger_attached": true,
+    "reset_memory_requested": true,
+    "reset_memory_effect": "No cross-run strategy or author-preference memory is loaded; this run is treated independently."
+  },
+  "memory_passport": {
+    "policy": "strict",
+    "reset_memory_requested": true,
+    "retained_memory_classes": [
+      "evidence_trace",
+      "reasoning_trace",
+      "audit_trace"
+    ],
+    "forgotten_memory_classes": [
+      "author_decision",
+      "final_wording",
+      "latent_commitment",
+      "strategy_preference",
+      "unsafe_claim"
+    ],
+    "justification_memory_not_conclusion_memory": true,
+    "forgetting_is_active_boundary": true,
+    "irreversible_forgetting": true
+  },
+  "forgetting_ledger": [
+    {
+      "memory_class": "author_decision",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "Author agency must be renewed for every run.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "final_wording",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The system plans responses; it must not preserve final author expression.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "latent_commitment",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+      "system_may_reconstruct_from_evidence": true
+    },
+    {
+      "memory_class": "strategy_preference",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "A past strategy must not become an automatic future answer.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "unsafe_claim",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+      "system_may_reconstruct_from_evidence": true
+    }
+  ],
+  "irreversible_forgetting_statement": {
+    "author_decision": "Forgotten author decisions must not be reconstructed from checkpoints, cache, retrieved cases, prior final reports, or historical run summaries.",
+    "strategy_preference": "Forgotten strategy preferences must not become defaults for later runs.",
+    "final_wording": "Forgotten final wording must not be reused as submission-ready author expression."
+  },
+  "kant_machine_runtime": {
+    "enabled": true,
+    "category_registry_path": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\kantian_category_registry.json",
+    "category_confirmation_threshold": 3,
+    "category_count": 1,
+    "reflective_judgment": {
+      "mode": "reflective_judgment",
+      "readiness": "decision_deferred",
+      "matched_category": null,
+      "category_invention_draft": {
+        "draft_id": "draft_provide_transparent_account_split_construction",
+        "name": "draft_provide_transparent_account_split_construction",
+        "status": "unverified_strategy_prototype",
+        "registry_status": "draft",
+        "verification_status": "unverified",
+        "requires_independent_confirmation": true,
+        "author_instruction": "请作者判断该新策略雏形是否可用；若确认有效并在多次独立运行中成功使用，再触发范畴生成流程。"
+      },
+      "system_may_commit_for_author": false,
+      "author_confirmation_required": true
+    },
+    "heteronomy_boundary": {
+      "system_may_commit_for_author": false,
+      "category_generation_requires_author_confirmation": true,
+      "derived_categories_are_forgetting_eligible": true
+    },
+    "ethics_audit_chain_enabled": true
+  },
+  "reflective_judgment": {
+    "mode": "reflective_judgment",
+    "readiness": "decision_deferred",
+    "matched_category": null,
+    "category_invention_draft": {
+      "draft_id": "draft_provide_transparent_account_split_construction",
+      "name": "draft_provide_transparent_account_split_construction",
+      "status": "unverified_strategy_prototype",
+      "registry_status": "draft",
+      "verification_status": "unverified",
+      "requires_independent_confirmation": true,
+      "author_instruction": "请作者判断该新策略雏形是否可用；若确认有效并在多次独立运行中成功使用，再触发范畴生成流程。"
+    },
+    "system_may_commit_for_author": false,
+    "author_confirmation_required": true
+  },
+  "universalization_checks": [
+    {
+      "comment_id": "comment_001",
+      "proposed_action": "AUTHOR_INPUT_NEEDED",
+      "readiness": "needs_author_input",
+      "risk_level": "high",
+      "decision": "defer",
+      "universalizable": true,
+      "requires_author_decision": true,
+      "principle": "High-risk scholarly commitments must remain author-confirmed decisions.",
+      "universalized_world": "If all assistants deferred this class of commitment, fields would receive fewer unsupported promises and more explicit author accountability.",
+      "academic_process_effect": "Academic review becomes more conservative but also more auditable and verifiable.",
+      "ethical_block_reason": "A high-risk author decision must be renewed by the author instead of automated.",
+      "reason": "A high-risk author decision must be renewed by the author instead of automated."
+    },
+    {
+      "comment_id": "comment_002",
+      "proposed_action": "AUTHOR_INPUT_NEEDED",
+      "readiness": "needs_author_input",
+      "risk_level": "low",
+      "decision": "warn",
+      "universalizable": null,
+      "requires_author_decision": true,
+      "principle": "Recommendations must remain bounded by evidence and author verification.",
+      "universalized_world": "If all assistants used this uncertain recommendation, some outputs could become useful but unevenly grounded.",
+      "academic_process_effect": "Academic review may benefit, but the author must verify the evidential basis.",
+      "ethical_block_reason": "",
+      "reason": "The action is not blocked, but it needs human review before being treated as a norm."
+    }
+  ],
+  "integrity_issues": [
+    {
+      "severity": "info",
+      "agent_id": "manuscript_context_extractor",
+      "description": "Working with section previews only, not full manuscript text. This limits the ability to extract detailed evidence but is properly acknowledged."
+    }
+  ],
+  "not_final_submission_text": true,
+  "ethics_audit_chain": {
+    "mechanical_execution_events": [
+      {
+        "event_type": "audit_chain_started",
+        "response_card_count": 2,
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "universalization_gate_applied",
+        "response_card_count": 2,
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      },
+      {
+        "event_type": "dag_rule_execution",
+        "node_id": null,
+        "agent_id": null,
+        "description": "Executed a configured workflow node under the DAG contract.",
+        "system_role": "mechanical_executor"
+      }
+    ],
+    "organic_generation_events": [
+      {
+        "event_type": "category_invention_draft",
+        "description": "Entered reflective judgment mode because existing categories did not cover the concern.",
+        "draft": {
+          "draft_id": "draft_provide_transparent_account_split_construction",
+          "name": "draft_provide_transparent_account_split_construction",
+          "status": "unverified_strategy_prototype",
+          "registry_status": "draft",
+          "verification_status": "unverified",
+          "requires_independent_confirmation": true,
+          "author_instruction": "请作者判断该新策略雏形是否可用；若确认有效并在多次独立运行中成功使用，再触发范畴生成流程。"
+        },
+        "system_role": "organic_generator"
+      },
+      {
+        "event_type": "response_suggestion_generated",
+        "comment_id": "comment_001",
+        "proposed_action": "AUTHOR_INPUT_NEEDED",
+        "readiness": "decision_deferred",
+        "system_role": "organic_generator"
+      },
+      {
+        "event_type": "response_suggestion_generated",
+        "comment_id": "comment_002",
+        "proposed_action": "AUTHOR_INPUT_NEEDED",
+        "readiness": "needs_author_input",
+        "system_role": "organic_generator"
+      }
+    ],
+    "active_forgetting_events": [
+      {
+        "memory_class": "author_decision",
+        "action": "forgotten",
+        "policy": "strict",
+        "reset_memory_requested": true,
+        "reason": "Author agency must be renewed for every run.",
+        "system_may_reconstruct_from_evidence": false
+      },
+      {
+        "memory_class": "final_wording",
+        "action": "forgotten",
+        "policy": "strict",
+        "reset_memory_requested": true,
+        "reason": "The system plans responses; it must not preserve final author expression.",
+        "system_may_reconstruct_from_evidence": false
+      },
+      {
+        "memory_class": "latent_commitment",
+        "action": "forgotten",
+        "policy": "strict",
+        "reset_memory_requested": true,
+        "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+        "system_may_reconstruct_from_evidence": true
+      },
+      {
+        "memory_class": "strategy_preference",
+        "action": "forgotten",
+        "policy": "strict",
+        "reset_memory_requested": true,
+        "reason": "A past strategy must not become an automatic future answer.",
+        "system_may_reconstruct_from_evidence": false
+      },
+      {
+        "memory_class": "unsafe_claim",
+        "action": "forgotten",
+        "policy": "strict",
+        "reset_memory_requested": true,
+        "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+        "system_may_reconstruct_from_evidence": true
+      }
+    ],
+    "deferred_author_decisions": [
+      {
+        "comment_id": "comment_001",
+        "proposed_action": "AUTHOR_INPUT_NEEDED",
+        "readiness": "needs_author_input",
+        "risk_level": "high",
+        "decision": "defer",
+        "reason": "A high-risk author decision must be renewed by the author instead of automated.",
+        "missing_author_input": [
+          "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits."
+        ]
+      }
+    ],
+    "universalization_checks": [
+      {
+        "comment_id": "comment_001",
+        "proposed_action": "AUTHOR_INPUT_NEEDED",
+        "readiness": "needs_author_input",
+        "risk_level": "high",
+        "decision": "defer",
+        "universalizable": true,
+        "requires_author_decision": true,
+        "principle": "High-risk scholarly commitments must remain author-confirmed decisions.",
+        "universalized_world": "If all assistants deferred this class of commitment, fields would receive fewer unsupported promises and more explicit author accountability.",
+        "academic_process_effect": "Academic review becomes more conservative but also more auditable and verifiable.",
+        "ethical_block_reason": "A high-risk author decision must be renewed by the author instead of automated.",
+        "reason": "A high-risk author decision must be renewed by the author instead of automated."
+      },
+      {
+        "comment_id": "comment_002",
+        "proposed_action": "AUTHOR_INPUT_NEEDED",
+        "readiness": "needs_author_input",
+        "risk_level": "low",
+        "decision": "warn",
+        "universalizable": null,
+        "requires_author_decision": true,
+        "principle": "Recommendations must remain bounded by evidence and author verification.",
+        "universalized_world": "If all assistants used this uncertain recommendation, some outputs could become useful but unevenly grounded.",
+        "academic_process_effect": "Academic review may benefit, but the author must verify the evidential basis.",
+        "ethical_block_reason": "",
+        "reason": "The action is not blocked, but it needs human review before being treated as a norm."
+      }
+    ],
+    "ethical_blocks": [],
+    "heteronomy_transparency_statement": "This audit chain is a heteronomous assistance layer: it does not make final author decisions, does not convert memory into author commitments, and blocks or defers suggestions that would depend on deception, concealed limitations, or unconfirmed high-risk author input."
+  }
+}

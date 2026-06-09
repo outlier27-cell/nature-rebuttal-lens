@@ -8,10 +8,12 @@ from typing import Any
 
 from peer_review_skills.agents.citation_support_checks import grade_citation_support
 from peer_review_skills.agents.data_availability_checks import build_data_availability_check
+from peer_review_skills.agents.ethics_audit_chain import build_ethics_audit_chain
 from peer_review_skills.agents.response_package import (
     build_response_package_cards,
     validate_response_package_cards,
 )
+from peer_review_skills.agents.universalization_gate import check_universalization
 
 
 def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
@@ -96,9 +98,11 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
             if card["author_input_required"] and card["recommended_action"]
         ]
     )
+    universalization_checks = _build_universalization_checks(comment_cards, trace)
     recommended_outline = _build_outline(comment_cards, integrity, strategy)
+    kant_runtime = _as_dict(trace.get("kant_machine_runtime"))
 
-    return {
+    report = {
         "report_type": "author_rebuttal_assistant_report",
         "workflow_version": trace.get("workflow_version", "rebuttal_lens_v1"),
         "query_unit_id": trace.get("query_unit_id", "unknown"),
@@ -118,9 +122,20 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         "memory_passport": _memory_passport(trace),
         "forgetting_ledger": _forgetting_ledger(trace),
         "irreversible_forgetting_statement": _irreversible_forgetting_statement(trace),
+        "kant_machine_runtime": kant_runtime,
+        "reflective_judgment": _as_dict(kant_runtime.get("reflective_judgment")),
+        "universalization_checks": universalization_checks,
         "integrity_issues": _as_list(integrity.get("issues", [])),
         "not_final_submission_text": True,
     }
+    if kant_runtime.get("enabled") and kant_runtime.get("ethics_audit_chain_enabled", True):
+        report["ethics_audit_chain"] = build_ethics_audit_chain(trace=trace, report=report)
+    else:
+        report["ethics_audit_chain"] = {}
+    report["package_readiness"] = _overall_package_readiness(comment_cards)
+    report["executive_summary"] = _build_executive_summary(comment_cards, unsafe_claims)
+    report["response_package_gate_issues"] = validate_response_package_cards(comment_cards)
+    return report
 
 
 def render_final_user_report_markdown(report: dict[str, Any]) -> str:
@@ -250,6 +265,88 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
                 "```json",
                 json.dumps(report["forgetting_ledger"], ensure_ascii=False, indent=2),
                 "```",
+            ]
+        )
+    kant_runtime = _as_dict(report.get("kant_machine_runtime"))
+    if kant_runtime:
+        lines.extend(
+            [
+                "",
+                "## 康德机器运行摘要",
+                "",
+                f"- Kant machine enabled: {kant_runtime.get('enabled')}",
+                f"- Category registry: {kant_runtime.get('category_registry_path')}",
+                f"- Category confirmation threshold: {kant_runtime.get('category_confirmation_threshold')}",
+                f"- Category count: {kant_runtime.get('category_count')}",
+            ]
+        )
+        reflective = _as_dict(report.get("reflective_judgment"))
+        if reflective:
+            lines.extend(
+                [
+                    "",
+                    "### 反思性判断",
+                    "",
+                    f"- Mode: {reflective.get('mode')}",
+                    f"- Readiness: {reflective.get('readiness')}",
+                    f"- System may commit for author: {reflective.get('system_may_commit_for_author')}",
+                ]
+            )
+            draft = _as_dict(reflective.get("category_invention_draft"))
+            if draft:
+                lines.extend(
+                    [
+                        f"- Draft id: {draft.get('draft_id')}",
+                        f"- Draft status: {draft.get('status')}",
+                        f"- Author instruction: {draft.get('author_instruction')}",
+                    ]
+                )
+    if report.get("universalization_checks"):
+        lines.extend(["", "## 可普遍化测试", ""])
+        for check in report.get("universalization_checks", []):
+            lines.extend(
+                [
+                    f"### {check.get('comment_id', 'unknown')}",
+                    f"- Universalizable: {check.get('universalizable')}",
+                    f"- Decision: {check.get('decision')}",
+                    f"- Principle: {check.get('principle')}",
+                    f"- Academic process effect: {check.get('academic_process_effect')}",
+                ]
+            )
+            if check.get("ethical_block_reason"):
+                lines.append(
+                    f"- Ethical block/defer reason: {check.get('ethical_block_reason')}"
+                )
+    audit_chain = _as_dict(report.get("ethics_audit_chain"))
+    if audit_chain:
+        lines.extend(["", "## 伦理审计链", "", "### 机械执行"])
+        for event in audit_chain.get("mechanical_execution_events", []):
+            lines.append(
+                f"- {event.get('node_id')} / {event.get('agent_id')}: {event.get('description')}"
+            )
+        lines.extend(["", "### 有机生成"])
+        organic_events = audit_chain.get("organic_generation_events", [])
+        if organic_events:
+            for event in organic_events:
+                lines.append(f"- {event.get('event_type')}: {event.get('description')}")
+        else:
+            lines.append("- 本次未生成新的范畴候选或反思性策略草稿。")
+        lines.extend(["", "### 主动遗忘"])
+        for event in audit_chain.get("active_forgetting_events", []):
+            lines.append(f"- {event.get('memory_class')}: {event.get('reason')}")
+        lines.extend(["", "### 作者决策保留"])
+        deferred = audit_chain.get("deferred_author_decisions", [])
+        if deferred:
+            for event in deferred:
+                lines.append(f"- {event.get('comment_id')}: {event.get('reason')}")
+        else:
+            lines.append("- 本次没有新增 decision_deferred 作者决策。")
+        lines.extend(
+            [
+                "",
+                "### 绝对他律下近乎自律证明",
+                "",
+                str(audit_chain.get("heteronomy_transparency_statement", "")),
             ]
         )
     return "\n".join(lines).rstrip() + "\n"
@@ -415,6 +512,42 @@ def _build_outline(
         "author confirmation."
     )
     return outline
+
+
+def _build_universalization_checks(
+    comment_cards: list[dict[str, Any]],
+    trace: dict[str, Any],
+) -> list[dict[str, Any]]:
+    runtime = _as_dict(trace.get("kant_machine_runtime"))
+    if not runtime.get("enabled"):
+        return []
+    checks = []
+    for card in comment_cards:
+        action_text = " ".join(
+            _string_value(value)
+            for value in [
+                card.get("recommended_action"),
+                card.get("safe_response_language"),
+            ]
+            if _string_value(value)
+        )
+        result = check_universalization(
+            action_text=action_text,
+            proposed_action=_string_value(card.get("proposed_action")),
+            readiness=_string_value(card.get("readiness")),
+            risk_level=_string_value(card.get("risk_level")),
+        )
+        payload = result.to_dict()
+        payload["comment_id"] = card.get("comment_id")
+        checks.append(payload)
+        if payload["decision"] == "block":
+            card["readiness"] = "blocked"
+            card["risk_level"] = "blocking"
+            card["ethical_block_reason"] = payload["ethical_block_reason"]
+        elif payload["decision"] == "defer":
+            card["readiness"] = "decision_deferred"
+            card["ethical_defer_reason"] = payload["ethical_block_reason"]
+    return checks
 
 
 def _overall_package_readiness(comment_cards: list[dict[str, Any]]) -> str:

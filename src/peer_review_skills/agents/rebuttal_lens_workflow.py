@@ -12,6 +12,7 @@ from peer_review_skills.agents.final_report import (
     compose_final_user_report,
     write_final_user_report,
 )
+from peer_review_skills.agents.kant_machine_runtime import attach_kant_machine_runtime
 from peer_review_skills.agents.manuscript_context import build_rebuttal_lens_unit
 from peer_review_skills.agents.memory_ethics import (
     build_memory_ethics_runtime,
@@ -293,6 +294,7 @@ def _with_rebuttal_lens_trace_metadata(
         reset_memory=bool(config.get("reset_memory", False)),
         forgetting_ledger_attached=True,
     )
+    trace = attach_kant_machine_runtime(trace, config)
     return trace
 
 

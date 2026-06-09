@@ -184,6 +184,16 @@ def build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=None,
     )
+    run_rebuttal_lens.add_argument("--enable-kantian-categories", action="store_true")
+    run_rebuttal_lens.add_argument("--enable-universalization-gate", action="store_true")
+    run_rebuttal_lens.add_argument("--enable-reflective-judgment", action="store_true")
+    run_rebuttal_lens.add_argument(
+        "--disable-ethics-audit-chain",
+        action="store_true",
+        help="Disable Kant-machine ethics audit chain sections in final reports.",
+    )
+    run_rebuttal_lens.add_argument("--category-confirmation-threshold", type=int, default=3)
+    run_rebuttal_lens.add_argument("--category-registry-path", type=config.Path, default=None)
 
     return parser
 
@@ -563,6 +573,19 @@ def main(argv: list[str] | None = None) -> int:
                 for item in args.forget_scope.split(",")
                 if item.strip()
             ]
+        if args.enable_kantian_categories:
+            workflow_config["enable_kantian_categories"] = True
+        if args.enable_universalization_gate:
+            workflow_config["enable_universalization_gate"] = True
+        if args.enable_reflective_judgment:
+            workflow_config["enable_reflective_judgment"] = True
+        if args.disable_ethics_audit_chain:
+            workflow_config["enable_ethics_audit_chain"] = False
+        workflow_config["category_confirmation_threshold"] = args.category_confirmation_threshold
+        if args.category_registry_path is not None:
+            workflow_config["category_registry_path"] = config.resolve_project_path(
+                args.category_registry_path
+            )
         if args.output_dir is not None:
             workflow_config["output_dir"] = config.resolve_project_path(args.output_dir)
         retrieved_cases = []

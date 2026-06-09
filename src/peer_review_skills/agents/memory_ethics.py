@@ -5,6 +5,19 @@ from __future__ import annotations
 from typing import Any
 
 
+REGENERATION_BLOCKED_MEMORY_CLASSES = {
+    "author_decision",
+    "final_wording",
+    "latent_commitment",
+    "unsafe_claim",
+}
+
+REGENERATION_SAFE_MEMORY_CLASSES = {
+    "strategy_preference",
+    "reasoning_trace",
+    "audit_trace",
+}
+
 MEMORY_OBJECT_TAXONOMY: dict[str, dict[str, str]] = {
     "evidence_trace": {
         "description": "Evidence anchors, manuscript sections, retrieved-case references.",
@@ -37,6 +50,27 @@ MEMORY_OBJECT_TAXONOMY: dict[str, dict[str, str]] = {
         "ethical_reason": "The system plans responses; it must not preserve final author expression.",
     },
 }
+
+
+def regeneration_safe_forgetting_events(
+    forgetting_ledger: list[dict[str, Any]] | tuple[dict[str, Any], ...],
+) -> list[dict[str, str]]:
+    safe_events: list[dict[str, str]] = []
+    for event in forgetting_ledger or []:
+        memory_class = str(event.get("memory_class", "")).strip()
+        if memory_class not in REGENERATION_SAFE_MEMORY_CLASSES:
+            continue
+        pattern_hint = str(event.get("pattern_hint", "")).strip()
+        reason = str(event.get("reason", "")).strip()
+        if not pattern_hint and not reason:
+            continue
+        safe_event = {"memory_class": memory_class}
+        if pattern_hint:
+            safe_event["pattern_hint"] = pattern_hint
+        if reason:
+            safe_event["reason"] = reason
+        safe_events.append(safe_event)
+    return safe_events
 
 
 POLICY_SCOPES: dict[str, set[str]] = {

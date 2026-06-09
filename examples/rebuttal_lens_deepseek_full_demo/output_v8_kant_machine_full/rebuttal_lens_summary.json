@@ -1,0 +1,115 @@
+{
+  "system_name": "Nature RebuttalLens",
+  "workflow_version": "rebuttal_lens_v1",
+  "total_traces": 1,
+  "total_llm_calls": 18,
+  "manuscript_mode": "manuscript_aware",
+  "output_trace_path": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\rebuttal_lens_trace.json",
+  "final_user_report_json": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\final_user_report.json",
+  "final_user_report_markdown": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\final_user_report.md",
+  "workflow_engine": "dag",
+  "config": {
+    "workflow": {
+      "mode": "rebuttal_lens",
+      "engine": "layered",
+      "dag_available": true
+    },
+    "rebuttal_lens": {
+      "enable_committee": false,
+      "enable_strategy_tournament": false,
+      "final_user_report": true
+    },
+    "multi_agent": {
+      "enable_refinement": false,
+      "max_refinement_iterations": 2,
+      "sequential_dependency_layers": true,
+      "agents": {
+        "manuscript_context_extractor": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "manuscript_evidence_locator": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "case_retrieval_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "reviewer_understanding_agent": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "tacit_concern_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "institutional_signal_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "evidence_action_planner": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "author_positioning_agent": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "tone_commitment_calibrator": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "actor_network_mapper": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "cross_disciplinary_lens_interpreter": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        },
+        "integrity_adequacy_checker": {
+          "model": "deepseek-v3",
+          "temperature": 0.0,
+          "max_retries": 3
+        }
+      }
+    },
+    "api": {},
+    "optimization": {
+      "use_tiered_models": true,
+      "enable_caching": true,
+      "batch_size": 10,
+      "selective_execution": false
+    },
+    "enable_refinement": false,
+    "max_refinement_iterations": 0,
+    "api_base": "https://xh.v1api.cc",
+    "api_key": "<redacted>",
+    "model": "deepseek-v3",
+    "workflow_engine": "dag",
+    "enable_committee": true,
+    "enable_strategy_tournament": true,
+    "reset_memory": true,
+    "memory_policy": "strict",
+    "enable_kantian_categories": true,
+    "enable_universalization_gate": true,
+    "enable_reflective_judgment": true,
+    "category_confirmation_threshold": 3,
+    "category_registry_path": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\kantian_category_registry.json",
+    "output_dir": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full",
+    "final_user_report": true,
+    "enable_ethics_audit_chain": true
+  }
+}

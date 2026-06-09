@@ -1,0 +1,20 @@
+{
+  "workflow_engine": "dag",
+  "workflow_version": "rebuttal_lens_v1",
+  "manuscript_mode": "manuscript_aware",
+  "llm_calls": 18,
+  "agent_output_count": 18,
+  "execution_errors": 0,
+  "package_readiness": "decision_deferred",
+  "not_final_submission_text": true,
+  "kant_machine_enabled": true,
+  "universalization_check_count": 2,
+  "ethics_audit_chain_present": true,
+  "memory_passport_present": true,
+  "forgetting_ledger_count": 5,
+  "response_package_gate_issues": [],
+  "comment_card_count": 2,
+  "ethical_block_count": 0,
+  "deferred_author_decision_count": 1,
+  "category_registry_count": 1
+}

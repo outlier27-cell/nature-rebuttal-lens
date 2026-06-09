@@ -2859,7 +2859,7 @@ python -m pip install --dry-run -e .
 
 The validation command checks the release-safe NatureReview v0.1 artifacts that support the Nature RebuttalLens workflow.
 
-Latest local release-readiness checks are recorded in `UPGRADE.md`. The release gate includes full pytest, compileall, v0.1 artifact validation, package dry-run, CLI smoke tests, public documentation scans, and secret scans.
+Release-readiness evidence should be recorded in the run report or release notes for the specific validation run. The release gate includes full pytest, compileall, v0.1 artifact validation, package dry-run, CLI smoke tests, public documentation scans, and secret scans.
 
 ## Responsible Use
 

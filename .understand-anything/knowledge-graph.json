@@ -1,6 +1,5 @@
 {
   "version": "1.0.0",
-  "kind": "codebase",
   "project": {
     "name": "Nature RebuttalLens",
     "languages": [
@@ -12,291 +11,1915 @@
     "frameworks": [
       "pytest",
       "OpenAI-compatible API",
-      "Understand Anything"
+      "Understand Anything",
+      "CodeGraph"
     ],
-    "description": "面向 Nature rebuttal 的 manuscript-aware 可审计回复规划系统，已加入主动遗忘 runtime、记忆护照、遗忘账本与不可逆遗忘声明。",
-    "analyzedAt": "2026-06-06T03:42:17Z",
-    "gitCommitHash": "90f59ba4f7142ab30900f3783e1efdabc11d1bea"
+    "description": "面向 Nature rebuttal 的 manuscript-aware 可审计回复规划系统，已加入 Kant machine runtime、范畴注册表、反思性判断、可普遍化测试、遗忘再生循环和伦理审计链。",
+    "analyzedAt": "2026-06-09T01:56:59.702Z",
+    "gitCommitHash": "29a4f20ee67e53464877b0a9aa3acc5a9a0717a4"
   },
   "nodes": [
     {
-      "id": "document:README.md",
-      "type": "document",
-      "name": "README 文档",
-      "summary": "介绍 Nature RebuttalLens 的工作流、Memory Ethics Boundary、主动遗忘 runtime、--reset-memory、--memory-policy 与 --forget-scope。",
-      "tags": [
-        "文档",
-        "入口",
-        "记忆伦理",
-        "主动遗忘"
-      ],
-      "complexity": "simple",
-      "filePath": "README.md"
-    },
-    {
-      "id": "document:UPGRADE.md",
-      "type": "document",
-      "name": "升级方案文档",
-      "summary": "记录 Active Forgetting Runtime、memory_passport、forgetting_ledger、irreversible_forgetting_statement 以及跨运行旧决策不复用测试。",
-      "tags": [
-        "文档",
-        "升级",
-        "主动遗忘"
-      ],
-      "complexity": "simple",
-      "filePath": "UPGRADE.md"
-    },
-    {
-      "id": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
-      "type": "document",
-      "name": "主动遗忘 runtime 实施计划",
-      "summary": "把“有遗忘才有记忆”落成可测试、可审计、可解释的主动遗忘 runtime，并把三点补充落地要求提升为硬验收门。",
-      "tags": [
-        "计划",
-        "记忆伦理",
-        "三点补充落地要求"
-      ],
-      "complexity": "moderate",
-      "filePath": "docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md"
-    },
-    {
-      "id": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "id": "file:README.md",
       "type": "file",
-      "name": "Memory Ethics Runtime",
-      "summary": "实现 memory object taxonomy、forgetting policy、memory_passport、forgetting_ledger、irreversible_forgetting_statement 与 runtime memory 过滤。",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
       "tags": [
-        "主动遗忘",
-        "记忆伦理",
-        "runtime"
+        "RebuttalLens"
       ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
-    },
-    {
-      "id": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-      "type": "function",
-      "name": "build_memory_ethics_runtime",
-      "summary": "根据 reset_memory、memory_policy 与 forget_scope 生成 memory_passport、forgetting_ledger 与 irreversible_forgetting_statement。",
-      "tags": [
-        "memory_passport",
-        "forgetting_ledger"
-      ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
-    },
-    {
-      "id": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
-      "type": "function",
-      "name": "filter_runtime_memory",
-      "summary": "过滤 author_decision、strategy_preference、final_wording 等可遗忘 memory class，防止 cache、checkpoint、retrieved cases 重新注入旧作者决策。",
-      "tags": [
-        "运行时过滤",
-        "遗忘",
-        "污染防护"
-      ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/agents/memory_ethics.py"
-    },
-    {
-      "id": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
-      "type": "file",
-      "name": "RebuttalLens 工作流",
-      "summary": "运行 manuscript-aware unit、layered/DAG workflow，并把 memory_passport、forgetting_ledger、irreversible_forgetting_statement、runtime_memory_after_forgetting 写入 trace。",
-      "tags": [
-        "工作流",
-        "trace",
-        "记忆伦理"
-      ],
-      "complexity": "complex",
-      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py"
-    },
-    {
-      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
-      "type": "function",
-      "name": "_with_rebuttal_lens_trace_metadata",
-      "summary": "汇总 system、workflow、responsible-use 与 memory ethics metadata，并接入主动遗忘后的 runtime memory。",
-      "tags": [
-        "trace",
-        "metadata",
-        "runtime_memory_after_forgetting"
-      ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py"
+      "complexity": "moderate"
     },
     {
       "id": "file:src/peer_review_skills/agents/final_report.py",
       "type": "file",
-      "name": "最终报告组合器",
-      "summary": "从 trace 生成 JSON/Markdown 最终报告，输出 memory_passport、forgetting_ledger、不可逆遗忘声明和中文伦理解释。",
+      "name": "final_report.py",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "summary": "最终作者辅助报告：输出 comment cards、memory ethics、Kant runtime、可普遍化测试和伦理审计链。",
       "tags": [
-        "最终报告",
-        "Markdown",
-        "记忆伦理"
+        "RebuttalLens"
       ],
-      "complexity": "complex",
-      "filePath": "src/peer_review_skills/agents/final_report.py"
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:compose_final_user_report",
+      "type": "function",
+      "name": "compose_final_user_report",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        19,
+        138
+      ],
+      "summary": "compose_final_user_report：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
     },
     {
       "id": "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
       "type": "function",
       "name": "render_final_user_report_markdown",
-      "summary": "渲染用户可见 Markdown 报告，包含“遗忘不是能力损失，而是保护作者主体性的边界。”这句中文伦理解释。",
-      "tags": [
-        "Markdown",
-        "中文伦理解释"
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        141,
+        352
       ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/agents/final_report.py"
+      "summary": "render_final_user_report_markdown：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
     },
     {
-      "id": "file:src/peer_review_skills/cli/main.py",
+      "id": "function:src/peer_review_skills/agents/final_report.py:write_final_user_report",
+      "type": "function",
+      "name": "write_final_user_report",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        355,
+        372
+      ],
+      "summary": "write_final_user_report：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_output_for",
+      "type": "function",
+      "name": "_output_for",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        375,
+        380
+      ],
+      "summary": "_output_for：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_as_list",
+      "type": "function",
+      "name": "_as_list",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        383,
+        384
+      ],
+      "summary": "_as_list：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_dict_items",
+      "type": "function",
+      "name": "_dict_items",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        387,
+        388
+      ],
+      "summary": "_dict_items：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_as_dict",
+      "type": "function",
+      "name": "_as_dict",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        391,
+        392
+      ],
+      "summary": "_as_dict：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_as_string_list",
+      "type": "function",
+      "name": "_as_string_list",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        395,
+        402
+      ],
+      "summary": "_as_string_list：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_select_for_concern",
+      "type": "function",
+      "name": "_select_for_concern",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        405,
+        442
+      ],
+      "summary": "_select_for_concern：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_find_exact_match",
+      "type": "function",
+      "name": "_find_exact_match",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        445,
+        454
+      ],
+      "summary": "_find_exact_match：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_clean_match_value",
+      "type": "function",
+      "name": "_clean_match_value",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        457,
+        460
+      ],
+      "summary": "_clean_match_value：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_safe_language_for",
+      "type": "function",
+      "name": "_safe_language_for",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        463,
+        474
+      ],
+      "summary": "_safe_language_for：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_unsafe_language_for",
+      "type": "function",
+      "name": "_unsafe_language_for",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        477,
+        483
+      ],
+      "summary": "_unsafe_language_for：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_build_outline",
+      "type": "function",
+      "name": "_build_outline",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        486,
+        514
+      ],
+      "summary": "_build_outline：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_build_universalization_checks",
+      "type": "function",
+      "name": "_build_universalization_checks",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        517,
+        547
+      ],
+      "summary": "_build_universalization_checks：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_overall_package_readiness",
+      "type": "function",
+      "name": "_overall_package_readiness",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        550,
+        563
+      ],
+      "summary": "_overall_package_readiness：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_build_executive_summary",
+      "type": "function",
+      "name": "_build_executive_summary",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        566,
+        576
+      ],
+      "summary": "_build_executive_summary：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_responsible_use_warnings",
+      "type": "function",
+      "name": "_responsible_use_warnings",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        579,
+        587
+      ],
+      "summary": "_responsible_use_warnings：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_memory_ethics_boundary",
+      "type": "function",
+      "name": "_memory_ethics_boundary",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        590,
+        602
+      ],
+      "summary": "_memory_ethics_boundary：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_memory_passport",
+      "type": "function",
+      "name": "_memory_passport",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        605,
+        621
+      ],
+      "summary": "_memory_passport：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_forgetting_ledger",
+      "type": "function",
+      "name": "_forgetting_ledger",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        624,
+        628
+      ],
+      "summary": "_forgetting_ledger：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_irreversible_forgetting_statement",
+      "type": "function",
+      "name": "_irreversible_forgetting_statement",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        631,
+        646
+      ],
+      "summary": "_irreversible_forgetting_statement：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_dedupe_strings",
+      "type": "function",
+      "name": "_dedupe_strings",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        649,
+        657
+      ],
+      "summary": "_dedupe_strings：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/final_report.py:_string_value",
+      "type": "function",
+      "name": "_string_value",
+      "filePath": "src/peer_review_skills/agents/final_report.py",
+      "lineRange": [
+        660,
+        666
+      ],
+      "summary": "_string_value：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/memory_ethics.py",
       "type": "file",
-      "name": "CLI Main",
-      "summary": "run-rebuttal-lens 支持 --reset-memory、--memory-policy、--forget-scope、DAG、committee 与 strategy tournament。",
+      "name": "memory_ethics.py",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "summary": "记忆伦理 runtime：定义可保留/必须遗忘/可安全再生的记忆类别。",
       "tags": [
-        "CLI",
-        "memory-policy",
-        "forget-scope"
-      ],
-      "complexity": "moderate",
-      "filePath": "src/peer_review_skills/cli/main.py"
-    },
-    {
-      "id": "file:tests/test_memory_ethics.py",
-      "type": "file",
-      "name": "Memory Ethics Tests",
-      "summary": "测试 taxonomy、forgetting runtime、不可逆声明、cache/checkpoint/retrieved-case-like 旧记忆过滤。",
-      "tags": [
-        "测试",
-        "污染防护",
-        "遗忘"
-      ],
-      "complexity": "moderate",
-      "filePath": "tests/test_memory_ethics.py"
-    },
-    {
-      "id": "file:tests/test_rebuttal_lens_workflow.py",
-      "type": "file",
-      "name": "RebuttalLens Workflow Tests",
-      "summary": "测试 trace/report/CLI/cross-run author decision 不复用，以及 DAG、decision_deferred、response package 兼容性。",
-      "tags": [
-        "测试",
-        "工作流",
-        "跨运行"
-      ],
-      "complexity": "complex",
-      "filePath": "tests/test_rebuttal_lens_workflow.py"
-    },
-    {
-      "id": "concept:active_forgetting_runtime",
-      "type": "concept",
-      "name": "主动遗忘 runtime",
-      "summary": "把遗忘变成可审计运行时机制：保留证成痕迹，遗忘作者决策、策略偏好和最终措辞。",
-      "tags": [
-        "记忆伦理",
+        "康德机器",
+        "伦理审计",
         "主动遗忘"
       ],
       "complexity": "moderate"
     },
     {
-      "id": "concept:memory_passport",
-      "type": "concept",
-      "name": "memory_passport",
-      "summary": "记录本次运行保留的 memory classes、遗忘的 memory classes、policy、reset memory 状态和不可逆遗忘标志。",
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:regeneration_safe_forgetting_events",
+      "type": "function",
+      "name": "regeneration_safe_forgetting_events",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        55,
+        73
+      ],
+      "summary": "regeneration_safe_forgetting_events：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
+      "type": "function",
+      "name": "build_memory_ethics_runtime",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        102,
+        131
+      ],
+      "summary": "build_memory_ethics_runtime：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
+      "type": "function",
+      "name": "filter_runtime_memory",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        134,
+        142
+      ],
+      "summary": "filter_runtime_memory：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:_normalize_policy",
+      "type": "function",
+      "name": "_normalize_policy",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        145,
+        149
+      ],
+      "summary": "_normalize_policy：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:_forgotten_classes",
+      "type": "function",
+      "name": "_forgotten_classes",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        152,
+        161
+      ],
+      "summary": "_forgotten_classes：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:_forget_event",
+      "type": "function",
+      "name": "_forget_event",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        164,
+        185
+      ],
+      "summary": "_forget_event：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:_drop_forgotten_memory_classes",
+      "type": "function",
+      "name": "_drop_forgotten_memory_classes",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        188,
+        214
+      ],
+      "summary": "_drop_forgotten_memory_classes：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/memory_ethics.py:_contains_forgotten_memory_class",
+      "type": "function",
+      "name": "_contains_forgotten_memory_class",
+      "filePath": "src/peer_review_skills/agents/memory_ethics.py",
+      "lineRange": [
+        217,
+        218
+      ],
+      "summary": "_contains_forgotten_memory_class：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "type": "file",
+      "name": "rebuttal_lens_workflow.py",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "summary": "RebuttalLens workflow：在 trace metadata 阶段接入 Kant machine runtime。",
       "tags": [
-        "记忆",
-        "审计"
+        "RebuttalLens"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:run_rebuttal_lens_workflow",
+      "type": "function",
+      "name": "run_rebuttal_lens_workflow",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        43,
+        118
+      ],
+      "summary": "run_rebuttal_lens_workflow：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_trace",
+      "type": "function",
+      "name": "execute_rebuttal_lens_trace",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        121,
+        161
+      ],
+      "summary": "execute_rebuttal_lens_trace：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_dag_trace",
+      "type": "function",
+      "name": "execute_rebuttal_lens_dag_trace",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        164,
+        234
+      ],
+      "summary": "execute_rebuttal_lens_dag_trace：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_dag_trace_from_graph_trace",
+      "type": "function",
+      "name": "_rebuttal_lens_dag_trace_from_graph_trace",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        237,
+        263
+      ],
+      "summary": "_rebuttal_lens_dag_trace_from_graph_trace：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "type": "function",
+      "name": "_with_rebuttal_lens_trace_metadata",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        266,
+        298
+      ],
+      "summary": "_with_rebuttal_lens_trace_metadata：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_responsible_use_boundary",
+      "type": "function",
+      "name": "_rebuttal_lens_responsible_use_boundary",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        301,
+        308
+      ],
+      "summary": "_rebuttal_lens_responsible_use_boundary：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_as_forget_scope",
+      "type": "function",
+      "name": "_as_forget_scope",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        311,
+        318
+      ],
+      "summary": "_as_forget_scope：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_memory_ethics_boundary",
+      "type": "function",
+      "name": "_rebuttal_lens_memory_ethics_boundary",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        321,
+        339
+      ],
+      "summary": "_rebuttal_lens_memory_ethics_boundary：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:load_rebuttal_lens_config",
+      "type": "function",
+      "name": "load_rebuttal_lens_config",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        342,
+        347
+      ],
+      "summary": "load_rebuttal_lens_config：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_create_optional_rebuttal_lens_agents",
+      "type": "function",
+      "name": "_create_optional_rebuttal_lens_agents",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        350,
+        400
+      ],
+      "summary": "_create_optional_rebuttal_lens_agents：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_build_rebuttal_lens_node_inputs",
+      "type": "function",
+      "name": "_build_rebuttal_lens_node_inputs",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        403,
+        498
+      ],
+      "summary": "_build_rebuttal_lens_node_inputs：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_agent_outputs_from_node_outputs",
+      "type": "function",
+      "name": "_agent_outputs_from_node_outputs",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        501,
+        526
+      ],
+      "summary": "_agent_outputs_from_node_outputs：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_merged_rebuttal_lens_config",
+      "type": "function",
+      "name": "_merged_rebuttal_lens_config",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        529,
+        560
+      ],
+      "summary": "_merged_rebuttal_lens_config：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_deep_merge_dicts",
+      "type": "function",
+      "name": "_deep_merge_dicts",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        563,
+        570
+      ],
+      "summary": "_deep_merge_dicts：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_parse_simple_yaml",
+      "type": "function",
+      "name": "_parse_simple_yaml",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        573,
+        596
+      ],
+      "summary": "_parse_simple_yaml：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_parse_simple_yaml_scalar",
+      "type": "function",
+      "name": "_parse_simple_yaml_scalar",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        599,
+        609
+      ],
+      "summary": "_parse_simple_yaml_scalar：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_checkpoint_writer",
+      "type": "function",
+      "name": "_checkpoint_writer",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        612,
+        629
+      ],
+      "summary": "_checkpoint_writer：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_write_failure_trace",
+      "type": "function",
+      "name": "_write_failure_trace",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        632,
+        667
+      ],
+      "summary": "_write_failure_trace：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_safe_filename",
+      "type": "function",
+      "name": "_safe_filename",
+      "filePath": "src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "lineRange": [
+        670,
+        677
+      ],
+      "summary": "_safe_filename：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/peer_review_skills/cli/main.py",
+      "type": "file",
+      "name": "main.py",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "summary": "CLI 入口：提供 Kant machine、universalization、reflective judgment 和 category registry flags。",
+      "tags": [
+        "RebuttalLens"
       ],
       "complexity": "moderate"
     },
     {
-      "id": "concept:forgetting_ledger",
-      "type": "concept",
-      "name": "forgetting_ledger",
-      "summary": "逐项记录被遗忘的 memory class、policy、reset 状态和伦理理由。",
+      "id": "function:src/peer_review_skills/cli/main.py:_require_rebuttal_lens_api_config",
+      "type": "function",
+      "name": "_require_rebuttal_lens_api_config",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "lineRange": [
+        47,
+        66
+      ],
+      "summary": "_require_rebuttal_lens_api_config：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/cli/main.py:build_parser",
+      "type": "function",
+      "name": "build_parser",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "lineRange": [
+        69,
+        198
+      ],
+      "summary": "build_parser：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/cli/main.py:build_rebuttal_lens_argv",
+      "type": "function",
+      "name": "build_rebuttal_lens_argv",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "lineRange": [
+        201,
+        206
+      ],
+      "summary": "build_rebuttal_lens_argv：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/cli/main.py:run_rebuttal_lens_cli",
+      "type": "function",
+      "name": "run_rebuttal_lens_cli",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "lineRange": [
+        209,
+        211
+      ],
+      "summary": "run_rebuttal_lens_cli：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/cli/main.py:main",
+      "type": "function",
+      "name": "main",
+      "filePath": "src/peer_review_skills/cli/main.py",
+      "lineRange": [
+        214,
+        619
+      ],
+      "summary": "main：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "type": "file",
+      "name": "kantian_categories.py",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "summary": "康德范畴注册表：持久化 category lifecycle、独立确认阈值、category_id 匹配和范畴相似度。",
       "tags": [
-        "遗忘",
-        "审计"
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:_status_or_default",
+      "type": "function",
+      "name": "_status_or_default",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        289,
+        294
+      ],
+      "summary": "_status_or_default：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:_normalize_name",
+      "type": "function",
+      "name": "_normalize_name",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        297,
+        302
+      ],
+      "summary": "_normalize_name：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:_tokens",
+      "type": "function",
+      "name": "_tokens",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        305,
+        310
+      ],
+      "summary": "_tokens：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:_jaccard_similarity",
+      "type": "function",
+      "name": "_jaccard_similarity",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        313,
+        318
+      ],
+      "summary": "_jaccard_similarity：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:category_similarity",
+      "type": "function",
+      "name": "category_similarity",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        321,
+        322
+      ],
+      "summary": "category_similarity：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kantian_categories.py:_category_match_text",
+      "type": "function",
+      "name": "_category_match_text",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        325,
+        328
+      ],
+      "summary": "_category_match_text：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryStatus",
+      "type": "class",
+      "name": "CategoryStatus",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        13,
+        18
+      ],
+      "summary": "CategoryStatus：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/kantian_categories.py:Category",
+      "type": "class",
+      "name": "Category",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        22,
+        63
+      ],
+      "summary": "Category：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/kantian_categories.py:KantianCategory",
+      "type": "class",
+      "name": "KantianCategory",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        67,
+        75
+      ],
+      "summary": "KantianCategory：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryMatch",
+      "type": "class",
+      "name": "CategoryMatch",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        79,
+        81
+      ],
+      "summary": "CategoryMatch：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryRegistry",
+      "type": "class",
+      "name": "CategoryRegistry",
+      "filePath": "src/peer_review_skills/agents/kantian_categories.py",
+      "lineRange": [
+        84,
+        286
+      ],
+      "summary": "CategoryRegistry：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "type": "file",
+      "name": "universalization_gate.py",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "summary": "可普遍化 gate：阻断夸大、伪造、隐藏限制，延迟高风险作者决策。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
       ],
       "complexity": "moderate"
     },
     {
-      "id": "concept:irreversible_forgetting_statement",
-      "type": "concept",
-      "name": "irreversible_forgetting_statement",
-      "summary": "声明 author_decision、strategy_preference、final_wording 不得从 checkpoint、cache、retrieved cases、旧 final report 或历史 summary 中重构。",
+      "id": "function:src/peer_review_skills/agents/universalization_gate.py:check_universalization",
+      "type": "function",
+      "name": "check_universalization",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        50,
+        128
+      ],
+      "summary": "check_universalization：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/universalization_gate.py:_contains_deceptive_suggestion",
+      "type": "function",
+      "name": "_contains_deceptive_suggestion",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        131,
+        132
+      ],
+      "summary": "_contains_deceptive_suggestion：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/universalization_gate.py:_card_text",
+      "type": "function",
+      "name": "_card_text",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        135,
+        146
+      ],
+      "summary": "_card_text：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/universalization_gate.py:_universalized_world",
+      "type": "function",
+      "name": "_universalized_world",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        149,
+        168
+      ],
+      "summary": "_universalized_world：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationDecision",
+      "type": "class",
+      "name": "UniversalizationDecision",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        10,
+        14
+      ],
+      "summary": "UniversalizationDecision：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationResult",
+      "type": "class",
+      "name": "UniversalizationResult",
+      "filePath": "src/peer_review_skills/agents/universalization_gate.py",
+      "lineRange": [
+        17,
+        25
+      ],
+      "summary": "UniversalizationResult：Kant Machine / RebuttalLens 数据结构或运行组件。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "type": "file",
+      "name": "forgetting_regeneration.py",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "summary": "遗忘再生循环：只从安全遗忘结构抽象 derived_forgettable 范畴，不重建作者决策和最终措辞。",
       "tags": [
-        "遗忘",
-        "不可逆遗忘声明"
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
       ],
       "complexity": "moderate"
     },
     {
-      "id": "concept:cross_run_author_decision_forgetting_test",
-      "type": "concept",
-      "name": "cross_run_author_decision_forgetting_test",
-      "summary": "跨运行回归测试：旧作者选择 A 不会变成下一轮默认答案，后一轮必须重新证据驱动或 decision_deferred。",
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:regenerate_categories_from_forgetting_ledger",
+      "type": "function",
+      "name": "regenerate_categories_from_forgetting_ledger",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        20,
+        49
+      ],
+      "summary": "regenerate_categories_from_forgetting_ledger：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_blocked_memory_classes",
+      "type": "function",
+      "name": "_blocked_memory_classes",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        52,
+        60
+      ],
+      "summary": "_blocked_memory_classes：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_candidate_from_safe_event",
+      "type": "function",
+      "name": "_candidate_from_safe_event",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        63,
+        81
+      ],
+      "summary": "_candidate_from_safe_event：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_derived_forgettable_status",
+      "type": "function",
+      "name": "_derived_forgettable_status",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        84,
+        87
+      ],
+      "summary": "_derived_forgettable_status：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_category_name",
+      "type": "function",
+      "name": "_category_name",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        90,
+        111
+      ],
+      "summary": "_category_name：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_pattern_counts",
+      "type": "function",
+      "name": "_pattern_counts",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        114,
+        121
+      ],
+      "summary": "_pattern_counts：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_write_registry_candidates",
+      "type": "function",
+      "name": "_write_registry_candidates",
+      "filePath": "src/peer_review_skills/agents/forgetting_regeneration.py",
+      "lineRange": [
+        124,
+        146
+      ],
+      "summary": "_write_registry_candidates：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/reflective_judgment.py",
+      "type": "file",
+      "name": "reflective_judgment.py",
+      "filePath": "src/peer_review_skills/agents/reflective_judgment.py",
+      "summary": "反思性判断：低相似度 concern 进入 decision_deferred，并生成未验证范畴草稿。",
       "tags": [
-        "测试",
-        "跨运行",
-        "跨运行旧决策不复用"
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
       ],
       "complexity": "moderate"
     },
     {
-      "id": "concept:three_supplemental_acceptance_gates",
-      "type": "concept",
-      "name": "三点补充落地要求",
-      "summary": "本轮计划的硬性验收门：不可逆遗忘声明、跨运行旧决策不复用回归测试、中文伦理解释进入用户可见报告。报告必须包含“遗忘不是能力损失，而是保护作者主体性的边界。”",
-      "tags": [
-        "验收门",
-        "不可逆遗忘声明",
-        "跨运行旧决策不复用",
-        "中文伦理解释"
+      "id": "function:src/peer_review_skills/agents/reflective_judgment.py:judge_reviewer_concern",
+      "type": "function",
+      "name": "judge_reviewer_concern",
+      "filePath": "src/peer_review_skills/agents/reflective_judgment.py",
+      "lineRange": [
+        14,
+        52
       ],
-      "complexity": "moderate",
-      "filePath": "docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md"
+      "summary": "judge_reviewer_concern：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/reflective_judgment.py:build_reflective_judgment",
+      "type": "function",
+      "name": "build_reflective_judgment",
+      "filePath": "src/peer_review_skills/agents/reflective_judgment.py",
+      "lineRange": [
+        55,
+        102
+      ],
+      "summary": "build_reflective_judgment：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/reflective_judgment.py:_draft_name",
+      "type": "function",
+      "name": "_draft_name",
+      "filePath": "src/peer_review_skills/agents/reflective_judgment.py",
+      "lineRange": [
+        105,
+        111
+      ],
+      "summary": "_draft_name：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "type": "file",
+      "name": "ethics_audit_chain.py",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "summary": "伦理审计链：汇总机械执行、有机生成、主动遗忘、作者决策保留和他律透明声明。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/ethics_audit_chain.py:build_ethics_audit_chain",
+      "type": "function",
+      "name": "build_ethics_audit_chain",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "lineRange": [
+        11,
+        67
+      ],
+      "summary": "build_ethics_audit_chain：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_mechanical_execution_events",
+      "type": "function",
+      "name": "_mechanical_execution_events",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "lineRange": [
+        70,
+        96
+      ],
+      "summary": "_mechanical_execution_events：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_organic_generation_events",
+      "type": "function",
+      "name": "_organic_generation_events",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "lineRange": [
+        99,
+        137
+      ],
+      "summary": "_organic_generation_events：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_attach_card_context",
+      "type": "function",
+      "name": "_attach_card_context",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "lineRange": [
+        140,
+        161
+      ],
+      "summary": "_attach_card_context：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_heteronomy_transparency_statement",
+      "type": "function",
+      "name": "_heteronomy_transparency_statement",
+      "filePath": "src/peer_review_skills/agents/ethics_audit_chain.py",
+      "lineRange": [
+        164,
+        169
+      ],
+      "summary": "_heteronomy_transparency_statement：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+      "type": "file",
+      "name": "kant_machine_runtime.py",
+      "filePath": "src/peer_review_skills/agents/kant_machine_runtime.py",
+      "summary": "Kant machine deterministic runtime：在 DAG trace 后附加范畴注册表、反思性判断和他律边界。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kant_machine_runtime.py:build_kant_machine_runtime",
+      "type": "function",
+      "name": "build_kant_machine_runtime",
+      "filePath": "src/peer_review_skills/agents/kant_machine_runtime.py",
+      "lineRange": [
+        12,
+        50
+      ],
+      "summary": "build_kant_machine_runtime：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kant_machine_runtime.py:attach_kant_machine_runtime",
+      "type": "function",
+      "name": "attach_kant_machine_runtime",
+      "filePath": "src/peer_review_skills/agents/kant_machine_runtime.py",
+      "lineRange": [
+        53,
+        56
+      ],
+      "summary": "attach_kant_machine_runtime：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kant_machine_runtime.py:_category_registry_path",
+      "type": "function",
+      "name": "_category_registry_path",
+      "filePath": "src/peer_review_skills/agents/kant_machine_runtime.py",
+      "lineRange": [
+        59,
+        68
+      ],
+      "summary": "_category_registry_path：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/peer_review_skills/agents/kant_machine_runtime.py:_concern_text",
+      "type": "function",
+      "name": "_concern_text",
+      "filePath": "src/peer_review_skills/agents/kant_machine_runtime.py",
+      "lineRange": [
+        71,
+        84
+      ],
+      "summary": "_concern_text：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_kantian_categories.py",
+      "type": "file",
+      "name": "test_kantian_categories.py",
+      "filePath": "tests/test_kantian_categories.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_category_registry_persists_and_promotes_after_three_independent_confirmations",
+      "type": "function",
+      "name": "test_category_registry_persists_and_promotes_after_three_independent_confirmations",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        11,
+        34
+      ],
+      "summary": "test_category_registry_persists_and_promotes_after_three_independent_confirmations：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_record_confirmation_counts_distinct_run_ids_only",
+      "type": "function",
+      "name": "test_record_confirmation_counts_distinct_run_ids_only",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        37,
+        46
+      ],
+      "summary": "test_record_confirmation_counts_distinct_run_ids_only：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_match_returns_best_approved_category_above_threshold",
+      "type": "function",
+      "name": "test_match_returns_best_approved_category_above_threshold",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        49,
+        66
+      ],
+      "summary": "test_match_returns_best_approved_category_above_threshold：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_match_ignores_retired_and_forgettable_categories_by_default",
+      "type": "function",
+      "name": "test_match_ignores_retired_and_forgettable_categories_by_default",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        69,
+        82
+      ],
+      "summary": "test_match_ignores_retired_and_forgettable_categories_by_default：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_category_status_includes_required_lifecycle_values",
+      "type": "function",
+      "name": "test_category_status_includes_required_lifecycle_values",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        85,
+        92
+      ],
+      "summary": "test_category_status_includes_required_lifecycle_values：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kantian_categories.py:test_kantian_category_id_is_persisted_and_usable_for_confirmations",
+      "type": "function",
+      "name": "test_kantian_category_id_is_persisted_and_usable_for_confirmations",
+      "filePath": "tests/test_kantian_categories.py",
+      "lineRange": [
+        95,
+        132
+      ],
+      "summary": "test_kantian_category_id_is_persisted_and_usable_for_confirmations：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_universalization_gate.py",
+      "type": "file",
+      "name": "test_universalization_gate.py",
+      "filePath": "tests/test_universalization_gate.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_decision_vocabulary_includes_defer",
+      "type": "function",
+      "name": "test_decision_vocabulary_includes_defer",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        7,
+        11
+      ],
+      "summary": "test_decision_vocabulary_includes_defer：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_blocks_universalized_deceptive_suggestions",
+      "type": "function",
+      "name": "test_blocks_universalized_deceptive_suggestions",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        14,
+        24
+      ],
+      "summary": "test_blocks_universalized_deceptive_suggestions：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_defers_decision_deferred_or_high_risk_author_input_needed",
+      "type": "function",
+      "name": "test_defers_decision_deferred_or_high_risk_author_input_needed",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        27,
+        48
+      ],
+      "summary": "test_defers_decision_deferred_or_high_risk_author_input_needed：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_allows_bounded_non_deceptive_action_labels",
+      "type": "function",
+      "name": "test_allows_bounded_non_deceptive_action_labels",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        51,
+        60
+      ],
+      "summary": "test_allows_bounded_non_deceptive_action_labels：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_warns_for_unrecognized_or_partial_actions",
+      "type": "function",
+      "name": "test_warns_for_unrecognized_or_partial_actions",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        63,
+        73
+      ],
+      "summary": "test_warns_for_unrecognized_or_partial_actions：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_universalization_gate.py:test_does_not_block_when_overstatement_is_only_diagnostic_context",
+      "type": "function",
+      "name": "test_does_not_block_when_overstatement_is_only_diagnostic_context",
+      "filePath": "tests/test_universalization_gate.py",
+      "lineRange": [
+        76,
+        90
+      ],
+      "summary": "test_does_not_block_when_overstatement_is_only_diagnostic_context：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_forgetting_regeneration.py",
+      "type": "file",
+      "name": "test_forgetting_regeneration.py",
+      "filePath": "tests/test_forgetting_regeneration.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_forgetting_regeneration.py:test_regenerates_derived_forgettable_candidates_from_structural_patterns",
+      "type": "function",
+      "name": "test_regenerates_derived_forgettable_candidates_from_structural_patterns",
+      "filePath": "tests/test_forgetting_regeneration.py",
+      "lineRange": [
+        6,
+        36
+      ],
+      "summary": "test_regenerates_derived_forgettable_candidates_from_structural_patterns：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_forgetting_regeneration.py:test_blocks_concrete_forgotten_memory_classes_without_reconstructing_content",
+      "type": "function",
+      "name": "test_blocks_concrete_forgotten_memory_classes_without_reconstructing_content",
+      "filePath": "tests/test_forgetting_regeneration.py",
+      "lineRange": [
+        39,
+        76
+      ],
+      "summary": "test_blocks_concrete_forgotten_memory_classes_without_reconstructing_content：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_reflective_judgment.py",
+      "type": "file",
+      "name": "test_reflective_judgment.py",
+      "filePath": "tests/test_reflective_judgment.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_reflective_judgment.py:test_low_similarity_defers_decision_and_drafts_unverified_category",
+      "type": "function",
+      "name": "test_low_similarity_defers_decision_and_drafts_unverified_category",
+      "filePath": "tests/test_reflective_judgment.py",
+      "lineRange": [
+        5,
+        25
+      ],
+      "summary": "test_low_similarity_defers_decision_and_drafts_unverified_category：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_reflective_judgment.py:test_high_similarity_uses_determining_judgment_without_inventing_category",
+      "type": "function",
+      "name": "test_high_similarity_uses_determining_judgment_without_inventing_category",
+      "filePath": "tests/test_reflective_judgment.py",
+      "lineRange": [
+        28,
+        46
+      ],
+      "summary": "test_high_similarity_uses_determining_judgment_without_inventing_category：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_ethics_audit_chain.py",
+      "type": "file",
+      "name": "test_ethics_audit_chain.py",
+      "filePath": "tests/test_ethics_audit_chain.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_surfaces_required_event_classes",
+      "type": "function",
+      "name": "test_ethics_audit_chain_surfaces_required_event_classes",
+      "filePath": "tests/test_ethics_audit_chain.py",
+      "lineRange": [
+        4,
+        49
+      ],
+      "summary": "test_ethics_audit_chain_surfaces_required_event_classes：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_can_derive_forgetting_runtime_from_reset_scope",
+      "type": "function",
+      "name": "test_ethics_audit_chain_can_derive_forgetting_runtime_from_reset_scope",
+      "filePath": "tests/test_ethics_audit_chain.py",
+      "lineRange": [
+        52,
+        67
+      ],
+      "summary": "test_ethics_audit_chain_can_derive_forgetting_runtime_from_reset_scope：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tests/test_kant_machine_workflow.py",
+      "type": "file",
+      "name": "test_kant_machine_workflow.py",
+      "filePath": "tests/test_kant_machine_workflow.py",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kant_machine_workflow.py:test_cli_parser_accepts_kant_machine_flags",
+      "type": "function",
+      "name": "test_cli_parser_accepts_kant_machine_flags",
+      "filePath": "tests/test_kant_machine_workflow.py",
+      "lineRange": [
+        10,
+        29
+      ],
+      "summary": "test_cli_parser_accepts_kant_machine_flags：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kant_machine_workflow.py:test_workflow_surfaces_kant_machine_runtime",
+      "type": "function",
+      "name": "test_workflow_surfaces_kant_machine_runtime",
+      "filePath": "tests/test_kant_machine_workflow.py",
+      "lineRange": [
+        32,
+        64
+      ],
+      "summary": "test_workflow_surfaces_kant_machine_runtime：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kant_machine_workflow.py:test_final_report_markdown_contains_kant_machine_sections",
+      "type": "function",
+      "name": "test_final_report_markdown_contains_kant_machine_sections",
+      "filePath": "tests/test_kant_machine_workflow.py",
+      "lineRange": [
+        67,
+        97
+      ],
+      "summary": "test_final_report_markdown_contains_kant_machine_sections：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tests/test_kant_machine_workflow.py:test_universalization_block_updates_top_level_package_readiness",
+      "type": "function",
+      "name": "test_universalization_block_updates_top_level_package_readiness",
+      "filePath": "tests/test_kant_machine_workflow.py",
+      "lineRange": [
+        100,
+        143
+      ],
+      "summary": "test_universalization_block_updates_top_level_package_readiness：Kant Machine / RebuttalLens 结构化能力的一部分。",
+      "tags": [],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:examples/rebuttal_lens_deepseek_full_demo/DEEPSEEK_V8_KANT_MACHINE_FULL_RUN_REPORT_zh.md",
+      "type": "file",
+      "name": "DEEPSEEK_V8_KANT_MACHINE_FULL_RUN_REPORT_zh.md",
+      "filePath": "examples/rebuttal_lens_deepseek_full_demo/DEEPSEEK_V8_KANT_MACHINE_FULL_RUN_REPORT_zh.md",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "RebuttalLens"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:examples/rebuttal_lens_deepseek_full_demo/output_v8_kant_machine_full/final_user_report.md",
+      "type": "file",
+      "name": "final_user_report.md",
+      "filePath": "examples/rebuttal_lens_deepseek_full_demo/output_v8_kant_machine_full/final_user_report.md",
+      "summary": "Kant Machine Organic RebuttalLens 相关文件。",
+      "tags": [
+        "康德机器",
+        "伦理审计",
+        "主动遗忘"
+      ],
+      "complexity": "moderate"
     }
   ],
   "edges": [
     {
-      "source": "document:README.md",
-      "target": "concept:active_forgetting_runtime",
-      "type": "documents",
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:compose_final_user_report",
+      "type": "contains",
       "direction": "forward",
-      "description": "README 解释主动遗忘 runtime 的用户入口。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "document:UPGRADE.md",
-      "target": "concept:active_forgetting_runtime",
-      "type": "documents",
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
+      "type": "contains",
       "direction": "forward",
-      "description": "UPGRADE 记录主动遗忘 runtime 的升级内容。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "documents",
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:write_final_user_report",
+      "type": "contains",
       "direction": "forward",
-      "description": "实施计划定义不可逆遗忘声明。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
-      "target": "concept:three_supplemental_acceptance_gates",
-      "type": "defines_acceptance_gate",
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_output_for",
+      "type": "contains",
       "direction": "forward",
-      "description": "实施计划把三点补充落地要求提升为硬性验收门。",
-      "weight": 0.95
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_as_list",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_dict_items",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_as_dict",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_as_string_list",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_select_for_concern",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_find_exact_match",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_clean_match_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_safe_language_for",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_unsafe_language_for",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_build_outline",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_build_universalization_checks",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_overall_package_readiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_build_executive_summary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_responsible_use_warnings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_memory_ethics_boundary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_memory_passport",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_forgetting_ledger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_irreversible_forgetting_statement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_dedupe_strings",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/final_report.py",
+      "target": "function:src/peer_review_skills/agents/final_report.py:_string_value",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:regeneration_safe_forgetting_events",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
     },
     {
       "source": "file:src/peer_review_skills/agents/memory_ethics.py",
       "target": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
       "type": "contains",
       "direction": "forward",
-      "description": "文件包含 runtime builder。",
       "weight": 1
     },
     {
@@ -304,258 +1927,739 @@
       "target": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
       "type": "contains",
       "direction": "forward",
-      "description": "文件包含运行时记忆过滤器。",
       "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-      "target": "concept:memory_passport",
-      "type": "produces",
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:_normalize_policy",
+      "type": "contains",
       "direction": "forward",
-      "description": "生成 memory_passport。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-      "target": "concept:forgetting_ledger",
-      "type": "produces",
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:_forgotten_classes",
+      "type": "contains",
       "direction": "forward",
-      "description": "生成 forgetting_ledger。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "defines_schema",
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:_forget_event",
+      "type": "contains",
       "direction": "forward",
-      "description": "runtime builder 定义不可逆遗忘声明。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "implements",
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:_drop_forgotten_memory_classes",
+      "type": "contains",
       "direction": "forward",
-      "description": "过滤器落实不可逆遗忘边界。",
-      "weight": 0.9
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/memory_ethics.py",
+      "target": "function:src/peer_review_skills/agents/memory_ethics.py:_contains_forgotten_memory_class",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
     },
     {
       "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
-      "target": "file:src/peer_review_skills/agents/memory_ethics.py",
-      "type": "imports",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:run_rebuttal_lens_workflow",
+      "type": "contains",
       "direction": "forward",
-      "description": "工作流调用记忆伦理 runtime。",
-      "weight": 0.7
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
-      "target": "concept:memory_passport",
-      "type": "writes_to",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_trace",
+      "type": "contains",
       "direction": "forward",
-      "description": "trace metadata 写入记忆护照。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
-      "target": "concept:forgetting_ledger",
-      "type": "writes_to",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_dag_trace",
+      "type": "contains",
       "direction": "forward",
-      "description": "trace metadata 写入遗忘账本。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "writes_to",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_dag_trace_from_graph_trace",
+      "type": "contains",
       "direction": "forward",
-      "description": "trace metadata 写入不可逆遗忘声明。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "file:src/peer_review_skills/agents/final_report.py",
-      "target": "concept:memory_passport",
-      "type": "renders",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata",
+      "type": "contains",
       "direction": "forward",
-      "description": "最终报告渲染记忆护照。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "file:src/peer_review_skills/agents/final_report.py",
-      "target": "concept:forgetting_ledger",
-      "type": "renders",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_responsible_use_boundary",
+      "type": "contains",
       "direction": "forward",
-      "description": "最终报告渲染遗忘账本。",
-      "weight": 0.8
+      "weight": 1
     },
     {
-      "source": "file:src/peer_review_skills/agents/final_report.py",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "renders",
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_as_forget_scope",
+      "type": "contains",
       "direction": "forward",
-      "description": "最终报告渲染不可逆遗忘声明。",
-      "weight": 0.8
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_rebuttal_lens_memory_ethics_boundary",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:load_rebuttal_lens_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_create_optional_rebuttal_lens_agents",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_build_rebuttal_lens_node_inputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_agent_outputs_from_node_outputs",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_merged_rebuttal_lens_config",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_deep_merge_dicts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_parse_simple_yaml",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_parse_simple_yaml_scalar",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_checkpoint_writer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_write_failure_trace",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+      "target": "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_safe_filename",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
     },
     {
       "source": "file:src/peer_review_skills/cli/main.py",
-      "target": "concept:active_forgetting_runtime",
-      "type": "configures",
-      "direction": "forward",
-      "description": "CLI 通过 --memory-policy 与 --forget-scope 配置主动遗忘 runtime。",
-      "weight": 0.7
-    },
-    {
-      "source": "file:tests/test_memory_ethics.py",
-      "target": "file:src/peer_review_skills/agents/memory_ethics.py",
-      "type": "tested_by",
-      "direction": "reverse",
-      "description": "memory_ethics.py 的记忆伦理单测。",
-      "weight": 0.8
-    },
-    {
-      "source": "file:tests/test_rebuttal_lens_workflow.py",
-      "target": "concept:cross_run_author_decision_forgetting_test",
+      "target": "function:src/peer_review_skills/cli/main.py:_require_rebuttal_lens_api_config",
       "type": "contains",
       "direction": "forward",
-      "description": "workflow 测试包含跨运行旧决策不复用断言。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "concept:cross_run_author_decision_forgetting_test",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "validates",
+      "source": "file:src/peer_review_skills/cli/main.py",
+      "target": "function:src/peer_review_skills/cli/main.py:build_parser",
+      "type": "contains",
       "direction": "forward",
-      "description": "跨运行测试验证不可逆遗忘声明不只是文档声明。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "concept:three_supplemental_acceptance_gates",
-      "target": "concept:irreversible_forgetting_statement",
-      "type": "requires",
+      "source": "file:src/peer_review_skills/cli/main.py",
+      "target": "function:src/peer_review_skills/cli/main.py:build_rebuttal_lens_argv",
+      "type": "contains",
       "direction": "forward",
-      "description": "三点验收门要求 trace、final JSON、final Markdown 输出不可逆遗忘声明。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "concept:three_supplemental_acceptance_gates",
-      "target": "concept:cross_run_author_decision_forgetting_test",
-      "type": "requires",
+      "source": "file:src/peer_review_skills/cli/main.py",
+      "target": "function:src/peer_review_skills/cli/main.py:run_rebuttal_lens_cli",
+      "type": "contains",
       "direction": "forward",
-      "description": "三点验收门要求跨运行旧作者决策不复用回归测试。",
-      "weight": 0.9
+      "weight": 1
     },
     {
-      "source": "concept:three_supplemental_acceptance_gates",
-      "target": "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
-      "type": "requires",
+      "source": "file:src/peer_review_skills/cli/main.py",
+      "target": "function:src/peer_review_skills/cli/main.py:main",
+      "type": "contains",
       "direction": "forward",
-      "description": "三点验收门要求 Markdown 报告包含中文伦理解释。",
-      "weight": 0.9
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:_status_or_default",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:_normalize_name",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:_tokens",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:_jaccard_similarity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:category_similarity",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "function:src/peer_review_skills/agents/kantian_categories.py:_category_match_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryStatus",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "class:src/peer_review_skills/agents/kantian_categories.py:Category",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "class:src/peer_review_skills/agents/kantian_categories.py:KantianCategory",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryMatch",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kantian_categories.py",
+      "target": "class:src/peer_review_skills/agents/kantian_categories.py:CategoryRegistry",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "function:src/peer_review_skills/agents/universalization_gate.py:check_universalization",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "function:src/peer_review_skills/agents/universalization_gate.py:_contains_deceptive_suggestion",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "function:src/peer_review_skills/agents/universalization_gate.py:_card_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "function:src/peer_review_skills/agents/universalization_gate.py:_universalized_world",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationDecision",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/universalization_gate.py",
+      "target": "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationResult",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:regenerate_categories_from_forgetting_ledger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_blocked_memory_classes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_candidate_from_safe_event",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_derived_forgettable_status",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_category_name",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_pattern_counts",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+      "target": "function:src/peer_review_skills/agents/forgetting_regeneration.py:_write_registry_candidates",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/reflective_judgment.py",
+      "target": "function:src/peer_review_skills/agents/reflective_judgment.py:judge_reviewer_concern",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/reflective_judgment.py",
+      "target": "function:src/peer_review_skills/agents/reflective_judgment.py:build_reflective_judgment",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/reflective_judgment.py",
+      "target": "function:src/peer_review_skills/agents/reflective_judgment.py:_draft_name",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "target": "function:src/peer_review_skills/agents/ethics_audit_chain.py:build_ethics_audit_chain",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "target": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_mechanical_execution_events",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "target": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_organic_generation_events",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "target": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_attach_card_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+      "target": "function:src/peer_review_skills/agents/ethics_audit_chain.py:_heteronomy_transparency_statement",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+      "target": "function:src/peer_review_skills/agents/kant_machine_runtime.py:build_kant_machine_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+      "target": "function:src/peer_review_skills/agents/kant_machine_runtime.py:attach_kant_machine_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+      "target": "function:src/peer_review_skills/agents/kant_machine_runtime.py:_category_registry_path",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+      "target": "function:src/peer_review_skills/agents/kant_machine_runtime.py:_concern_text",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_category_registry_persists_and_promotes_after_three_independent_confirmations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_record_confirmation_counts_distinct_run_ids_only",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_match_returns_best_approved_category_above_threshold",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_match_ignores_retired_and_forgettable_categories_by_default",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_category_status_includes_required_lifecycle_values",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kantian_categories.py",
+      "target": "function:tests/test_kantian_categories.py:test_kantian_category_id_is_persisted_and_usable_for_confirmations",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_decision_vocabulary_includes_defer",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_blocks_universalized_deceptive_suggestions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_defers_decision_deferred_or_high_risk_author_input_needed",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_allows_bounded_non_deceptive_action_labels",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_warns_for_unrecognized_or_partial_actions",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_universalization_gate.py",
+      "target": "function:tests/test_universalization_gate.py:test_does_not_block_when_overstatement_is_only_diagnostic_context",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_forgetting_regeneration.py",
+      "target": "function:tests/test_forgetting_regeneration.py:test_regenerates_derived_forgettable_candidates_from_structural_patterns",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_forgetting_regeneration.py",
+      "target": "function:tests/test_forgetting_regeneration.py:test_blocks_concrete_forgotten_memory_classes_without_reconstructing_content",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_reflective_judgment.py",
+      "target": "function:tests/test_reflective_judgment.py:test_low_similarity_defers_decision_and_drafts_unverified_category",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_reflective_judgment.py",
+      "target": "function:tests/test_reflective_judgment.py:test_high_similarity_uses_determining_judgment_without_inventing_category",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ethics_audit_chain.py",
+      "target": "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_surfaces_required_event_classes",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_ethics_audit_chain.py",
+      "target": "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_can_derive_forgetting_runtime_from_reset_scope",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kant_machine_workflow.py",
+      "target": "function:tests/test_kant_machine_workflow.py:test_cli_parser_accepts_kant_machine_flags",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kant_machine_workflow.py",
+      "target": "function:tests/test_kant_machine_workflow.py:test_workflow_surfaces_kant_machine_runtime",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kant_machine_workflow.py",
+      "target": "function:tests/test_kant_machine_workflow.py:test_final_report_markdown_contains_kant_machine_sections",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
+    },
+    {
+      "source": "file:tests/test_kant_machine_workflow.py",
+      "target": "function:tests/test_kant_machine_workflow.py:test_universalization_block_updates_top_level_package_readiness",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1
     }
   ],
   "layers": [
     {
-      "id": "layer:docs",
-      "name": "文档与计划",
-      "description": "README、UPGRADE 与 superpowers plan 对主动遗忘的说明。",
-      "nodeIds": [
-        "document:README.md",
-        "document:UPGRADE.md",
-        "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
-        "concept:three_supplemental_acceptance_gates"
-      ]
+      "id": "input",
+      "name": "输入与证据层",
+      "summary": "reviewer comment、manuscript excerpt、retrieved cases 和 evidence map。",
+      "nodeIds": []
     },
     {
-      "id": "layer:runtime",
-      "name": "主动遗忘 runtime",
-      "description": "memory_ethics.py 与 workflow metadata 的遗忘机制。",
-      "nodeIds": [
-        "file:src/peer_review_skills/agents/memory_ethics.py",
-        "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-        "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory",
-        "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
-        "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:_with_rebuttal_lens_trace_metadata"
-      ]
+      "id": "workflow",
+      "name": "DAG 与策略层",
+      "summary": "RebuttalLens DAG、committee、strategy tournament 和 final report。",
+      "nodeIds": []
     },
     {
-      "id": "layer:reporting-cli",
-      "name": "报告与 CLI",
-      "description": "final_report 与 CLI 暴露记忆伦理控制和用户可见说明。",
+      "id": "kant_runtime",
+      "name": "康德机器运行层",
+      "summary": "范畴注册表、反思性判断、可普遍化 gate、遗忘再生和伦理审计链。",
       "nodeIds": [
-        "file:src/peer_review_skills/agents/final_report.py",
-        "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
-        "file:src/peer_review_skills/cli/main.py"
-      ]
-    },
-    {
-      "id": "layer:tests",
-      "name": "测试",
-      "description": "覆盖 memory ethics、跨运行旧决策不复用和 CLI 参数。",
-      "nodeIds": [
-        "file:tests/test_memory_ethics.py",
-        "file:tests/test_rebuttal_lens_workflow.py",
-        "concept:cross_run_author_decision_forgetting_test"
-      ]
-    },
-    {
-      "id": "layer:concepts",
-      "name": "核心概念",
-      "description": "主动遗忘机制的关键概念。",
-      "nodeIds": [
-        "concept:active_forgetting_runtime",
-        "concept:memory_passport",
-        "concept:forgetting_ledger",
-        "concept:irreversible_forgetting_statement",
-        "concept:three_supplemental_acceptance_gates"
+        "file:src/peer_review_skills/agents/kantian_categories.py",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_status_or_default",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_normalize_name",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_tokens",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_jaccard_similarity",
+        "function:src/peer_review_skills/agents/kantian_categories.py:category_similarity",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_category_match_text",
+        "class:src/peer_review_skills/agents/kantian_categories.py:CategoryStatus",
+        "class:src/peer_review_skills/agents/kantian_categories.py:Category",
+        "class:src/peer_review_skills/agents/kantian_categories.py:KantianCategory",
+        "class:src/peer_review_skills/agents/kantian_categories.py:CategoryMatch",
+        "class:src/peer_review_skills/agents/kantian_categories.py:CategoryRegistry",
+        "file:src/peer_review_skills/agents/universalization_gate.py",
+        "function:src/peer_review_skills/agents/universalization_gate.py:check_universalization",
+        "function:src/peer_review_skills/agents/universalization_gate.py:_contains_deceptive_suggestion",
+        "function:src/peer_review_skills/agents/universalization_gate.py:_card_text",
+        "function:src/peer_review_skills/agents/universalization_gate.py:_universalized_world",
+        "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationDecision",
+        "class:src/peer_review_skills/agents/universalization_gate.py:UniversalizationResult",
+        "file:src/peer_review_skills/agents/forgetting_regeneration.py",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:regenerate_categories_from_forgetting_ledger",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_blocked_memory_classes",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_candidate_from_safe_event",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_derived_forgettable_status",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_category_name",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_pattern_counts",
+        "function:src/peer_review_skills/agents/forgetting_regeneration.py:_write_registry_candidates",
+        "file:src/peer_review_skills/agents/reflective_judgment.py",
+        "function:src/peer_review_skills/agents/reflective_judgment.py:judge_reviewer_concern",
+        "function:src/peer_review_skills/agents/reflective_judgment.py:build_reflective_judgment",
+        "function:src/peer_review_skills/agents/reflective_judgment.py:_draft_name",
+        "file:src/peer_review_skills/agents/ethics_audit_chain.py",
+        "function:src/peer_review_skills/agents/ethics_audit_chain.py:build_ethics_audit_chain",
+        "function:src/peer_review_skills/agents/ethics_audit_chain.py:_mechanical_execution_events",
+        "function:src/peer_review_skills/agents/ethics_audit_chain.py:_organic_generation_events",
+        "function:src/peer_review_skills/agents/ethics_audit_chain.py:_attach_card_context",
+        "function:src/peer_review_skills/agents/ethics_audit_chain.py:_heteronomy_transparency_statement",
+        "file:src/peer_review_skills/agents/kant_machine_runtime.py",
+        "function:src/peer_review_skills/agents/kant_machine_runtime.py:build_kant_machine_runtime",
+        "function:src/peer_review_skills/agents/kant_machine_runtime.py:attach_kant_machine_runtime",
+        "function:src/peer_review_skills/agents/kant_machine_runtime.py:_category_registry_path",
+        "function:src/peer_review_skills/agents/kant_machine_runtime.py:_concern_text",
+        "file:tests/test_kantian_categories.py",
+        "function:tests/test_kantian_categories.py:test_category_registry_persists_and_promotes_after_three_independent_confirmations",
+        "function:tests/test_kantian_categories.py:test_record_confirmation_counts_distinct_run_ids_only",
+        "function:tests/test_kantian_categories.py:test_match_returns_best_approved_category_above_threshold",
+        "function:tests/test_kantian_categories.py:test_match_ignores_retired_and_forgettable_categories_by_default",
+        "function:tests/test_kantian_categories.py:test_category_status_includes_required_lifecycle_values",
+        "function:tests/test_kantian_categories.py:test_kantian_category_id_is_persisted_and_usable_for_confirmations",
+        "file:tests/test_universalization_gate.py",
+        "function:tests/test_universalization_gate.py:test_decision_vocabulary_includes_defer",
+        "function:tests/test_universalization_gate.py:test_blocks_universalized_deceptive_suggestions",
+        "function:tests/test_universalization_gate.py:test_defers_decision_deferred_or_high_risk_author_input_needed",
+        "function:tests/test_universalization_gate.py:test_allows_bounded_non_deceptive_action_labels",
+        "function:tests/test_universalization_gate.py:test_warns_for_unrecognized_or_partial_actions",
+        "function:tests/test_universalization_gate.py:test_does_not_block_when_overstatement_is_only_diagnostic_context",
+        "file:tests/test_forgetting_regeneration.py",
+        "function:tests/test_forgetting_regeneration.py:test_regenerates_derived_forgettable_candidates_from_structural_patterns",
+        "function:tests/test_forgetting_regeneration.py:test_blocks_concrete_forgotten_memory_classes_without_reconstructing_content",
+        "file:tests/test_reflective_judgment.py",
+        "function:tests/test_reflective_judgment.py:test_low_similarity_defers_decision_and_drafts_unverified_category",
+        "function:tests/test_reflective_judgment.py:test_high_similarity_uses_determining_judgment_without_inventing_category",
+        "file:tests/test_ethics_audit_chain.py",
+        "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_surfaces_required_event_classes",
+        "function:tests/test_ethics_audit_chain.py:test_ethics_audit_chain_can_derive_forgetting_runtime_from_reset_scope"
       ]
     }
   ],
   "tour": [
     {
-      "order": 1,
-      "title": "从 README 理解边界",
-      "description": "先看 README 中的 Memory Ethics Boundary 和主动遗忘说明。",
+      "title": "从 workflow 接入开始",
+      "description": "先看 rebuttal_lens_workflow.py 如何附加 kant_machine_runtime。",
       "nodeIds": [
-        "document:README.md",
-        "concept:active_forgetting_runtime"
+        "file:src/peer_review_skills/agents/rebuttal_lens_workflow.py",
+        "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:run_rebuttal_lens_workflow",
+        "function:src/peer_review_skills/agents/rebuttal_lens_workflow.py:execute_rebuttal_lens_trace"
       ]
     },
     {
-      "order": 2,
-      "title": "查看三点验收门",
-      "description": "实施计划把不可逆遗忘声明、跨运行旧决策不复用、中文伦理解释设为硬性验收门。",
+      "title": "理解康德机器核心模块",
+      "description": "依次看 category registry、universalization gate、reflective judgment 和 ethics audit chain。",
       "nodeIds": [
-        "document:docs/superpowers/plans/2026-06-06-agent-forgetting-ethics-runtime-plan.md",
-        "concept:three_supplemental_acceptance_gates"
+        "file:src/peer_review_skills/agents/kantian_categories.py",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_status_or_default",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_normalize_name",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_tokens",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_jaccard_similarity",
+        "function:src/peer_review_skills/agents/kantian_categories.py:category_similarity",
+        "function:src/peer_review_skills/agents/kantian_categories.py:_category_match_text",
+        "class:src/peer_review_skills/agents/kantian_categories.py:CategoryStatus"
       ]
     },
     {
-      "order": 3,
-      "title": "进入主动遗忘 runtime",
-      "description": "查看 memory_ethics.py 如何生成 memory_passport、forgetting_ledger 并过滤旧作者决策。",
-      "nodeIds": [
-        "file:src/peer_review_skills/agents/memory_ethics.py",
-        "function:src/peer_review_skills/agents/memory_ethics.py:build_memory_ethics_runtime",
-        "function:src/peer_review_skills/agents/memory_ethics.py:filter_runtime_memory"
-      ]
-    },
-    {
-      "order": 4,
-      "title": "查看 final report 输出",
-      "description": "final report 输出 memory passport、不可逆遗忘声明、遗忘账本和中文伦理解释。",
+      "title": "检查最终作者报告",
+      "description": "最后看 final_report.py 如何把 Kant runtime 渲染进 JSON 和中文 Markdown。",
       "nodeIds": [
         "file:src/peer_review_skills/agents/final_report.py",
-        "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown"
-      ]
-    },
-    {
-      "order": 5,
-      "title": "验证旧决策不复用",
-      "description": "测试证明旧作者选择不会成为下一轮默认答案。",
-      "nodeIds": [
-        "file:tests/test_memory_ethics.py",
-        "file:tests/test_rebuttal_lens_workflow.py",
-        "concept:cross_run_author_decision_forgetting_test"
+        "function:src/peer_review_skills/agents/final_report.py:compose_final_user_report",
+        "function:src/peer_review_skills/agents/final_report.py:render_final_user_report_markdown",
+        "function:src/peer_review_skills/agents/final_report.py:write_final_user_report",
+        "function:src/peer_review_skills/agents/final_report.py:_output_for"
       ]
     }
-  ]
+  ],
+  "kind": "knowledge-graph"
 }

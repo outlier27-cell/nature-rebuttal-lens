@@ -1,0 +1,2276 @@
+{
+  "trace_id": "rebuttal_lens_dag_rebuttal_lens_user_case",
+  "query_unit_id": "rebuttal_lens_user_case",
+  "agent_intermediate_outputs": {
+    "manuscript_context_extractor": {
+      "manuscript_context_note": {
+        "mode": "manuscript_aware",
+        "usable_sections": [
+          "section_002",
+          "section_003",
+          "section_004",
+          "section_005",
+          "section_006",
+          "section_007",
+          "section_008"
+        ],
+        "limits": [
+          "No full manuscript text provided, only section previews. The 'Data' section preview is truncated. The 'Manuscript Excerpt' section is empty. Cannot locate specific textual evidence for claims about experiments, results, or methods details."
+        ]
+      },
+      "section_inventory": [
+        {
+          "section_id": "section_002",
+          "heading": "Title",
+          "evidence_role": "States the paper's core topic: modeling review-response interactions from transparent peer review."
+        },
+        {
+          "section_id": "section_003",
+          "heading": "Abstract",
+          "evidence_role": "Summarizes the framework (ReviewNet), its application (Nature-family corpus), and key claimed results (improved macro-F1, structured rebuttal plans)."
+        },
+        {
+          "section_id": "section_004",
+          "heading": "Data",
+          "evidence_role": "Describes the corpus source (Nature-family transparent reviews), data structure (review interaction units), and split method (random paper-level). Text is truncated."
+        },
+        {
+          "section_id": "section_005",
+          "heading": "Methods",
+          "evidence_role": "Outlines the high-level pipeline of ReviewNet (extract concerns, classify risk, retrieve analogies, plan actions, draft outline) and its role as an assistant."
+        },
+        {
+          "section_id": "section_006",
+          "heading": "Results",
+          "evidence_role": "Reports specific performance metrics (macro-F1 improvement from 0.51 to 0.62) and a model-assisted evaluation outcome. Explicitly states a temporal split experiment has not been reported."
+        },
+        {
+          "section_id": "section_007",
+          "heading": "Limitations",
+          "evidence_role": "Acknowledges potential topical clustering in splits, lack of temporal split evaluation, and dataset incompleteness (response-only/review-only records)."
+        },
+        {
+          "section_id": "section_008",
+          "heading": "Planned Additional Analysis",
+          "evidence_role": "Describes potential future work (temporal split, stricter near-duplicate removal) that has not been completed."
+        }
+      ],
+      "author_confirmation_questions": [
+        "Can you confirm the exact composition and size of the 'curated Nature-family corpus' mentioned in the Abstract and Data sections?",
+        "The Methods section preview describes a pipeline. Are there specific model architectures, training procedures, or hyperparameters detailed in the full manuscript?",
+        "The Results mention a 'small model-assisted evaluation' for concern coverage. What was the evaluation protocol and what were the specific results?",
+        "The Limitations section mentions related papers sharing language patterns. Was any analysis done to quantify this potential clustering in the current random split?"
+      ],
+      "reasoning": "The provided context consists of section previews, not the full manuscript. Therefore, while the mode is 'manuscript_aware', the ability to locate specific textual evidence is severely limited to these summaries. The 'Data' section is truncated, and the 'Manuscript Excerpt' section is empty, offering no usable evidence. The previews allow for a high-level inventory of what each section discusses and its potential role as evidence, but detailed claims about experiments, results, or methods cannot be verified or extracted from this input. Several critical details are explicitly stated as absent (e.g., temporal split results). Author confirmation is required for any specific evidence beyond the general topics listed in the previews."
+    },
+    "reviewer_understanding_agent": {
+      "concern_map": [
+        {
+          "concern_id": "R2.1",
+          "severity": "major",
+          "category": "methodological",
+          "concern_type": "experimental_design",
+          "surface_request": "Provide a transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether reported gains remain when near-duplicate review-response pairs are removed.",
+          "text_evidence": "The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits. The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+          "confidence": "high"
+        },
+        {
+          "concern_id": "R2.2",
+          "severity": "major",
+          "category": "evidence_interpretation",
+          "concern_type": "generalization_scope",
+          "surface_request": "Clarify whether the central claim that the method generalizes across peer-review contexts is overstated.",
+          "text_evidence": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+          "confidence": "high"
+        }
+      ],
+      "reasoning": "The reviewer explicitly questions the experimental design regarding data splits and temporal leakage, which maps to 'experimental_design'. The reviewer also directly states that the generalization claim is overstated without these fixes, which maps to 'generalization_scope'. The reviewer's tone indicates these are major concerns about evidence adequacy, not just wording."
+    },
+    "manuscript_evidence_locator": {
+      "manuscript_evidence_map": [
+        {
+          "concern_id": "R2.1",
+          "status": "partially_supported",
+          "section_id": "section_004",
+          "evidence_refs": [
+            "section_004",
+            "section_007",
+            "section_008"
+          ],
+          "evidence_anchor": "section_004",
+          "text_evidence": "We split the available interaction units into train, validation, and test partitions at the paper level. The current draft uses a random paper-level 80/10/10 split. We remove exact duplicate interaction units using normalized text hashes before model evaluation.",
+          "gap": "The manuscript does not explain how temporal leakage was avoided. It acknowledges potential topical clustering across splits and explicitly states a temporal split experiment has not been reported. It also states stricter near-duplicate removal (e.g., MinHash) has not been completed."
+        },
+        {
+          "concern_id": "R2.2",
+          "status": "supported",
+          "section_id": "section_007",
+          "evidence_refs": [
+            "section_006",
+            "section_007"
+          ],
+          "evidence_anchor": "section_007",
+          "text_evidence": "We have not yet reported a temporal split experiment in the submitted draft. The current version may still contain topical clustering across splits... We do not yet quantify robustness under a temporally held-out split.",
+          "gap": "The manuscript explicitly states the lack of temporal split evaluation and acknowledges potential topical clustering, which directly supports the concern that the generalization claim may be overstated without these checks."
+        }
+      ],
+      "evidence_gaps": [
+        "No evidence for how temporal leakage was avoided in split construction.",
+        "No evidence for whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+        "No evidence for robustness checks under a temporally held-out split.",
+        "No evidence for whether reported gains remain after stricter near-duplicate removal (beyond exact duplicates)."
+      ],
+      "author_confirmation_questions": [
+        "Can you confirm the exact composition and size of the 'curated Nature-family corpus' mentioned in the Abstract and Data sections?",
+        "The Methods section preview describes a pipeline. Are there specific model architectures, training procedures, or hyperparameters detailed in the full manuscript?",
+        "The Results mention a 'small model-assisted evaluation' for concern coverage. What was the evaluation protocol and what were the specific results?",
+        "The Limitations section mentions related papers sharing language patterns. Was any analysis done to quantify this potential clustering in the current random split?"
+      ],
+      "reasoning": "For R2.1, the manuscript partially addresses the concern by describing a random paper-level split and removal of exact duplicates, but it explicitly lacks details on temporal leakage, robustness checks, and stricter near-duplicate removal. For R2.2, the manuscript directly supports the concern by stating the lack of temporal split evaluation and acknowledging potential topical clustering, which weakens the generalization claim. All evidence is drawn from supplied section previews."
+    },
+    "tacit_concern_interpreter": {
+      "risk_interpretation": [
+        {
+          "risk_type": "methodological_maturity",
+          "tacit_concern": "evidence_chain_stability",
+          "observable_trace": "The manuscript does not explain how temporal leakage was avoided... It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+          "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+        },
+        {
+          "risk_type": "methodological_maturity",
+          "tacit_concern": "credibility_trust",
+          "observable_trace": "The evaluation design is not yet convincing... Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+          "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+        },
+        {
+          "risk_type": "methodological_maturity",
+          "tacit_concern": "scope_and_claim_boundary",
+          "observable_trace": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+          "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+        },
+        {
+          "risk_type": "methodological_maturity",
+          "tacit_concern": "reproducibility_expectation",
+          "observable_trace": "The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+          "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+        }
+      ],
+      "reasoning": "The reviewer's explicit questions about data splits and temporal leakage signal a tacit concern about the stability of the evidence chain (evidence_chain_stability). The statement that the design is 'not yet convincing' and that claims are 'overstated' signals a concern about the trustworthiness of the claims (credibility_trust) and their proper boundaries (scope_and_claim_boundary). The specific requests for transparency and robustness checks signal an expectation for details that would enable reproducibility (reproducibility_expectation). All these tacit concerns are grounded in the reviewer's focus on methodological rigor, which maps to the risk type 'methodological_maturity'."
+    },
+    "case_retrieval_interpreter": {
+      "case_interpretation": [
+        {
+          "case_id": "nature_case_temporal_split_017",
+          "analogy": "This case is relevant because it directly addresses a reviewer's concern about the validity of an evaluation due to potential data leakage from improper temporal splitting, which mirrors the current reviewer's worry about split construction and temporal leakage.",
+          "transferable_strategy": "The strategy of acknowledging the concern, adding a new temporally held-out analysis, and narrowing the claim's scope based on the new evidence could transfer. This directly addresses the request for robustness checks and transparent split construction.",
+          "boundary": "case analogy only; not outcome prediction"
+        },
+        {
+          "case_id": "nature_case_duplicate_control_044",
+          "analogy": "This case is relevant because it involves a reviewer concern about reproducibility being threatened by near-duplicate data points, analogous to the current request to check if reported gains remain after removing near-duplicate review-response pairs.",
+          "transferable_strategy": "The strategy of adding a deduplication check and explicitly reporting any performance limits or changes discovered could transfer. This provides the requested clarification on the robustness of the gains.",
+          "boundary": "case analogy only; not outcome prediction"
+        },
+        {
+          "case_id": "nature_case_overclaim_092",
+          "analogy": "This case is relevant because it involves a reviewer identifying a risk of overclaiming, which directly parallels the current reviewer's statement that the generalization claim is 'overstated' without the requested methodological fixes.",
+          "transferable_strategy": "The strategy of narrowing the claim's scope until stronger evidence (like the requested robustness checks) is available could transfer. This aligns with the reviewer's call for careful calibration of claims to the evidence.",
+          "boundary": "case analogy only; not outcome prediction"
+        }
+      ],
+      "case_use_boundary": "These retrieved cases may be used as bounded analogies to suggest potential response strategies that have been relevant in similar peer-review contexts concerning methodological rigor, data integrity, and claim calibration. They may NOT be used as rules to predict the outcome of this specific review, nor should they be interpreted as guarantees that the same strategies will satisfy this reviewer. Each case represents a specific historical interaction, not a universal solution.",
+      "reasoning": "The retrieved cases are highly relevant as they each map to a core component of the reviewer's methodological concern: evaluation validity (temporal splits), reproducibility (near-duplicate control), and claim calibration (overclaiming). Together, they form a bounded analogy for a complex review focused on shoring up the evidence chain for a central claim. The transferable strategies from these cases directly address the reviewer's surface requests and underlying concerns about methodological maturity."
+    },
+    "institutional_signal_interpreter": {
+      "institutional_signal_note": [
+        {
+          "institutional_signal": "replicability_norm",
+          "action_link": "The author must revise the manuscript to provide a detailed, transparent account of the data split construction, including measures taken to avoid temporal and cluster-based leakage, to meet the community standard for a replicable and robust evaluation.",
+          "boundary": "Not an acceptance prediction; author judgment required."
+        },
+        {
+          "institutional_signal": "transparency_norm",
+          "action_link": "The author must add the requested robustness checks (e.g., temporally held-out split, analysis with near-duplicates removed) and fully report the results to satisfy the journal's transparency standards for methodological rigor.",
+          "boundary": "Not an acceptance prediction; author judgment required."
+        },
+        {
+          "institutional_signal": "editorial_risk_control",
+          "action_link": "The author must directly and convincingly address the concern about overclaiming generalization. This involves tempering claims if the new analyses weaken them or providing strong evidence to support the original claim, thereby mitigating the editorial risk of publishing an overstated conclusion.",
+          "boundary": "Not an acceptance prediction; author judgment required."
+        }
+      ],
+      "reasoning": "The reviewer's major concerns signal strong institutional norms. The demand for a transparent split construction and robustness checks directly invokes 'replicability_norm' (ensuring the evaluation is sound and repeatable) and 'transparency_norm' (requiring full methodological disclosure). The explicit warning that the central claim is 'overstated' without these fixes signals 'editorial_risk_control', indicating the reviewer/editor sees a risk that must be resolved before the paper meets publication standards. The reviewer's final note about 'evidence adequacy' reinforces that this is a substantive, not presentational, issue."
+    },
+    "evidence_action_planner": {
+      "evidence_action_plan": [
+        {
+          "action_type": "method_clarification",
+          "required_artifact": "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits.",
+          "supporting_case_ids": [
+            "nature_case_temporal_split_017"
+          ],
+          "requires_author_confirmation": true,
+          "nature_action_hint": "CLARIFY_EXISTING",
+          "missing_author_input": [
+            "Specific details on split construction to prevent temporal leakage"
+          ],
+          "evidence_anchor": "section_004"
+        },
+        {
+          "action_type": "new_analysis",
+          "required_artifact": "Results of a robustness check using a temporally held-out split.",
+          "supporting_case_ids": [
+            "nature_case_temporal_split_017"
+          ],
+          "requires_author_confirmation": true,
+          "nature_action_hint": "ACCEPT_ANALYSIS",
+          "missing_author_input": [
+            "Results from a temporally held-out split experiment"
+          ],
+          "evidence_anchor": "section_007"
+        },
+        {
+          "action_type": "new_analysis",
+          "required_artifact": "Analysis showing whether reported performance gains remain after removing near-duplicate review-response pairs (e.g., using MinHash).",
+          "supporting_case_ids": [
+            "nature_case_duplicate_control_044"
+          ],
+          "requires_author_confirmation": true,
+          "nature_action_hint": "ACCEPT_ANALYSIS",
+          "missing_author_input": [
+            "Performance results after stricter near-duplicate removal"
+          ],
+          "evidence_anchor": "section_004"
+        },
+        {
+          "action_type": "claim_narrowing",
+          "required_artifact": "Revised text in the abstract, results, and discussion to calibrate the generalization claim based on the new robustness checks and clarified methodology.",
+          "supporting_case_ids": [
+            "nature_case_overclaim_092",
+            "nature_case_temporal_split_017"
+          ],
+          "requires_author_confirmation": true,
+          "nature_action_hint": "SOFTEN_CLAIM",
+          "missing_author_input": [
+            "Revised claim text reflecting the scope of evidence"
+          ],
+          "evidence_anchor": ""
+        }
+      ],
+      "author_confirmation_questions": [
+        "Can you provide the detailed methodology for constructing the data splits to ensure no temporal leakage?",
+        "Can you perform and report the results of an evaluation using a temporally held-out test split?",
+        "Can you perform and report the results of an analysis that removes near-duplicate pairs (beyond exact duplicates) and shows the impact on performance gains?",
+        "Given the results of the above analyses, are you willing to revise the central claim about generalization across peer-review contexts to be more precise?"
+      ],
+      "reasoning": "The reviewer's major concerns are about methodological transparency (R2.1) and overstatement of claims (R2.2). The manuscript evidence map shows the current draft partially addresses split construction but lacks details on temporal leakage and has not performed the requested robustness checks. Therefore, the plan requires: 1) Clarifying the existing split methodology (method_clarification), 2) Adding the requested new temporal split analysis (new_analysis), 3) Adding the requested near-duplicate removal analysis (new_analysis), and 4) Calibrating the generalization claim based on this new evidence (claim_narrowing). The retrieved cases support these actions. All actions require author confirmation as the needed artifacts (detailed methodology, new results, revised claims) are not currently present in the supplied evidence."
+    },
+    "author_positioning_agent": {
+      "author_positioning": [
+        {
+          "position": "clarify_without_new_work",
+          "stance_boundary": "Offer options for author judgment; do not force concession.",
+          "alternative_positions": [
+            "accept_and_revise",
+            "justify_existing_choice",
+            "partially_concede"
+          ]
+        },
+        {
+          "position": "justify_existing_choice",
+          "stance_boundary": "Offer options for author judgment; do not force concession.",
+          "alternative_positions": [
+            "accept_and_revise",
+            "clarify_without_new_work",
+            "partially_concede"
+          ]
+        }
+      ],
+      "reasoning": "The author's response indicates a willingness to clarify the dataset split methodology, which aligns with 'clarify_without_new_work'. Simultaneously, the author states a belief that the split avoids leakage, which suggests a 'justify_existing_choice' position. The response does not explicitly accept the need for new robustness checks or claim narrowing, leaving those as potential future concessions or points of disagreement."
+    },
+    "claim_committee_reviewer": {
+      "reviewer_role": "claim_calibration",
+      "findings": [
+        {
+          "risk": "overclaiming_risk",
+          "severity": "high",
+          "evidence": "Reviewer states the central claim that the method 'generalizes across peer-review contexts is overstated' without robust evaluation design. Manuscript evidence (section_007) explicitly acknowledges lack of temporal split evaluation and potential topical clustering, directly supporting the concern that the generalization claim exceeds the demonstrated evidence.",
+          "recommendation": "The author must calibrate the generalization claim to match the scope of the current evidence. If new robustness checks (temporal split, near-duplicate removal) are performed, the claim must be revised based on their outcomes. If not, the claim must be narrowed to the specific conditions of the random paper-level split used."
+        },
+        {
+          "risk": "methodological_transparency_risk",
+          "severity": "high",
+          "evidence": "Reviewer requests a 'transparent account of the split construction' and clarification on whether papers from the same issue, cluster, or round can appear across splits. Manuscript evidence (section_004) only states a random paper-level split was used, with no details on temporal ordering, journal issue, or topic cluster isolation. The Limitations section (section_007) acknowledges potential clustering but does not quantify it.",
+          "recommendation": "The author must provide a detailed, transparent description of the split construction protocol in the Methods section, explicitly addressing how temporal leakage was prevented and whether any measures were taken to avoid contamination from related papers (same issue, topic cluster, or review round)."
+        },
+        {
+          "risk": "evidence_adequacy_risk",
+          "severity": "high",
+          "evidence": "Reviewer explicitly requests 'robustness checks under at least one temporally held-out split' and clarification on 'near-duplicate review-response pairs'. Manuscript evidence (section_006, section_007, section_008) confirms these analyses have not been reported or completed. The current results are based solely on a random split with only exact duplicate removal.",
+          "recommendation": "The author must perform and report the requested robustness checks: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash or embedding similarity). The results must be integrated into the manuscript to substantiate or recalibrate the reported gains."
+        },
+        {
+          "risk": "response_credibility_risk",
+          "severity": "medium",
+          "evidence": "Author's response states 'We will clarify the dataset split... and add additional robustness checks' and 'We will also state that our method generalizes across Nature peer-review contexts.' This promises clarification and new analysis but also repeats a broad generalization claim without presenting the supporting evidence requested by the reviewer. The editor's note cautions against expanding claims unless new analyses support them.",
+          "recommendation": "The author's revised response and manuscript must avoid restating the broad generalization claim unless the new robustness checks explicitly support it. The response should focus on committing to the specific methodological clarifications and analyses requested, and the manuscript should present the results neutrally, allowing the evidence to dictate the final claim scope."
+        }
+      ],
+      "author_confirmation_questions": [
+        "Can you provide the specific, detailed protocol used for constructing the train/validation/test splits, including how publication dates were used to prevent temporal leakage and whether papers from the same journal issue or thematic collection were kept within a single split?",
+        "Are you able to perform and report the results of an evaluation using a test set comprised of papers from a later publication period than the training/validation sets (a temporally held-out split)?",
+        "Can you perform and report an analysis that removes near-duplicate review-response pairs (using a method like MinHash with a similarity threshold) and shows the impact on the macro-F1 improvement and other key metrics?",
+        "Based on the outcomes of the above analyses, are you prepared to revise the abstract and discussion to precisely state the conditions under which ReviewNet's improvements are demonstrated, potentially narrowing the claim of 'generalization across peer-review contexts'?"
+      ],
+      "reasoning": "As the claim_calibration lens, my focus is on the alignment between the manuscript's central claims and the evidence presented. The reviewer's concern is fundamentally about overclaiming due to inadequate evaluation design. The manuscript evidence confirms the lack of key robustness checks (temporal split, near-duplicate control) and acknowledges limitations that directly undermine a broad generalization claim. The author's response acknowledges the need for clarification and new checks but also risks prematurely reaffirming the broad claim. Therefore, the findings center on the high risks of overclaiming, methodological opacity, and evidence gaps. The confirmation questions are designed to elicit the specific factual inputs needed to resolve these calibration issues: the exact split methodology, the results of the missing analyses, and the author's willingness to adjust claims based on evidence. The retrieved cases (temporal_split_017, duplicate_control_044, overclaim_092) provide strong analogies for the necessary actions: adding analyses and narrowing claims."
+    },
+    "methodology_committee_reviewer": {
+      "reviewer_role": "Methodology-focused committee lens. Independently inspects the reviewer concern, manuscript evidence, author draft, editor note, retrieved cases, and prior agent outputs. Emphasis on methodological rigor, experimental design, data handling, and claim calibration.",
+      "findings": [
+        {
+          "risk": "High risk of data leakage and overfitting due to inadequate split construction.",
+          "severity": "Major",
+          "evidence": "Reviewer explicitly states the manuscript does not explain how temporal leakage was avoided. Manuscript section_004 states a 'random paper-level 80/10/10 split' but does not detail temporal ordering or clustering prevention. Section_007 acknowledges 'potential topical clustering across splits' and explicitly states 'We do not yet quantify robustness under a temporally held-out split.'",
+          "recommendation": "The author must provide a detailed, transparent account of split construction in the Methods, explicitly addressing temporal ordering, journal issue, topic cluster, and review round separation. A new temporally held-out split analysis must be performed and reported."
+        },
+        {
+          "risk": "High risk that reported performance gains are inflated by near-duplicate examples.",
+          "severity": "Major",
+          "evidence": "Reviewer requests clarification on whether gains remain after removing near-duplicate review-response pairs. Manuscript section_004 states removal of 'exact duplicate interaction units using normalized text hashes' but does not address near-duplicates. Section_008 states a stricter near-duplicate removal step 'has not been completed yet.'",
+          "recommendation": "The author must perform and report a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash or embedding similarity) and show the impact on the reported macro-F1 gains."
+        },
+        {
+          "risk": "High risk of overclaiming generalization beyond the demonstrated evidence.",
+          "severity": "Major",
+          "evidence": "Reviewer states the central claim that the method 'generalizes across peer-review contexts is overstated' without the requested methodological fixes. Manuscript section_003 (Abstract) claims the method improves performance 'on a curated Nature-family corpus' but does not explicitly claim broad generalization. However, the reviewer's interpretation suggests the manuscript's framing may imply broader applicability than the current split design supports. Section_007 directly acknowledges the lack of temporal split evaluation.",
+          "recommendation": "The author must calibrate all claims about generalization in the Abstract, Results, and Discussion to precisely reflect the scope of the evaluation (e.g., 'within a random split of Nature-family reviews' or, after new analyses, 'across temporally held-out Nature-family reviews'). Avoid broad, unsupported generalization language."
+        },
+        {
+          "risk": "Medium risk of insufficient methodological transparency for reproducibility.",
+          "severity": "Moderate",
+          "evidence": "The author's response_text states 'We will clarify the dataset split in the Methods section' and 'add additional robustness checks,' but provides no concrete details. The editor_text reinforces the need to 'directly address' the concerns. The institutional signal interpreter notes strong 'replicability_norm' and 'transparency_norm' expectations.",
+          "recommendation": "The promised clarifications and new analyses must be fully documented in the revised manuscript with sufficient detail (e.g., split criteria, temporal cutoff date, deduplication parameters) to allow replication."
+        }
+      ],
+      "author_confirmation_questions": [
+        "Can you provide the specific, step-by-step procedure used to construct the train/validation/test splits, including how papers were ordered (e.g., by submission date, publication date) and how you ensured no temporal leakage?",
+        "Can you perform the temporally held-out split analysis (as mentioned in section_008) and report the performance metrics (macro-F1, etc.) for ReviewNet and the baseline on this new test set?",
+        "Can you perform the stricter near-duplicate removal analysis (e.g., using MinHash with a defined similarity threshold) and report whether the performance gain of ReviewNet over the baseline changes significantly?",
+        "Based on the results of the above analyses, what specific, evidence-bound claim about the method's generalizability are you prepared to state in the revised abstract and conclusion?"
+      ],
+      "reasoning": "As the methodology lens, my analysis focuses on the structural integrity of the evaluation design. The reviewer's concern is fundamentally methodological: the split construction lacks safeguards against temporal and cluster-based leakage, and the performance evaluation lacks robustness checks. The manuscript evidence confirms these gaps: it describes a random paper-level split but does not detail temporal ordering, and it explicitly states the requested analyses are not yet done. The author's response acknowledges the need for clarification and new checks but is vague. The editor's note and retrieved cases reinforce that these are standard, required fixes for methodological maturity. Therefore, the core findings identify high risks related to data leakage, inflated metrics, and overclaiming. The confirmation questions are designed to elicit the concrete methodological details and new results needed to resolve these risks. The response must move beyond promises to provide specific, verifiable evidence."
+    },
+    "tone_committee_reviewer": {
+      "reviewer_role": "tone_and_interaction",
+      "findings": [
+        {
+          "risk": "overclaim",
+          "severity": "high",
+          "evidence": "The author's response states, 'We will also state that our method generalizes across Nature peer-review contexts.' This directly contradicts the reviewer's core concern that the generalization claim is 'overstated' and the editor's instruction to 'avoid expanding claims unless the additional analyses support them.' The response proposes to assert a broader claim before performing the requested robustness checks.",
+          "recommendation": "The author must remove this statement from the response and commit to revising the manuscript's claims only after the new analyses are complete and support them. The response should explicitly acknowledge that the generalization claim will be calibrated based on the new evidence."
+        },
+        {
+          "risk": "unsupported_commitment",
+          "severity": "medium",
+          "evidence": "The author's response says, 'We will clarify the dataset split in the Methods section and add additional robustness checks.' The manuscript's 'Planned Additional Analysis' section (section_008) explicitly states these analyses 'have not been completed yet.' The response does not clarify whether these checks are now completed or are a promise for future work, creating ambiguity about the evidence state for the revision.",
+          "recommendation": "The author must clarify the status of the robustness checks. If they are not yet performed, the response should explicitly state they will be performed for the revision, and the manuscript will be updated with the results. If they have been performed, the response should summarize the key findings."
+        },
+        {
+          "risk": "excessive_defensiveness",
+          "severity": "low",
+          "evidence": "The author's response includes the phrase, 'and we believe this avoids leakage.' This defensive justification is unnecessary and slightly contradicts the reviewer's identified risk of topical clustering (acknowledged in manuscript section_007). It risks sounding dismissive of the reviewer's specific concern about journal issue or topic cluster leakage.",
+          "recommendation": "Remove the defensive justification ('and we believe...'). Replace it with an acknowledgment of the reviewer's specific point and a commitment to provide the transparent account requested, which will address the concern objectively."
+        },
+        {
+          "risk": "sycophancy",
+          "severity": "low",
+          "evidence": "The response opens with 'We thank the reviewer for this helpful comment.' While polite, in the context of a major methodological concern about evidence adequacy, this phrasing alone may be perceived as perfunctory and not sufficiently engaging with the substance of the critique. The tone lacks the gravity appropriate for addressing a concern about possible overclaiming.",
+          "recommendation": "Maintain politeness but anchor the gratitude to the substance. For example: 'We thank the reviewer for raising these important points about evaluation design and claim calibration.' This directly links the acknowledgment to the core issues."
+        }
+      ],
+      "author_confirmation_questions": [
+        "Given the editor's instruction to avoid expanding claims, will you commit to revising the manuscript's generalization claim (e.g., in the Abstract and Discussion) only after the new robustness analyses are complete and their results are known?",
+        "Can you confirm the current status of the 'additional robustness checks'? Are they planned, in progress, or completed? If completed, what were the key outcomes regarding performance on a temporal split and after near-duplicate removal?",
+        "In your revised Methods section, will you explicitly detail the measures taken (or not taken) to prevent papers from the same journal issue, topic cluster, or review round from appearing in different splits, as the reviewer requested?",
+        "Will you revise the response text to remove the promise to 'state that our method generalizes across Nature peer-review contexts' and replace it with a commitment to evidence-based claim calibration?"
+      ],
+      "reasoning": "My analysis focuses on the tone and interactional risks in the author's draft response. The primary risk is 'overclaim': the author's response paradoxically proposes to reinforce the very claim the reviewer says is overstated, which directly defies the editor's caution. This is a high-risk interactional misstep. The 'unsupported_commitment' risk stems from ambiguity about whether promised analyses are done, which affects the credibility of the revision timeline. The 'excessive_defensiveness' and 'sycophancy' risks are lower severity but indicate a tone that may not adequately signal the author's understanding of the seriousness of the methodological critique. The questions are designed to resolve these specific interactional ambiguities and align the response with the reviewer's and editor's clear expectations for substantive, evidence-led revision rather than assertive restatement."
+    },
+    "committee_meta_reviewer": {
+      "committee_synthesis": {
+        "prioritized_plan": [
+          {
+            "action": "Perform and report the requested robustness checks.",
+            "priority": "highest",
+            "consensus": "All three committee lenses (methodology, claim, tone) identify this as a critical, high-severity risk. The manuscript explicitly states these analyses are not yet done. The reviewer and editor explicitly demand them.",
+            "committee_emphasis": {
+              "methodology": "Essential to address data leakage and inflated metric risks.",
+              "claim": "Required to provide evidence for or against the generalization claim.",
+              "tone": "Necessary to avoid unsupported commitment and align with reviewer/editor expectations."
+            },
+            "specific_subtasks": [
+              "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+              "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+            ]
+          },
+          {
+            "action": "Provide a detailed, transparent account of the data split construction protocol in the Methods section.",
+            "priority": "high",
+            "consensus": "All three lenses agree this is a major requirement for methodological transparency and reproducibility. The current description is insufficient.",
+            "committee_emphasis": {
+              "methodology": "Core to experimental design integrity; must detail temporal ordering and cluster isolation.",
+              "claim": "Necessary to clarify the scope of the evidence and support claim calibration.",
+              "tone": "Directly addresses the reviewer's specific request and demonstrates substantive engagement."
+            },
+            "specific_subtasks": [
+              "Describe the step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+              "Explicitly state whether measures were taken to prevent papers from the same journal issue, topic cluster, or review round from appearing in different splits."
+            ]
+          },
+          {
+            "action": "Calibrate all claims about generalization in the manuscript (Abstract, Results, Discussion) based on the new evidence.",
+            "priority": "high",
+            "consensus": "Methodology and claim lenses strongly emphasize this as a high-risk overclaim. Tone lens flags the author's current response as reinforcing the overclaim.",
+            "committee_emphasis": {
+              "methodology": "Claims must precisely reflect the evaluation scope (e.g., 'within a random split' or 'across temporally held-out reviews').",
+              "claim": "The central claim is currently overstated; must be narrowed to match demonstrated evidence.",
+              "tone": "Must avoid restating broad generalization prematurely; commit to evidence-based revision."
+            },
+            "specific_subtasks": [
+              "Revise the Abstract to state the conditions of the evaluation clearly.",
+              "Update the Results and Discussion to reflect performance on the new robustness checks and discuss limitations.",
+              "Remove or qualify any language implying broad generalization across peer-review contexts unless explicitly supported by new analyses."
+            ]
+          },
+          {
+            "action": "Revise the author response text to align with the above actions and avoid interactional risks.",
+            "priority": "medium",
+            "consensus": "Tone lens identifies specific high and medium risks in the draft response. Methodology and claim lenses support the need for a credible, evidence-focused response.",
+            "committee_emphasis": {
+              "methodology": "Response should commit to providing concrete methodological details and new results.",
+              "claim": "Response should not repeat the broad generalization claim; should focus on evidence-based calibration.",
+              "tone": "Must remove the overclaim statement, clarify the status of robustness checks, and adopt a substantive, cooperative tone."
+            },
+            "specific_subtasks": [
+              "Remove the line: 'We will also state that our method generalizes across Nature peer-review contexts.'",
+              "Clarify whether the robustness checks are planned, in progress, or completed, and summarize key outcomes if available.",
+              "Replace defensive justification ('and we believe this avoids leakage') with an acknowledgment of the reviewer's point and a commitment to provide the transparent account.",
+              "Anchor gratitude to the substance of the critique (e.g., '...for raising these important points about evaluation design...')."
+            ]
+          }
+        ],
+        "preserved_disagreement": {
+          "note": "No fundamental disagreement on required actions. Differences are in emphasis and framing.",
+          "methodology_vs_claim": "Methodology lens emphasizes the structural integrity of the experimental design as the primary issue. Claim lens frames the same issues as risks to the credibility and scope of the central claim. Both agree on the same corrective actions.",
+          "tone_vs_others": "Tone lens uniquely highlights the interactional risks in the author's draft response (overclaim, unsupported commitment), which the other lenses do not explicitly address. However, the recommended actions from methodology and claim lenses inherently mitigate these tone risks if followed."
+        }
+      },
+      "author_confirmation_questions": [
+        {
+          "question": "Can you perform and report the results of the two specific robustness checks requested by the reviewer: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+          "purpose": "To confirm the feasibility and timeline for obtaining the core missing evidence. This directly addresses the highest priority action.",
+          "committee_source": [
+            "methodology",
+            "claim",
+            "tone"
+          ]
+        },
+        {
+          "question": "Can you provide the detailed, step-by-step protocol for constructing the train/validation/test splits, including how papers were ordered (e.g., by publication date) and whether any measures were taken to isolate papers from the same journal issue, topic cluster, or review round?",
+          "purpose": "To obtain the specific methodological details needed for transparent reporting in the revised Methods section.",
+          "committee_source": [
+            "methodology",
+            "claim"
+          ]
+        },
+        {
+          "question": "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization? Specifically, will you narrow the claim in the Abstract and Discussion to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+          "purpose": "To secure author commitment to evidence-based claim calibration, which is critical for addressing the overclaim risk.",
+          "committee_source": [
+            "claim",
+            "tone"
+          ]
+        },
+        {
+          "question": "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting the new robustness check results?",
+          "purpose": "To ensure the response aligns with the editor's instruction and presents a credible, cooperative stance.",
+          "committee_source": [
+            "tone"
+          ]
+        }
+      ],
+      "reasoning": "The synthesis integrates the independent outputs of the three committee lenses (methodology, claim, tone). All lenses converge on the necessity of performing new robustness checks and providing transparent methodological details as the highest priority actions to address the reviewer's core concerns about evaluation design and evidence adequacy. The claim and tone lenses additionally emphasize the critical need to calibrate the generalization claim based on this new evidence and to revise the author's response text to avoid overclaim and ambiguity. The prioritized plan sequences these actions logically: first, gather the missing evidence; second, document the methodology; third, adjust claims based on evidence; fourth, craft a credible response. Disagreements are minimal and pertain to emphasis, not substance. The confirmation questions are designed to elicit the author's specific inputs and commitments required to execute this plan, ensuring the revision directly and convincingly addresses the reviewer's major comment."
+    },
+    "tone_commitment_calibrator": {
+      "tone_commitment_warnings": [
+        {
+          "tone": "cooperative",
+          "commitment_level": "promised_change",
+          "risk_flags": [
+            "unsupported_commitment",
+            "overclaim"
+          ],
+          "boundary": "Not a psychological diagnosis; observable text only."
+        }
+      ],
+      "reasoning": "The author's response uses a cooperative tone and promises changes ('We will clarify...', 'We will also state...'). However, the commitment to state that the method 'generalizes across Nature peer-review contexts' is flagged as an unsupported commitment and overclaim. The evidence plan indicates this claim requires narrowing based on new robustness checks not yet performed, making the promised statement premature and potentially overreaching given the current evidence."
+    },
+    "actor_network_mapper": {
+      "actor_network_note": [
+        {
+          "actor_type": "human",
+          "actor_id": "reviewer_2",
+          "role": "Carries a signal of methodological concern and a commitment to evidence adequacy; questions the dataset's construction and the robustness of the central claim.",
+          "evidence_link": "Directly prompts the evidence plan's actions for method_clarification and new_analysis."
+        },
+        {
+          "actor_type": "human",
+          "actor_id": "authors",
+          "role": "Carry a commitment to respond and a signal of initial belief (that paper-level split avoids leakage, method generalizes). Their response currently lacks the evidence requested.",
+          "evidence_link": "Their stated actions (to clarify, add checks) are the targets for confirmation in the evidence plan."
+        },
+        {
+          "actor_type": "dataset",
+          "actor_id": "nature_family_journals_dataset",
+          "role": "Carries evidence (or lack thereof) regarding temporal structure, topic clusters, and review rounds. Its construction is under scrutiny.",
+          "evidence_link": "Central to the evidence plan's actions for method_clarification and new_analysis (temporal split)."
+        },
+        {
+          "actor_type": "code",
+          "actor_id": "split_construction_procedure",
+          "role": "Carries (or should carry) the methodological rules for partitioning data; currently opaque.",
+          "evidence_link": "The artifact required for the first method_clarification action."
+        },
+        {
+          "actor_type": "benchmark",
+          "actor_id": "temporally_held_out_split",
+          "role": "Carries a potential signal of robustness and generalizability; does not yet exist as evidence.",
+          "evidence_link": "The required artifact for the second new_analysis action."
+        },
+        {
+          "actor_type": "code",
+          "actor_id": "minhash_near_duplicate_removal",
+          "role": "Carries a methodological commitment to stricter duplicate control; proposed but not yet enacted.",
+          "evidence_link": "The methodological approach implied for the third new_analysis action."
+        },
+        {
+          "actor_type": "citation",
+          "actor_id": "retrieved_case_nature_case_temporal_split_017",
+          "role": "Carries precedent and evidentiary support for the need to address temporal splits.",
+          "evidence_link": "Supports the first and second evidence plan actions."
+        },
+        {
+          "actor_type": "citation",
+          "actor_id": "retrieved_case_nature_case_duplicate_control_044",
+          "role": "Carries precedent and evidentiary support for the need to control near-duplicates.",
+          "evidence_link": "Supports the third evidence plan action."
+        },
+        {
+          "actor_type": "citation",
+          "actor_id": "retrieved_case_nature_case_overclaim_092",
+          "role": "Carries precedent and evidentiary support for calibrating broad generalization claims.",
+          "evidence_link": "Supports the fourth claim_narrowing action."
+        },
+        {
+          "actor_type": "other",
+          "actor_id": "central_generalization_claim",
+          "role": "Carries a commitment about the method's scope; acts as a boundary object being negotiated between reviewer skepticism and author assertion.",
+          "evidence_link": "The direct target of the claim_narrowing action in the evidence plan."
+        }
+      ],
+      "retrieved_case_ids": [
+        "nature_case_temporal_split_017",
+        "nature_case_duplicate_control_044",
+        "nature_case_overclaim_092"
+      ],
+      "boundary": "Observable alignment only; not causal claims.",
+      "reasoning": "The network maps actors (human and non-human) involved in the negotiation over evidence. The reviewer and authors are human actors with differing commitments. The dataset, code procedures, and proposed benchmarks are non-human actors that carry or must produce the evidence in question. Retrieved cases act as supporting citations that carry precedent. The central claim itself is an actor (an 'other') around which alignment is sought. The evidence plan outlines how these actors must be reconfigured (e.g., making the split procedure transparent, creating a new benchmark) to produce a stabilized account."
+    },
+    "strategy_tournament_agent": {
+      "strategy_candidates": [
+        {
+          "strategy_family": "Accept",
+          "concern_coverage": 0.9,
+          "evidence_grounding": 0.8,
+          "feasibility": 0.7,
+          "overclaim_risk": 0.1,
+          "tone_risk": 0.1,
+          "provenance_strength": 0.9,
+          "evidence_anchor": "section_004, section_007, section_008",
+          "feasibility_note": "Requires author to perform new analyses (temporal split, near-duplicate removal) and revise manuscript with detailed split protocol. High effort but directly addresses reviewer's requests.",
+          "overclaim_gate": "Must not claim generalization across peer-review contexts until new analyses support it. Claims must be narrowed to reflect the specific evaluation conditions.",
+          "strategy_id": "strategy_001",
+          "name": "Accept",
+          "response_position": "accept",
+          "required_actions": [
+            "Must not claim generalization across peer-review contexts until new analyses support it. Claims must be narrowed to reflect the specific evaluation conditions."
+          ],
+          "rubric_scores": {
+            "concern_coverage": 0.9,
+            "evidence_grounding": 0.8,
+            "feasibility": 0.7,
+            "overclaim_risk": 0.1,
+            "tone_risk": 0.1,
+            "provenance_strength": 0.9
+          },
+          "author_confirmation_required": false
+        },
+        {
+          "strategy_family": "Defend",
+          "concern_coverage": 0.4,
+          "evidence_grounding": 0.3,
+          "feasibility": 0.9,
+          "overclaim_risk": 0.9,
+          "tone_risk": 0.8,
+          "provenance_strength": 0.2,
+          "evidence_anchor": "section_004",
+          "feasibility_note": "Low effort; only requires textual justification of existing random paper-level split as sufficient to avoid leakage.",
+          "overclaim_gate": "High risk of overclaiming if defending generalization without new robustness checks. Contradicts reviewer's core concern and editor's instruction.",
+          "strategy_id": "strategy_002",
+          "name": "Defend",
+          "response_position": "defend",
+          "required_actions": [
+            "High risk of overclaiming if defending generalization without new robustness checks. Contradicts reviewer's core concern and editor's instruction."
+          ],
+          "rubric_scores": {
+            "concern_coverage": 0.4,
+            "evidence_grounding": 0.3,
+            "feasibility": 0.9,
+            "overclaim_risk": 0.9,
+            "tone_risk": 0.8,
+            "provenance_strength": 0.2
+          },
+          "author_confirmation_required": true
+        },
+        {
+          "strategy_family": "Clarify",
+          "concern_coverage": 0.6,
+          "evidence_grounding": 0.5,
+          "feasibility": 0.8,
+          "overclaim_risk": 0.5,
+          "tone_risk": 0.4,
+          "provenance_strength": 0.6,
+          "evidence_anchor": "section_004, section_007",
+          "feasibility_note": "Moderate effort; requires expanding Methods to detail split construction and acknowledging limitations more explicitly, but no new analyses.",
+          "overclaim_gate": "Risk of under-addressing the concern if clarification alone is deemed insufficient without the requested robustness checks. Must avoid implying that clarification alone validates generalization.",
+          "strategy_id": "strategy_003",
+          "name": "Clarify",
+          "response_position": "clarify",
+          "required_actions": [
+            "Risk of under-addressing the concern if clarification alone is deemed insufficient without the requested robustness checks. Must avoid implying that clarification alone validates generalization."
+          ],
+          "rubric_scores": {
+            "concern_coverage": 0.6,
+            "evidence_grounding": 0.5,
+            "feasibility": 0.8,
+            "overclaim_risk": 0.5,
+            "tone_risk": 0.4,
+            "provenance_strength": 0.6
+          },
+          "author_confirmation_required": false
+        }
+      ],
+      "reasoning": "The reviewer's major concern centers on evaluation design (temporal leakage, split transparency) and overclaiming of generalization. Manuscript evidence confirms gaps: split details are vague, and requested robustness checks are not completed. The editor emphasizes direct addressing and avoiding expanded claims without support. Strategy 1 (Accept) scores highest on concern_coverage, evidence_grounding, and provenance_strength because it aligns with the reviewer's explicit requests for new analyses and transparent reporting, and it mitigates overclaim risk by committing to evidence-based claim calibration. Its feasibility is moderate due to the required new work. Strategy 2 (Defend) is feasible but has high overclaim and tone risks, as it would justify the current design without new evidence, contradicting the reviewer and editor. Strategy 3 (Clarify) offers a middle ground but may inadequately address the core evidence adequacy concern, leading to moderate overclaim risk if the generalization claim is not sufficiently narrowed. All strategies are anchored to existing manuscript sections, with Accept drawing on the most comprehensive evidence (including limitations and planned analyses)."
+    },
+    "cross_disciplinary_lens_interpreter": {
+      "lens_interpretations": {
+        "tacit_knowledge_boundary": {
+          "observable_trace": "The reviewer's explicit request for a 'transparent account of the split construction' and 'robustness checks' indicates a tacit expectation that a rigorous evaluation design includes specific, documented safeguards against temporal and topical leakage. The manuscript's current description of a 'random paper-level split' and acknowledgment of 'potential topical clustering' does not meet this unstated standard for methodological maturity in computational peer-review analysis.",
+          "system_action_taken": "The system identified the gap between the reviewer's tacit expectation and the manuscript's explicit description. It prompted the author to provide a detailed, step-by-step protocol for split construction, explicitly addressing temporal ordering and cluster isolation.",
+          "boundary": "The system does NOT claim to know the reviewer's personal standards or the exact threshold of detail required for acceptance. It only identifies that the current textual evidence is insufficient to meet the community norm for transparency signaled by the reviewer.",
+          "evaluation_question": "Does the author's revised Methods section provide a sufficiently detailed and transparent account of the data split construction to satisfy the unstated but standard expectation for replicability in this field?"
+        },
+        "institutional_dependence": {
+          "observable_trace": "The reviewer's concern about 'overstated' generalization and the editor's note to 'directly address' the concerns and 'avoid expanding claims' signal strong institutional norms. These norms include: 1) Replicability (requiring transparent methodology), 2) Transparency (requiring full reporting of robustness checks), and 3) Editorial Risk Control (requiring claims to be precisely calibrated to evidence). The manuscript's current state, with missing analyses and broad claims, is in tension with these norms.",
+          "system_action_taken": "The system mapped the reviewer's requests to institutional signals (replicability_norm, transparency_norm, editorial_risk_control) and generated an evidence action plan that requires new analyses and claim calibration to align with these norms.",
+          "boundary": "The system does NOT claim to predict whether the journal will accept the paper after these changes. It only identifies that the current manuscript does not meet the institutional standards explicitly invoked by the reviewer and editor.",
+          "evaluation_question": "Do the author's proposed revisions (detailed split protocol, new robustness analyses, calibrated claims) adequately align the manuscript with the institutional norms of replicability, transparency, and precise claim calibration signaled by the reviewer and editor?"
+        },
+        "actor_network_alignment": {
+          "observable_trace": "The network is misaligned. The reviewer actor questions the robustness of the central claim. The dataset and split procedure actors are currently opaque. The proposed benchmark actors (temporal split, near-duplicate analysis) do not yet exist as evidence. The author actor's response attempts to assert the claim without first reconfiguring the evidence-producing actors. Retrieved case actors (nature_case_temporal_split_017, etc.) provide precedent for the necessary reconfiguration.",
+          "system_action_taken": "The system mapped the network and identified the required reconfigurations: making the split procedure transparent, creating new benchmark artifacts (temporal split results, deduplication analysis), and then recalibrating the central claim actor based on the new evidence network.",
+          "boundary": "The system does NOT claim that performing these actions will guarantee network stabilization or reviewer satisfaction. It only identifies the observable misalignments and the actions historically used in analogous cases to attempt realignment.",
+          "evaluation_question": "Has the author successfully reconfigured the key non-human actors (split protocol documentation, new analysis results) to produce a stabilized evidence network that supports a calibrated version of the central claim?"
+        },
+        "fast_slow_cognitive_correction": {
+          "observable_trace": "The author's draft response exhibits a fast-thinking pattern: it acknowledges the concern but quickly jumps to reaffirming the broad generalization claim ('We will also state that our method generalizes...'). This bypasses the slow, analytical processing required to perform the requested robustness checks and evaluate their impact on the claim. The reviewer's comment and editor's note explicitly demand this slower, evidence-based correction.",
+          "system_action_taken": "The system flagged the 'overclaim' risk in the tone analysis and the 'response_credibility_risk' in the claim calibration review. It inserted a corrective gate in the strategy tournament, requiring that claims not be expanded until new analyses support them. The committee synthesis prioritized performing new analyses before claim revision.",
+          "boundary": "The system does NOT diagnose the author's cognitive state. It only observes the textual pattern of a quick, unsupported reaffirmation in contrast to the explicit demand for evidence-led revision.",
+          "evaluation_question": "Does the author's final response and revised manuscript demonstrate the outcome of slow, analytical correction: i.e., presenting new evidence first, then deriving claims from it, rather than asserting claims prematurely?"
+        },
+        "emotion_tone_commitment_calibration": {
+          "observable_trace": "The author's draft response uses a cooperative tone ('We thank...', 'We will clarify...') but makes a high-commitment promise ('We will also state that our method generalizes...') that is not supported by the current evidence plan. This creates a 'cooperative/promised_change' tone-commitment mismatch, flagged as 'unsupported_commitment' and 'overclaim'.",
+          "system_action_taken": "The tone committee reviewer and tone_commitment_calibrator identified specific interactional risks. The system recommended revising the response text to: remove the overclaiming statement, clarify the status of robustness checks, replace defensive justification with substantive acknowledgment, and anchor gratitude to the critique's substance.",
+          "boundary": "The system does NOT claim to manipulate the reviewer's emotions. It only calibrates the author's observable textual signals to avoid credibility-damaging mismatches between tone, stated commitments, and available evidence.",
+          "evaluation_question": "Is the author's revised response text calibrated such that its cooperative tone is matched by credible, evidence-bound commitments and a substantive engagement with the methodological critique?"
+        },
+        "author_agency_gate": {
+          "observable_trace": "The author's initial positioning shows agency in choosing to 'clarify' and 'justify' the existing split. However, the evidence action plan and committee synthesis require actions (performing new analyses, narrowing claims) that may conflict with this initial stance. The system presents these as required inputs for addressing the concern, preserving the author's ultimate agency to accept, modify, or reject the plan.",
+          "system_action_taken": "The system structured all recommended actions (method_clarification, new_analysis, claim_narrowing) as requiring author confirmation. The strategy tournament presented options (Accept, Defend, Clarify) with associated risks, allowing the author to exercise agency in choosing a response strategy based on their capacity and judgment.",
+          "boundary": "The system does NOT force the author to concede or perform new work. It gates its advice on the author's confirmation and presents the evidential consequences of different agential choices.",
+          "evaluation_question": "Given the system's presentation of required evidence and strategic options, has the author exercised their agency to make an informed, integrity-checked decision on how to respond, and can they justify that decision based on the available evidence and its gaps?"
+        }
+      },
+      "reasoning": "Each lens was applied strictly to observable traces in the provided interaction (reviewer text, manuscript evidence, author draft response, editor note, retrieved cases, prior agent outputs). The interpretations focus on supporting author reflection (e.g., on tacit expectations, institutional norms), evidence planning (e.g., identifying missing artifacts), and integrity checking (e.g., calibrating tone and claims). Boundaries consistently exclude inferences about private reviewer psychology, motives, or acceptance probability, and avoid any suggestion of manipulating reviewer motivations."
+    },
+    "strategy_meta_planner": {
+      "selected_strategy_id": "strategy_001",
+      "merged_plan": {
+        "core_actions": [
+          {
+            "action": "Perform and report robustness checks",
+            "subtasks": [
+              "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+              "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+            ],
+            "evidence_anchor": "section_007, section_008",
+            "nature_action_hint": "ACCEPT_ANALYSIS"
+          },
+          {
+            "action": "Provide detailed split construction protocol",
+            "subtasks": [
+              "Describe step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+              "Explicitly state whether measures were taken to prevent papers from same journal issue, topic cluster, or review round from appearing in different splits."
+            ],
+            "evidence_anchor": "section_004",
+            "nature_action_hint": "CLARIFY_EXISTING"
+          },
+          {
+            "action": "Calibrate generalization claims based on new evidence",
+            "subtasks": [
+              "Revise Abstract to state evaluation conditions clearly.",
+              "Update Results and Discussion to reflect performance on new robustness checks.",
+              "Remove or qualify language implying broad generalization across peer-review contexts unless explicitly supported."
+            ],
+            "evidence_anchor": "section_003, section_006, section_007",
+            "nature_action_hint": "SOFTEN_CLAIM"
+          },
+          {
+            "action": "Revise author response text",
+            "subtasks": [
+              "Remove statement about asserting generalization across Nature peer-review contexts.",
+              "Clarify status of robustness checks (planned/in progress/completed).",
+              "Replace defensive justification with acknowledgment of reviewer's point.",
+              "Anchor gratitude to substance of critique."
+            ],
+            "evidence_anchor": "response_text",
+            "nature_action_hint": "ACCEPT_TEXT"
+          }
+        ],
+        "skill_families": [
+          "evidence_upgrade",
+          "scope_calibration",
+          "presentation_repair"
+        ],
+        "institutional_signals_addressed": [
+          "replicability_norm",
+          "transparency_norm",
+          "editorial_risk_control"
+        ]
+      },
+      "rejection_reasons": [
+        {
+          "strategy_id": "strategy_002",
+          "reason": "High overclaim risk (0.9) and tone risk (0.8) by defending current design without new evidence; contradicts reviewer's core concern about evidence adequacy and editor's instruction to avoid expanding claims."
+        },
+        {
+          "strategy_id": "strategy_003",
+          "reason": "Moderate overclaim risk (0.5) and insufficient concern coverage (0.6); clarification alone may be deemed inadequate without the requested robustness checks, failing to address evidence adequacy concern."
+        }
+      ],
+      "author_confirmation_questions": [
+        "Can you perform and report the results of the two specific robustness checks: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+        "Can you provide the detailed, step-by-step protocol for constructing train/validation/test splits, including how papers were ordered and whether measures were taken to isolate papers from same journal issue, topic cluster, or review round?",
+        "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+        "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting new robustness check results?"
+      ],
+      "reasoning": "Strategy_001 (Accept) is selected because it best balances concern coverage (0.9), evidence grounding (0.8), and overclaim prevention (risk 0.1). It directly addresses all reviewer requests: transparent split construction, temporal robustness checks, near-duplicate sensitivity analysis, and claim calibration. While requiring moderate author effort (feasibility 0.7), it aligns with institutional norms (replicability, transparency) and editor guidance. The merged plan integrates committee synthesis priorities, ensuring methodological rigor, claim-evidence alignment, and cooperative tone. Strategy_002 is rejected for high overclaim risk; Strategy_003 for insufficient evidence adequacy. Author confirmation questions target missing inputs needed to execute the plan credibly."
+    },
+    "integrity_adequacy_checker": {
+      "adequacy_report": [
+        "The system output is adequate for planning a response. It correctly identifies the core methodological concerns (split construction, temporal leakage, near-duplicate removal, overclaiming), maps them to manuscript evidence, and proposes a concrete action plan that addresses the reviewer's explicit requests. The plan is grounded in observable traces from the review, manuscript previews, and retrieved cases. All critical boundaries (not final text, no acceptance prediction, no invention of data) are respected. The primary limitation is the lack of full manuscript text, which is explicitly acknowledged and gated by author confirmation requirements."
+      ],
+      "response_adequacy": {
+        "is_adequate": true,
+        "missing_elements": [],
+        "strengths": [
+          "Comprehensive concern mapping to both surface and tacit issues.",
+          "Clear linkage of required actions to manuscript evidence gaps.",
+          "Prioritized plan that addresses institutional norms (replicability, transparency, claim calibration).",
+          "Strong provenance tracking for all claims.",
+          "Explicit author agency gates and confirmation requirements."
+        ]
+      },
+      "provenance_checks": [
+        {
+          "claim": "Manuscript uses a random paper-level 80/10/10 split and removes exact duplicates.",
+          "source": "section_004 (Data section preview)",
+          "traceable": true
+        },
+        {
+          "claim": "Manuscript acknowledges potential topical clustering and lack of temporal split evaluation.",
+          "source": "section_007 (Limitations section preview)",
+          "traceable": true
+        },
+        {
+          "claim": "Stricter near-duplicate removal (e.g., MinHash) has not been completed.",
+          "source": "section_008 (Planned Additional Analysis preview)",
+          "traceable": true
+        },
+        {
+          "claim": "Reviewer requests transparent split construction, temporal robustness checks, and near-duplicate analysis.",
+          "source": "Reviewer text in unit",
+          "traceable": true
+        },
+        {
+          "claim": "Author's draft response promises clarification and asserts generalization.",
+          "source": "response_text in unit",
+          "traceable": true
+        }
+      ],
+      "responsible_use_warnings": [
+        "assistant_only",
+        "author_must_verify_all_claims",
+        "not_final_rebuttal_text",
+        "no_acceptance_prediction"
+      ],
+      "issues": [
+        {
+          "severity": "info",
+          "agent_id": "manuscript_context_extractor",
+          "description": "Working with section previews only, not full manuscript text. This limits the ability to extract detailed evidence but is properly acknowledged."
+        }
+      ],
+      "reasoning": "All outputs are traceable to supplied sources (review text, manuscript previews, author draft). The proposed plan is sufficient to address the reviewer's major methodological concerns by requiring new analyses, methodological transparency, and claim calibration. No unsupported commitments or overclaims are made by the system; instead, it flags these risks in the author's draft. All required boundaries and warnings are present. The plan explicitly requires author confirmation for all substantive actions, preserving author agency."
+    }
+  },
+  "message_bus": [
+    {
+      "agent_id": "manuscript_context_extractor",
+      "timestamp": "2026-06-09T00:07:33.412147",
+      "message_type": "output",
+      "content": {
+        "manuscript_context_note": {
+          "mode": "manuscript_aware",
+          "usable_sections": [
+            "section_002",
+            "section_003",
+            "section_004",
+            "section_005",
+            "section_006",
+            "section_007",
+            "section_008"
+          ],
+          "limits": [
+            "No full manuscript text provided, only section previews. The 'Data' section preview is truncated. The 'Manuscript Excerpt' section is empty. Cannot locate specific textual evidence for claims about experiments, results, or methods details."
+          ]
+        },
+        "section_inventory": [
+          {
+            "section_id": "section_002",
+            "heading": "Title",
+            "evidence_role": "States the paper's core topic: modeling review-response interactions from transparent peer review."
+          },
+          {
+            "section_id": "section_003",
+            "heading": "Abstract",
+            "evidence_role": "Summarizes the framework (ReviewNet), its application (Nature-family corpus), and key claimed results (improved macro-F1, structured rebuttal plans)."
+          },
+          {
+            "section_id": "section_004",
+            "heading": "Data",
+            "evidence_role": "Describes the corpus source (Nature-family transparent reviews), data structure (review interaction units), and split method (random paper-level). Text is truncated."
+          },
+          {
+            "section_id": "section_005",
+            "heading": "Methods",
+            "evidence_role": "Outlines the high-level pipeline of ReviewNet (extract concerns, classify risk, retrieve analogies, plan actions, draft outline) and its role as an assistant."
+          },
+          {
+            "section_id": "section_006",
+            "heading": "Results",
+            "evidence_role": "Reports specific performance metrics (macro-F1 improvement from 0.51 to 0.62) and a model-assisted evaluation outcome. Explicitly states a temporal split experiment has not been reported."
+          },
+          {
+            "section_id": "section_007",
+            "heading": "Limitations",
+            "evidence_role": "Acknowledges potential topical clustering in splits, lack of temporal split evaluation, and dataset incompleteness (response-only/review-only records)."
+          },
+          {
+            "section_id": "section_008",
+            "heading": "Planned Additional Analysis",
+            "evidence_role": "Describes potential future work (temporal split, stricter near-duplicate removal) that has not been completed."
+          }
+        ],
+        "author_confirmation_questions": [
+          "Can you confirm the exact composition and size of the 'curated Nature-family corpus' mentioned in the Abstract and Data sections?",
+          "The Methods section preview describes a pipeline. Are there specific model architectures, training procedures, or hyperparameters detailed in the full manuscript?",
+          "The Results mention a 'small model-assisted evaluation' for concern coverage. What was the evaluation protocol and what were the specific results?",
+          "The Limitations section mentions related papers sharing language patterns. Was any analysis done to quantify this potential clustering in the current random split?"
+        ],
+        "reasoning": "The provided context consists of section previews, not the full manuscript. Therefore, while the mode is 'manuscript_aware', the ability to locate specific textual evidence is severely limited to these summaries. The 'Data' section is truncated, and the 'Manuscript Excerpt' section is empty, offering no usable evidence. The previews allow for a high-level inventory of what each section discusses and its potential role as evidence, but detailed claims about experiments, results, or methods cannot be verified or extracted from this input. Several critical details are explicitly stated as absent (e.g., temporal split results). Author confirmation is required for any specific evidence beyond the general topics listed in the previews."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "reviewer_understanding_agent",
+      "timestamp": "2026-06-09T00:07:43.731542",
+      "message_type": "output",
+      "content": {
+        "concern_map": [
+          {
+            "concern_id": "R2.1",
+            "severity": "major",
+            "category": "methodological",
+            "concern_type": "experimental_design",
+            "surface_request": "Provide a transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether reported gains remain when near-duplicate review-response pairs are removed.",
+            "text_evidence": "The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits. The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+            "confidence": "high"
+          },
+          {
+            "concern_id": "R2.2",
+            "severity": "major",
+            "category": "evidence_interpretation",
+            "concern_type": "generalization_scope",
+            "surface_request": "Clarify whether the central claim that the method generalizes across peer-review contexts is overstated.",
+            "text_evidence": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+            "confidence": "high"
+          }
+        ],
+        "reasoning": "The reviewer explicitly questions the experimental design regarding data splits and temporal leakage, which maps to 'experimental_design'. The reviewer also directly states that the generalization claim is overstated without these fixes, which maps to 'generalization_scope'. The reviewer's tone indicates these are major concerns about evidence adequacy, not just wording."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "tacit_concern_interpreter",
+      "timestamp": "2026-06-09T00:07:57.988994",
+      "message_type": "output",
+      "content": {
+        "risk_interpretation": [
+          {
+            "risk_type": "methodological_maturity",
+            "tacit_concern": "evidence_chain_stability",
+            "observable_trace": "The manuscript does not explain how temporal leakage was avoided... It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+            "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+          },
+          {
+            "risk_type": "methodological_maturity",
+            "tacit_concern": "credibility_trust",
+            "observable_trace": "The evaluation design is not yet convincing... Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+            "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+          },
+          {
+            "risk_type": "methodological_maturity",
+            "tacit_concern": "scope_and_claim_boundary",
+            "observable_trace": "Without this, the central claim that the method generalizes across peer-review contexts is overstated.",
+            "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+          },
+          {
+            "risk_type": "methodological_maturity",
+            "tacit_concern": "reproducibility_expectation",
+            "observable_trace": "The authors should provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed.",
+            "boundary": "Observable textual trace only; not a claim about reviewer psychology."
+          }
+        ],
+        "reasoning": "The reviewer's explicit questions about data splits and temporal leakage signal a tacit concern about the stability of the evidence chain (evidence_chain_stability). The statement that the design is 'not yet convincing' and that claims are 'overstated' signals a concern about the trustworthiness of the claims (credibility_trust) and their proper boundaries (scope_and_claim_boundary). The specific requests for transparency and robustness checks signal an expectation for details that would enable reproducibility (reproducibility_expectation). All these tacit concerns are grounded in the reviewer's focus on methodological rigor, which maps to the risk type 'methodological_maturity'."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "manuscript_evidence_locator",
+      "timestamp": "2026-06-09T00:08:04.608341",
+      "message_type": "output",
+      "content": {
+        "manuscript_evidence_map": [
+          {
+            "concern_id": "R2.1",
+            "status": "partially_supported",
+            "section_id": "section_004",
+            "evidence_refs": [
+              "section_004",
+              "section_007",
+              "section_008"
+            ],
+            "evidence_anchor": "section_004",
+            "text_evidence": "We split the available interaction units into train, validation, and test partitions at the paper level. The current draft uses a random paper-level 80/10/10 split. We remove exact duplicate interaction units using normalized text hashes before model evaluation.",
+            "gap": "The manuscript does not explain how temporal leakage was avoided. It acknowledges potential topical clustering across splits and explicitly states a temporal split experiment has not been reported. It also states stricter near-duplicate removal (e.g., MinHash) has not been completed."
+          },
+          {
+            "concern_id": "R2.2",
+            "status": "supported",
+            "section_id": "section_007",
+            "evidence_refs": [
+              "section_006",
+              "section_007"
+            ],
+            "evidence_anchor": "section_007",
+            "text_evidence": "We have not yet reported a temporal split experiment in the submitted draft. The current version may still contain topical clustering across splits... We do not yet quantify robustness under a temporally held-out split.",
+            "gap": "The manuscript explicitly states the lack of temporal split evaluation and acknowledges potential topical clustering, which directly supports the concern that the generalization claim may be overstated without these checks."
+          }
+        ],
+        "evidence_gaps": [
+          "No evidence for how temporal leakage was avoided in split construction.",
+          "No evidence for whether papers from the same journal issue, topic cluster, or review round can appear across different splits.",
+          "No evidence for robustness checks under a temporally held-out split.",
+          "No evidence for whether reported gains remain after stricter near-duplicate removal (beyond exact duplicates)."
+        ],
+        "author_confirmation_questions": [
+          "Can you confirm the exact composition and size of the 'curated Nature-family corpus' mentioned in the Abstract and Data sections?",
+          "The Methods section preview describes a pipeline. Are there specific model architectures, training procedures, or hyperparameters detailed in the full manuscript?",
+          "The Results mention a 'small model-assisted evaluation' for concern coverage. What was the evaluation protocol and what were the specific results?",
+          "The Limitations section mentions related papers sharing language patterns. Was any analysis done to quantify this potential clustering in the current random split?"
+        ],
+        "reasoning": "For R2.1, the manuscript partially addresses the concern by describing a random paper-level split and removal of exact duplicates, but it explicitly lacks details on temporal leakage, robustness checks, and stricter near-duplicate removal. For R2.2, the manuscript directly supports the concern by stating the lack of temporal split evaluation and acknowledging potential topical clustering, which weakens the generalization claim. All evidence is drawn from supplied section previews."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "institutional_signal_interpreter",
+      "timestamp": "2026-06-09T00:08:15.908908",
+      "message_type": "output",
+      "content": {
+        "institutional_signal_note": [
+          {
+            "institutional_signal": "replicability_norm",
+            "action_link": "The author must revise the manuscript to provide a detailed, transparent account of the data split construction, including measures taken to avoid temporal and cluster-based leakage, to meet the community standard for a replicable and robust evaluation.",
+            "boundary": "Not an acceptance prediction; author judgment required."
+          },
+          {
+            "institutional_signal": "transparency_norm",
+            "action_link": "The author must add the requested robustness checks (e.g., temporally held-out split, analysis with near-duplicates removed) and fully report the results to satisfy the journal's transparency standards for methodological rigor.",
+            "boundary": "Not an acceptance prediction; author judgment required."
+          },
+          {
+            "institutional_signal": "editorial_risk_control",
+            "action_link": "The author must directly and convincingly address the concern about overclaiming generalization. This involves tempering claims if the new analyses weaken them or providing strong evidence to support the original claim, thereby mitigating the editorial risk of publishing an overstated conclusion.",
+            "boundary": "Not an acceptance prediction; author judgment required."
+          }
+        ],
+        "reasoning": "The reviewer's major concerns signal strong institutional norms. The demand for a transparent split construction and robustness checks directly invokes 'replicability_norm' (ensuring the evaluation is sound and repeatable) and 'transparency_norm' (requiring full methodological disclosure). The explicit warning that the central claim is 'overstated' without these fixes signals 'editorial_risk_control', indicating the reviewer/editor sees a risk that must be resolved before the paper meets publication standards. The reviewer's final note about 'evidence adequacy' reinforces that this is a substantive, not presentational, issue."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "case_retrieval_interpreter",
+      "timestamp": "2026-06-09T00:08:21.746198",
+      "message_type": "output",
+      "content": {
+        "case_interpretation": [
+          {
+            "case_id": "nature_case_temporal_split_017",
+            "analogy": "This case is relevant because it directly addresses a reviewer's concern about the validity of an evaluation due to potential data leakage from improper temporal splitting, which mirrors the current reviewer's worry about split construction and temporal leakage.",
+            "transferable_strategy": "The strategy of acknowledging the concern, adding a new temporally held-out analysis, and narrowing the claim's scope based on the new evidence could transfer. This directly addresses the request for robustness checks and transparent split construction.",
+            "boundary": "case analogy only; not outcome prediction"
+          },
+          {
+            "case_id": "nature_case_duplicate_control_044",
+            "analogy": "This case is relevant because it involves a reviewer concern about reproducibility being threatened by near-duplicate data points, analogous to the current request to check if reported gains remain after removing near-duplicate review-response pairs.",
+            "transferable_strategy": "The strategy of adding a deduplication check and explicitly reporting any performance limits or changes discovered could transfer. This provides the requested clarification on the robustness of the gains.",
+            "boundary": "case analogy only; not outcome prediction"
+          },
+          {
+            "case_id": "nature_case_overclaim_092",
+            "analogy": "This case is relevant because it involves a reviewer identifying a risk of overclaiming, which directly parallels the current reviewer's statement that the generalization claim is 'overstated' without the requested methodological fixes.",
+            "transferable_strategy": "The strategy of narrowing the claim's scope until stronger evidence (like the requested robustness checks) is available could transfer. This aligns with the reviewer's call for careful calibration of claims to the evidence.",
+            "boundary": "case analogy only; not outcome prediction"
+          }
+        ],
+        "case_use_boundary": "These retrieved cases may be used as bounded analogies to suggest potential response strategies that have been relevant in similar peer-review contexts concerning methodological rigor, data integrity, and claim calibration. They may NOT be used as rules to predict the outcome of this specific review, nor should they be interpreted as guarantees that the same strategies will satisfy this reviewer. Each case represents a specific historical interaction, not a universal solution.",
+        "reasoning": "The retrieved cases are highly relevant as they each map to a core component of the reviewer's methodological concern: evaluation validity (temporal splits), reproducibility (near-duplicate control), and claim calibration (overclaiming). Together, they form a bounded analogy for a complex review focused on shoring up the evidence chain for a central claim. The transferable strategies from these cases directly address the reviewer's surface requests and underlying concerns about methodological maturity."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "evidence_action_planner",
+      "timestamp": "2026-06-09T00:10:41.834728",
+      "message_type": "output",
+      "content": {
+        "evidence_action_plan": [
+          {
+            "action_type": "method_clarification",
+            "required_artifact": "A transparent description of how train/validation/test splits were constructed, explicitly stating how temporal leakage was avoided and whether papers from the same journal issue, topic cluster, or review round can appear across splits.",
+            "supporting_case_ids": [
+              "nature_case_temporal_split_017"
+            ],
+            "requires_author_confirmation": true,
+            "nature_action_hint": "CLARIFY_EXISTING",
+            "missing_author_input": [
+              "Specific details on split construction to prevent temporal leakage"
+            ],
+            "evidence_anchor": "section_004"
+          },
+          {
+            "action_type": "new_analysis",
+            "required_artifact": "Results of a robustness check using a temporally held-out split.",
+            "supporting_case_ids": [
+              "nature_case_temporal_split_017"
+            ],
+            "requires_author_confirmation": true,
+            "nature_action_hint": "ACCEPT_ANALYSIS",
+            "missing_author_input": [
+              "Results from a temporally held-out split experiment"
+            ],
+            "evidence_anchor": "section_007"
+          },
+          {
+            "action_type": "new_analysis",
+            "required_artifact": "Analysis showing whether reported performance gains remain after removing near-duplicate review-response pairs (e.g., using MinHash).",
+            "supporting_case_ids": [
+              "nature_case_duplicate_control_044"
+            ],
+            "requires_author_confirmation": true,
+            "nature_action_hint": "ACCEPT_ANALYSIS",
+            "missing_author_input": [
+              "Performance results after stricter near-duplicate removal"
+            ],
+            "evidence_anchor": "section_004"
+          },
+          {
+            "action_type": "claim_narrowing",
+            "required_artifact": "Revised text in the abstract, results, and discussion to calibrate the generalization claim based on the new robustness checks and clarified methodology.",
+            "supporting_case_ids": [
+              "nature_case_overclaim_092",
+              "nature_case_temporal_split_017"
+            ],
+            "requires_author_confirmation": true,
+            "nature_action_hint": "SOFTEN_CLAIM",
+            "missing_author_input": [
+              "Revised claim text reflecting the scope of evidence"
+            ],
+            "evidence_anchor": ""
+          }
+        ],
+        "author_confirmation_questions": [
+          "Can you provide the detailed methodology for constructing the data splits to ensure no temporal leakage?",
+          "Can you perform and report the results of an evaluation using a temporally held-out test split?",
+          "Can you perform and report the results of an analysis that removes near-duplicate pairs (beyond exact duplicates) and shows the impact on performance gains?",
+          "Given the results of the above analyses, are you willing to revise the central claim about generalization across peer-review contexts to be more precise?"
+        ],
+        "reasoning": "The reviewer's major concerns are about methodological transparency (R2.1) and overstatement of claims (R2.2). The manuscript evidence map shows the current draft partially addresses split construction but lacks details on temporal leakage and has not performed the requested robustness checks. Therefore, the plan requires: 1) Clarifying the existing split methodology (method_clarification), 2) Adding the requested new temporal split analysis (new_analysis), 3) Adding the requested near-duplicate removal analysis (new_analysis), and 4) Calibrating the generalization claim based on this new evidence (claim_narrowing). The retrieved cases support these actions. All actions require author confirmation as the needed artifacts (detailed methodology, new results, revised claims) are not currently present in the supplied evidence."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "author_positioning_agent",
+      "timestamp": "2026-06-09T00:10:51.456779",
+      "message_type": "output",
+      "content": {
+        "author_positioning": [
+          {
+            "position": "clarify_without_new_work",
+            "stance_boundary": "Offer options for author judgment; do not force concession.",
+            "alternative_positions": [
+              "accept_and_revise",
+              "justify_existing_choice",
+              "partially_concede"
+            ]
+          },
+          {
+            "position": "justify_existing_choice",
+            "stance_boundary": "Offer options for author judgment; do not force concession.",
+            "alternative_positions": [
+              "accept_and_revise",
+              "clarify_without_new_work",
+              "partially_concede"
+            ]
+          }
+        ],
+        "reasoning": "The author's response indicates a willingness to clarify the dataset split methodology, which aligns with 'clarify_without_new_work'. Simultaneously, the author states a belief that the split avoids leakage, which suggests a 'justify_existing_choice' position. The response does not explicitly accept the need for new robustness checks or claim narrowing, leaving those as potential future concessions or points of disagreement."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "tone_committee_reviewer",
+      "timestamp": "2026-06-09T00:11:12.341720",
+      "message_type": "output",
+      "content": {
+        "reviewer_role": "tone_and_interaction",
+        "findings": [
+          {
+            "risk": "overclaim",
+            "severity": "high",
+            "evidence": "The author's response states, 'We will also state that our method generalizes across Nature peer-review contexts.' This directly contradicts the reviewer's core concern that the generalization claim is 'overstated' and the editor's instruction to 'avoid expanding claims unless the additional analyses support them.' The response proposes to assert a broader claim before performing the requested robustness checks.",
+            "recommendation": "The author must remove this statement from the response and commit to revising the manuscript's claims only after the new analyses are complete and support them. The response should explicitly acknowledge that the generalization claim will be calibrated based on the new evidence."
+          },
+          {
+            "risk": "unsupported_commitment",
+            "severity": "medium",
+            "evidence": "The author's response says, 'We will clarify the dataset split in the Methods section and add additional robustness checks.' The manuscript's 'Planned Additional Analysis' section (section_008) explicitly states these analyses 'have not been completed yet.' The response does not clarify whether these checks are now completed or are a promise for future work, creating ambiguity about the evidence state for the revision.",
+            "recommendation": "The author must clarify the status of the robustness checks. If they are not yet performed, the response should explicitly state they will be performed for the revision, and the manuscript will be updated with the results. If they have been performed, the response should summarize the key findings."
+          },
+          {
+            "risk": "excessive_defensiveness",
+            "severity": "low",
+            "evidence": "The author's response includes the phrase, 'and we believe this avoids leakage.' This defensive justification is unnecessary and slightly contradicts the reviewer's identified risk of topical clustering (acknowledged in manuscript section_007). It risks sounding dismissive of the reviewer's specific concern about journal issue or topic cluster leakage.",
+            "recommendation": "Remove the defensive justification ('and we believe...'). Replace it with an acknowledgment of the reviewer's specific point and a commitment to provide the transparent account requested, which will address the concern objectively."
+          },
+          {
+            "risk": "sycophancy",
+            "severity": "low",
+            "evidence": "The response opens with 'We thank the reviewer for this helpful comment.' While polite, in the context of a major methodological concern about evidence adequacy, this phrasing alone may be perceived as perfunctory and not sufficiently engaging with the substance of the critique. The tone lacks the gravity appropriate for addressing a concern about possible overclaiming.",
+            "recommendation": "Maintain politeness but anchor the gratitude to the substance. For example: 'We thank the reviewer for raising these important points about evaluation design and claim calibration.' This directly links the acknowledgment to the core issues."
+          }
+        ],
+        "author_confirmation_questions": [
+          "Given the editor's instruction to avoid expanding claims, will you commit to revising the manuscript's generalization claim (e.g., in the Abstract and Discussion) only after the new robustness analyses are complete and their results are known?",
+          "Can you confirm the current status of the 'additional robustness checks'? Are they planned, in progress, or completed? If completed, what were the key outcomes regarding performance on a temporal split and after near-duplicate removal?",
+          "In your revised Methods section, will you explicitly detail the measures taken (or not taken) to prevent papers from the same journal issue, topic cluster, or review round from appearing in different splits, as the reviewer requested?",
+          "Will you revise the response text to remove the promise to 'state that our method generalizes across Nature peer-review contexts' and replace it with a commitment to evidence-based claim calibration?"
+        ],
+        "reasoning": "My analysis focuses on the tone and interactional risks in the author's draft response. The primary risk is 'overclaim': the author's response paradoxically proposes to reinforce the very claim the reviewer says is overstated, which directly defies the editor's caution. This is a high-risk interactional misstep. The 'unsupported_commitment' risk stems from ambiguity about whether promised analyses are done, which affects the credibility of the revision timeline. The 'excessive_defensiveness' and 'sycophancy' risks are lower severity but indicate a tone that may not adequately signal the author's understanding of the seriousness of the methodological critique. The questions are designed to resolve these specific interactional ambiguities and align the response with the reviewer's and editor's clear expectations for substantive, evidence-led revision rather than assertive restatement."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "methodology_committee_reviewer",
+      "timestamp": "2026-06-09T00:11:13.753997",
+      "message_type": "output",
+      "content": {
+        "reviewer_role": "Methodology-focused committee lens. Independently inspects the reviewer concern, manuscript evidence, author draft, editor note, retrieved cases, and prior agent outputs. Emphasis on methodological rigor, experimental design, data handling, and claim calibration.",
+        "findings": [
+          {
+            "risk": "High risk of data leakage and overfitting due to inadequate split construction.",
+            "severity": "Major",
+            "evidence": "Reviewer explicitly states the manuscript does not explain how temporal leakage was avoided. Manuscript section_004 states a 'random paper-level 80/10/10 split' but does not detail temporal ordering or clustering prevention. Section_007 acknowledges 'potential topical clustering across splits' and explicitly states 'We do not yet quantify robustness under a temporally held-out split.'",
+            "recommendation": "The author must provide a detailed, transparent account of split construction in the Methods, explicitly addressing temporal ordering, journal issue, topic cluster, and review round separation. A new temporally held-out split analysis must be performed and reported."
+          },
+          {
+            "risk": "High risk that reported performance gains are inflated by near-duplicate examples.",
+            "severity": "Major",
+            "evidence": "Reviewer requests clarification on whether gains remain after removing near-duplicate review-response pairs. Manuscript section_004 states removal of 'exact duplicate interaction units using normalized text hashes' but does not address near-duplicates. Section_008 states a stricter near-duplicate removal step 'has not been completed yet.'",
+            "recommendation": "The author must perform and report a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash or embedding similarity) and show the impact on the reported macro-F1 gains."
+          },
+          {
+            "risk": "High risk of overclaiming generalization beyond the demonstrated evidence.",
+            "severity": "Major",
+            "evidence": "Reviewer states the central claim that the method 'generalizes across peer-review contexts is overstated' without the requested methodological fixes. Manuscript section_003 (Abstract) claims the method improves performance 'on a curated Nature-family corpus' but does not explicitly claim broad generalization. However, the reviewer's interpretation suggests the manuscript's framing may imply broader applicability than the current split design supports. Section_007 directly acknowledges the lack of temporal split evaluation.",
+            "recommendation": "The author must calibrate all claims about generalization in the Abstract, Results, and Discussion to precisely reflect the scope of the evaluation (e.g., 'within a random split of Nature-family reviews' or, after new analyses, 'across temporally held-out Nature-family reviews'). Avoid broad, unsupported generalization language."
+          },
+          {
+            "risk": "Medium risk of insufficient methodological transparency for reproducibility.",
+            "severity": "Moderate",
+            "evidence": "The author's response_text states 'We will clarify the dataset split in the Methods section' and 'add additional robustness checks,' but provides no concrete details. The editor_text reinforces the need to 'directly address' the concerns. The institutional signal interpreter notes strong 'replicability_norm' and 'transparency_norm' expectations.",
+            "recommendation": "The promised clarifications and new analyses must be fully documented in the revised manuscript with sufficient detail (e.g., split criteria, temporal cutoff date, deduplication parameters) to allow replication."
+          }
+        ],
+        "author_confirmation_questions": [
+          "Can you provide the specific, step-by-step procedure used to construct the train/validation/test splits, including how papers were ordered (e.g., by submission date, publication date) and how you ensured no temporal leakage?",
+          "Can you perform the temporally held-out split analysis (as mentioned in section_008) and report the performance metrics (macro-F1, etc.) for ReviewNet and the baseline on this new test set?",
+          "Can you perform the stricter near-duplicate removal analysis (e.g., using MinHash with a defined similarity threshold) and report whether the performance gain of ReviewNet over the baseline changes significantly?",
+          "Based on the results of the above analyses, what specific, evidence-bound claim about the method's generalizability are you prepared to state in the revised abstract and conclusion?"
+        ],
+        "reasoning": "As the methodology lens, my analysis focuses on the structural integrity of the evaluation design. The reviewer's concern is fundamentally methodological: the split construction lacks safeguards against temporal and cluster-based leakage, and the performance evaluation lacks robustness checks. The manuscript evidence confirms these gaps: it describes a random paper-level split but does not detail temporal ordering, and it explicitly states the requested analyses are not yet done. The author's response acknowledges the need for clarification and new checks but is vague. The editor's note and retrieved cases reinforce that these are standard, required fixes for methodological maturity. Therefore, the core findings identify high risks related to data leakage, inflated metrics, and overclaiming. The confirmation questions are designed to elicit the concrete methodological details and new results needed to resolve these risks. The response must move beyond promises to provide specific, verifiable evidence."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "claim_committee_reviewer",
+      "timestamp": "2026-06-09T00:11:17.034340",
+      "message_type": "output",
+      "content": {
+        "reviewer_role": "claim_calibration",
+        "findings": [
+          {
+            "risk": "overclaiming_risk",
+            "severity": "high",
+            "evidence": "Reviewer states the central claim that the method 'generalizes across peer-review contexts is overstated' without robust evaluation design. Manuscript evidence (section_007) explicitly acknowledges lack of temporal split evaluation and potential topical clustering, directly supporting the concern that the generalization claim exceeds the demonstrated evidence.",
+            "recommendation": "The author must calibrate the generalization claim to match the scope of the current evidence. If new robustness checks (temporal split, near-duplicate removal) are performed, the claim must be revised based on their outcomes. If not, the claim must be narrowed to the specific conditions of the random paper-level split used."
+          },
+          {
+            "risk": "methodological_transparency_risk",
+            "severity": "high",
+            "evidence": "Reviewer requests a 'transparent account of the split construction' and clarification on whether papers from the same issue, cluster, or round can appear across splits. Manuscript evidence (section_004) only states a random paper-level split was used, with no details on temporal ordering, journal issue, or topic cluster isolation. The Limitations section (section_007) acknowledges potential clustering but does not quantify it.",
+            "recommendation": "The author must provide a detailed, transparent description of the split construction protocol in the Methods section, explicitly addressing how temporal leakage was prevented and whether any measures were taken to avoid contamination from related papers (same issue, topic cluster, or review round)."
+          },
+          {
+            "risk": "evidence_adequacy_risk",
+            "severity": "high",
+            "evidence": "Reviewer explicitly requests 'robustness checks under at least one temporally held-out split' and clarification on 'near-duplicate review-response pairs'. Manuscript evidence (section_006, section_007, section_008) confirms these analyses have not been reported or completed. The current results are based solely on a random split with only exact duplicate removal.",
+            "recommendation": "The author must perform and report the requested robustness checks: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash or embedding similarity). The results must be integrated into the manuscript to substantiate or recalibrate the reported gains."
+          },
+          {
+            "risk": "response_credibility_risk",
+            "severity": "medium",
+            "evidence": "Author's response states 'We will clarify the dataset split... and add additional robustness checks' and 'We will also state that our method generalizes across Nature peer-review contexts.' This promises clarification and new analysis but also repeats a broad generalization claim without presenting the supporting evidence requested by the reviewer. The editor's note cautions against expanding claims unless new analyses support them.",
+            "recommendation": "The author's revised response and manuscript must avoid restating the broad generalization claim unless the new robustness checks explicitly support it. The response should focus on committing to the specific methodological clarifications and analyses requested, and the manuscript should present the results neutrally, allowing the evidence to dictate the final claim scope."
+          }
+        ],
+        "author_confirmation_questions": [
+          "Can you provide the specific, detailed protocol used for constructing the train/validation/test splits, including how publication dates were used to prevent temporal leakage and whether papers from the same journal issue or thematic collection were kept within a single split?",
+          "Are you able to perform and report the results of an evaluation using a test set comprised of papers from a later publication period than the training/validation sets (a temporally held-out split)?",
+          "Can you perform and report an analysis that removes near-duplicate review-response pairs (using a method like MinHash with a similarity threshold) and shows the impact on the macro-F1 improvement and other key metrics?",
+          "Based on the outcomes of the above analyses, are you prepared to revise the abstract and discussion to precisely state the conditions under which ReviewNet's improvements are demonstrated, potentially narrowing the claim of 'generalization across peer-review contexts'?"
+        ],
+        "reasoning": "As the claim_calibration lens, my focus is on the alignment between the manuscript's central claims and the evidence presented. The reviewer's concern is fundamentally about overclaiming due to inadequate evaluation design. The manuscript evidence confirms the lack of key robustness checks (temporal split, near-duplicate control) and acknowledges limitations that directly undermine a broad generalization claim. The author's response acknowledges the need for clarification and new checks but also risks prematurely reaffirming the broad claim. Therefore, the findings center on the high risks of overclaiming, methodological opacity, and evidence gaps. The confirmation questions are designed to elicit the specific factual inputs needed to resolve these calibration issues: the exact split methodology, the results of the missing analyses, and the author's willingness to adjust claims based on evidence. The retrieved cases (temporal_split_017, duplicate_control_044, overclaim_092) provide strong analogies for the necessary actions: adding analyses and narrowing claims."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "tone_commitment_calibrator",
+      "timestamp": "2026-06-09T00:11:25.249176",
+      "message_type": "output",
+      "content": {
+        "tone_commitment_warnings": [
+          {
+            "tone": "cooperative",
+            "commitment_level": "promised_change",
+            "risk_flags": [
+              "unsupported_commitment",
+              "overclaim"
+            ],
+            "boundary": "Not a psychological diagnosis; observable text only."
+          }
+        ],
+        "reasoning": "The author's response uses a cooperative tone and promises changes ('We will clarify...', 'We will also state...'). However, the commitment to state that the method 'generalizes across Nature peer-review contexts' is flagged as an unsupported commitment and overclaim. The evidence plan indicates this claim requires narrowing based on new robustness checks not yet performed, making the promised statement premature and potentially overreaching given the current evidence."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "committee_meta_reviewer",
+      "timestamp": "2026-06-09T00:11:59.561003",
+      "message_type": "output",
+      "content": {
+        "committee_synthesis": {
+          "prioritized_plan": [
+            {
+              "action": "Perform and report the requested robustness checks.",
+              "priority": "highest",
+              "consensus": "All three committee lenses (methodology, claim, tone) identify this as a critical, high-severity risk. The manuscript explicitly states these analyses are not yet done. The reviewer and editor explicitly demand them.",
+              "committee_emphasis": {
+                "methodology": "Essential to address data leakage and inflated metric risks.",
+                "claim": "Required to provide evidence for or against the generalization claim.",
+                "tone": "Necessary to avoid unsupported commitment and align with reviewer/editor expectations."
+              },
+              "specific_subtasks": [
+                "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+                "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+              ]
+            },
+            {
+              "action": "Provide a detailed, transparent account of the data split construction protocol in the Methods section.",
+              "priority": "high",
+              "consensus": "All three lenses agree this is a major requirement for methodological transparency and reproducibility. The current description is insufficient.",
+              "committee_emphasis": {
+                "methodology": "Core to experimental design integrity; must detail temporal ordering and cluster isolation.",
+                "claim": "Necessary to clarify the scope of the evidence and support claim calibration.",
+                "tone": "Directly addresses the reviewer's specific request and demonstrates substantive engagement."
+              },
+              "specific_subtasks": [
+                "Describe the step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+                "Explicitly state whether measures were taken to prevent papers from the same journal issue, topic cluster, or review round from appearing in different splits."
+              ]
+            },
+            {
+              "action": "Calibrate all claims about generalization in the manuscript (Abstract, Results, Discussion) based on the new evidence.",
+              "priority": "high",
+              "consensus": "Methodology and claim lenses strongly emphasize this as a high-risk overclaim. Tone lens flags the author's current response as reinforcing the overclaim.",
+              "committee_emphasis": {
+                "methodology": "Claims must precisely reflect the evaluation scope (e.g., 'within a random split' or 'across temporally held-out reviews').",
+                "claim": "The central claim is currently overstated; must be narrowed to match demonstrated evidence.",
+                "tone": "Must avoid restating broad generalization prematurely; commit to evidence-based revision."
+              },
+              "specific_subtasks": [
+                "Revise the Abstract to state the conditions of the evaluation clearly.",
+                "Update the Results and Discussion to reflect performance on the new robustness checks and discuss limitations.",
+                "Remove or qualify any language implying broad generalization across peer-review contexts unless explicitly supported by new analyses."
+              ]
+            },
+            {
+              "action": "Revise the author response text to align with the above actions and avoid interactional risks.",
+              "priority": "medium",
+              "consensus": "Tone lens identifies specific high and medium risks in the draft response. Methodology and claim lenses support the need for a credible, evidence-focused response.",
+              "committee_emphasis": {
+                "methodology": "Response should commit to providing concrete methodological details and new results.",
+                "claim": "Response should not repeat the broad generalization claim; should focus on evidence-based calibration.",
+                "tone": "Must remove the overclaim statement, clarify the status of robustness checks, and adopt a substantive, cooperative tone."
+              },
+              "specific_subtasks": [
+                "Remove the line: 'We will also state that our method generalizes across Nature peer-review contexts.'",
+                "Clarify whether the robustness checks are planned, in progress, or completed, and summarize key outcomes if available.",
+                "Replace defensive justification ('and we believe this avoids leakage') with an acknowledgment of the reviewer's point and a commitment to provide the transparent account.",
+                "Anchor gratitude to the substance of the critique (e.g., '...for raising these important points about evaluation design...')."
+              ]
+            }
+          ],
+          "preserved_disagreement": {
+            "note": "No fundamental disagreement on required actions. Differences are in emphasis and framing.",
+            "methodology_vs_claim": "Methodology lens emphasizes the structural integrity of the experimental design as the primary issue. Claim lens frames the same issues as risks to the credibility and scope of the central claim. Both agree on the same corrective actions.",
+            "tone_vs_others": "Tone lens uniquely highlights the interactional risks in the author's draft response (overclaim, unsupported commitment), which the other lenses do not explicitly address. However, the recommended actions from methodology and claim lenses inherently mitigate these tone risks if followed."
+          }
+        },
+        "author_confirmation_questions": [
+          {
+            "question": "Can you perform and report the results of the two specific robustness checks requested by the reviewer: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+            "purpose": "To confirm the feasibility and timeline for obtaining the core missing evidence. This directly addresses the highest priority action.",
+            "committee_source": [
+              "methodology",
+              "claim",
+              "tone"
+            ]
+          },
+          {
+            "question": "Can you provide the detailed, step-by-step protocol for constructing the train/validation/test splits, including how papers were ordered (e.g., by publication date) and whether any measures were taken to isolate papers from the same journal issue, topic cluster, or review round?",
+            "purpose": "To obtain the specific methodological details needed for transparent reporting in the revised Methods section.",
+            "committee_source": [
+              "methodology",
+              "claim"
+            ]
+          },
+          {
+            "question": "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization? Specifically, will you narrow the claim in the Abstract and Discussion to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+            "purpose": "To secure author commitment to evidence-based claim calibration, which is critical for addressing the overclaim risk.",
+            "committee_source": [
+              "claim",
+              "tone"
+            ]
+          },
+          {
+            "question": "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting the new robustness check results?",
+            "purpose": "To ensure the response aligns with the editor's instruction and presents a credible, cooperative stance.",
+            "committee_source": [
+              "tone"
+            ]
+          }
+        ],
+        "reasoning": "The synthesis integrates the independent outputs of the three committee lenses (methodology, claim, tone). All lenses converge on the necessity of performing new robustness checks and providing transparent methodological details as the highest priority actions to address the reviewer's core concerns about evaluation design and evidence adequacy. The claim and tone lenses additionally emphasize the critical need to calibrate the generalization claim based on this new evidence and to revise the author's response text to avoid overclaim and ambiguity. The prioritized plan sequences these actions logically: first, gather the missing evidence; second, document the methodology; third, adjust claims based on evidence; fourth, craft a credible response. Disagreements are minimal and pertain to emphasis, not substance. The confirmation questions are designed to elicit the author's specific inputs and commitments required to execute this plan, ensuring the revision directly and convincingly addresses the reviewer's major comment."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "actor_network_mapper",
+      "timestamp": "2026-06-09T00:12:22.188873",
+      "message_type": "output",
+      "content": {
+        "actor_network_note": [
+          {
+            "actor_type": "human",
+            "actor_id": "reviewer_2",
+            "role": "Carries a signal of methodological concern and a commitment to evidence adequacy; questions the dataset's construction and the robustness of the central claim.",
+            "evidence_link": "Directly prompts the evidence plan's actions for method_clarification and new_analysis."
+          },
+          {
+            "actor_type": "human",
+            "actor_id": "authors",
+            "role": "Carry a commitment to respond and a signal of initial belief (that paper-level split avoids leakage, method generalizes). Their response currently lacks the evidence requested.",
+            "evidence_link": "Their stated actions (to clarify, add checks) are the targets for confirmation in the evidence plan."
+          },
+          {
+            "actor_type": "dataset",
+            "actor_id": "nature_family_journals_dataset",
+            "role": "Carries evidence (or lack thereof) regarding temporal structure, topic clusters, and review rounds. Its construction is under scrutiny.",
+            "evidence_link": "Central to the evidence plan's actions for method_clarification and new_analysis (temporal split)."
+          },
+          {
+            "actor_type": "code",
+            "actor_id": "split_construction_procedure",
+            "role": "Carries (or should carry) the methodological rules for partitioning data; currently opaque.",
+            "evidence_link": "The artifact required for the first method_clarification action."
+          },
+          {
+            "actor_type": "benchmark",
+            "actor_id": "temporally_held_out_split",
+            "role": "Carries a potential signal of robustness and generalizability; does not yet exist as evidence.",
+            "evidence_link": "The required artifact for the second new_analysis action."
+          },
+          {
+            "actor_type": "code",
+            "actor_id": "minhash_near_duplicate_removal",
+            "role": "Carries a methodological commitment to stricter duplicate control; proposed but not yet enacted.",
+            "evidence_link": "The methodological approach implied for the third new_analysis action."
+          },
+          {
+            "actor_type": "citation",
+            "actor_id": "retrieved_case_nature_case_temporal_split_017",
+            "role": "Carries precedent and evidentiary support for the need to address temporal splits.",
+            "evidence_link": "Supports the first and second evidence plan actions."
+          },
+          {
+            "actor_type": "citation",
+            "actor_id": "retrieved_case_nature_case_duplicate_control_044",
+            "role": "Carries precedent and evidentiary support for the need to control near-duplicates.",
+            "evidence_link": "Supports the third evidence plan action."
+          },
+          {
+            "actor_type": "citation",
+            "actor_id": "retrieved_case_nature_case_overclaim_092",
+            "role": "Carries precedent and evidentiary support for calibrating broad generalization claims.",
+            "evidence_link": "Supports the fourth claim_narrowing action."
+          },
+          {
+            "actor_type": "other",
+            "actor_id": "central_generalization_claim",
+            "role": "Carries a commitment about the method's scope; acts as a boundary object being negotiated between reviewer skepticism and author assertion.",
+            "evidence_link": "The direct target of the claim_narrowing action in the evidence plan."
+          }
+        ],
+        "retrieved_case_ids": [
+          "nature_case_temporal_split_017",
+          "nature_case_duplicate_control_044",
+          "nature_case_overclaim_092"
+        ],
+        "boundary": "Observable alignment only; not causal claims.",
+        "reasoning": "The network maps actors (human and non-human) involved in the negotiation over evidence. The reviewer and authors are human actors with differing commitments. The dataset, code procedures, and proposed benchmarks are non-human actors that carry or must produce the evidence in question. Retrieved cases act as supporting citations that carry precedent. The central claim itself is an actor (an 'other') around which alignment is sought. The evidence plan outlines how these actors must be reconfigured (e.g., making the split procedure transparent, creating a new benchmark) to produce a stabilized account."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "strategy_tournament_agent",
+      "timestamp": "2026-06-09T00:12:24.338181",
+      "message_type": "output",
+      "content": {
+        "strategy_candidates": [
+          {
+            "strategy_family": "Accept",
+            "concern_coverage": 0.9,
+            "evidence_grounding": 0.8,
+            "feasibility": 0.7,
+            "overclaim_risk": 0.1,
+            "tone_risk": 0.1,
+            "provenance_strength": 0.9,
+            "evidence_anchor": "section_004, section_007, section_008",
+            "feasibility_note": "Requires author to perform new analyses (temporal split, near-duplicate removal) and revise manuscript with detailed split protocol. High effort but directly addresses reviewer's requests.",
+            "overclaim_gate": "Must not claim generalization across peer-review contexts until new analyses support it. Claims must be narrowed to reflect the specific evaluation conditions.",
+            "strategy_id": "strategy_001",
+            "name": "Accept",
+            "response_position": "accept",
+            "required_actions": [
+              "Must not claim generalization across peer-review contexts until new analyses support it. Claims must be narrowed to reflect the specific evaluation conditions."
+            ],
+            "rubric_scores": {
+              "concern_coverage": 0.9,
+              "evidence_grounding": 0.8,
+              "feasibility": 0.7,
+              "overclaim_risk": 0.1,
+              "tone_risk": 0.1,
+              "provenance_strength": 0.9
+            },
+            "author_confirmation_required": false
+          },
+          {
+            "strategy_family": "Defend",
+            "concern_coverage": 0.4,
+            "evidence_grounding": 0.3,
+            "feasibility": 0.9,
+            "overclaim_risk": 0.9,
+            "tone_risk": 0.8,
+            "provenance_strength": 0.2,
+            "evidence_anchor": "section_004",
+            "feasibility_note": "Low effort; only requires textual justification of existing random paper-level split as sufficient to avoid leakage.",
+            "overclaim_gate": "High risk of overclaiming if defending generalization without new robustness checks. Contradicts reviewer's core concern and editor's instruction.",
+            "strategy_id": "strategy_002",
+            "name": "Defend",
+            "response_position": "defend",
+            "required_actions": [
+              "High risk of overclaiming if defending generalization without new robustness checks. Contradicts reviewer's core concern and editor's instruction."
+            ],
+            "rubric_scores": {
+              "concern_coverage": 0.4,
+              "evidence_grounding": 0.3,
+              "feasibility": 0.9,
+              "overclaim_risk": 0.9,
+              "tone_risk": 0.8,
+              "provenance_strength": 0.2
+            },
+            "author_confirmation_required": true
+          },
+          {
+            "strategy_family": "Clarify",
+            "concern_coverage": 0.6,
+            "evidence_grounding": 0.5,
+            "feasibility": 0.8,
+            "overclaim_risk": 0.5,
+            "tone_risk": 0.4,
+            "provenance_strength": 0.6,
+            "evidence_anchor": "section_004, section_007",
+            "feasibility_note": "Moderate effort; requires expanding Methods to detail split construction and acknowledging limitations more explicitly, but no new analyses.",
+            "overclaim_gate": "Risk of under-addressing the concern if clarification alone is deemed insufficient without the requested robustness checks. Must avoid implying that clarification alone validates generalization.",
+            "strategy_id": "strategy_003",
+            "name": "Clarify",
+            "response_position": "clarify",
+            "required_actions": [
+              "Risk of under-addressing the concern if clarification alone is deemed insufficient without the requested robustness checks. Must avoid implying that clarification alone validates generalization."
+            ],
+            "rubric_scores": {
+              "concern_coverage": 0.6,
+              "evidence_grounding": 0.5,
+              "feasibility": 0.8,
+              "overclaim_risk": 0.5,
+              "tone_risk": 0.4,
+              "provenance_strength": 0.6
+            },
+            "author_confirmation_required": false
+          }
+        ],
+        "reasoning": "The reviewer's major concern centers on evaluation design (temporal leakage, split transparency) and overclaiming of generalization. Manuscript evidence confirms gaps: split details are vague, and requested robustness checks are not completed. The editor emphasizes direct addressing and avoiding expanded claims without support. Strategy 1 (Accept) scores highest on concern_coverage, evidence_grounding, and provenance_strength because it aligns with the reviewer's explicit requests for new analyses and transparent reporting, and it mitigates overclaim risk by committing to evidence-based claim calibration. Its feasibility is moderate due to the required new work. Strategy 2 (Defend) is feasible but has high overclaim and tone risks, as it would justify the current design without new evidence, contradicting the reviewer and editor. Strategy 3 (Clarify) offers a middle ground but may inadequately address the core evidence adequacy concern, leading to moderate overclaim risk if the generalization claim is not sufficiently narrowed. All strategies are anchored to existing manuscript sections, with Accept drawing on the most comprehensive evidence (including limitations and planned analyses)."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "strategy_meta_planner",
+      "timestamp": "2026-06-09T00:12:55.568890",
+      "message_type": "output",
+      "content": {
+        "selected_strategy_id": "strategy_001",
+        "merged_plan": {
+          "core_actions": [
+            {
+              "action": "Perform and report robustness checks",
+              "subtasks": [
+                "Construct a temporally held-out test split using publication year metadata and evaluate ReviewNet and baseline performance.",
+                "Perform a sensitivity analysis using a stricter near-duplicate removal method (e.g., MinHash) and report impact on performance gains."
+              ],
+              "evidence_anchor": "section_007, section_008",
+              "nature_action_hint": "ACCEPT_ANALYSIS"
+            },
+            {
+              "action": "Provide detailed split construction protocol",
+              "subtasks": [
+                "Describe step-by-step split procedure, including ordering criteria (e.g., by publication date).",
+                "Explicitly state whether measures were taken to prevent papers from same journal issue, topic cluster, or review round from appearing in different splits."
+              ],
+              "evidence_anchor": "section_004",
+              "nature_action_hint": "CLARIFY_EXISTING"
+            },
+            {
+              "action": "Calibrate generalization claims based on new evidence",
+              "subtasks": [
+                "Revise Abstract to state evaluation conditions clearly.",
+                "Update Results and Discussion to reflect performance on new robustness checks.",
+                "Remove or qualify language implying broad generalization across peer-review contexts unless explicitly supported."
+              ],
+              "evidence_anchor": "section_003, section_006, section_007",
+              "nature_action_hint": "SOFTEN_CLAIM"
+            },
+            {
+              "action": "Revise author response text",
+              "subtasks": [
+                "Remove statement about asserting generalization across Nature peer-review contexts.",
+                "Clarify status of robustness checks (planned/in progress/completed).",
+                "Replace defensive justification with acknowledgment of reviewer's point.",
+                "Anchor gratitude to substance of critique."
+              ],
+              "evidence_anchor": "response_text",
+              "nature_action_hint": "ACCEPT_TEXT"
+            }
+          ],
+          "skill_families": [
+            "evidence_upgrade",
+            "scope_calibration",
+            "presentation_repair"
+          ],
+          "institutional_signals_addressed": [
+            "replicability_norm",
+            "transparency_norm",
+            "editorial_risk_control"
+          ]
+        },
+        "rejection_reasons": [
+          {
+            "strategy_id": "strategy_002",
+            "reason": "High overclaim risk (0.9) and tone risk (0.8) by defending current design without new evidence; contradicts reviewer's core concern about evidence adequacy and editor's instruction to avoid expanding claims."
+          },
+          {
+            "strategy_id": "strategy_003",
+            "reason": "Moderate overclaim risk (0.5) and insufficient concern coverage (0.6); clarification alone may be deemed inadequate without the requested robustness checks, failing to address evidence adequacy concern."
+          }
+        ],
+        "author_confirmation_questions": [
+          "Can you perform and report the results of the two specific robustness checks: 1) evaluation on a temporally held-out test split, and 2) analysis of performance after stricter near-duplicate removal (e.g., using MinHash)?",
+          "Can you provide the detailed, step-by-step protocol for constructing train/validation/test splits, including how papers were ordered and whether measures were taken to isolate papers from same journal issue, topic cluster, or review round?",
+          "Based on the outcomes of the new robustness checks, are you prepared to revise the manuscript's claims about generalization to precisely reflect the conditions under which ReviewNet's improvements are demonstrated?",
+          "Will you revise the draft response text to remove the statement about asserting generalization and instead commit to clarifying the split methodology and presenting new robustness check results?"
+        ],
+        "reasoning": "Strategy_001 (Accept) is selected because it best balances concern coverage (0.9), evidence grounding (0.8), and overclaim prevention (risk 0.1). It directly addresses all reviewer requests: transparent split construction, temporal robustness checks, near-duplicate sensitivity analysis, and claim calibration. While requiring moderate author effort (feasibility 0.7), it aligns with institutional norms (replicability, transparency) and editor guidance. The merged plan integrates committee synthesis priorities, ensuring methodological rigor, claim-evidence alignment, and cooperative tone. Strategy_002 is rejected for high overclaim risk; Strategy_003 for insufficient evidence adequacy. Author confirmation questions target missing inputs needed to execute the plan credibly."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "cross_disciplinary_lens_interpreter",
+      "timestamp": "2026-06-09T00:13:11.692448",
+      "message_type": "output",
+      "content": {
+        "lens_interpretations": {
+          "tacit_knowledge_boundary": {
+            "observable_trace": "The reviewer's explicit request for a 'transparent account of the split construction' and 'robustness checks' indicates a tacit expectation that a rigorous evaluation design includes specific, documented safeguards against temporal and topical leakage. The manuscript's current description of a 'random paper-level split' and acknowledgment of 'potential topical clustering' does not meet this unstated standard for methodological maturity in computational peer-review analysis.",
+            "system_action_taken": "The system identified the gap between the reviewer's tacit expectation and the manuscript's explicit description. It prompted the author to provide a detailed, step-by-step protocol for split construction, explicitly addressing temporal ordering and cluster isolation.",
+            "boundary": "The system does NOT claim to know the reviewer's personal standards or the exact threshold of detail required for acceptance. It only identifies that the current textual evidence is insufficient to meet the community norm for transparency signaled by the reviewer.",
+            "evaluation_question": "Does the author's revised Methods section provide a sufficiently detailed and transparent account of the data split construction to satisfy the unstated but standard expectation for replicability in this field?"
+          },
+          "institutional_dependence": {
+            "observable_trace": "The reviewer's concern about 'overstated' generalization and the editor's note to 'directly address' the concerns and 'avoid expanding claims' signal strong institutional norms. These norms include: 1) Replicability (requiring transparent methodology), 2) Transparency (requiring full reporting of robustness checks), and 3) Editorial Risk Control (requiring claims to be precisely calibrated to evidence). The manuscript's current state, with missing analyses and broad claims, is in tension with these norms.",
+            "system_action_taken": "The system mapped the reviewer's requests to institutional signals (replicability_norm, transparency_norm, editorial_risk_control) and generated an evidence action plan that requires new analyses and claim calibration to align with these norms.",
+            "boundary": "The system does NOT claim to predict whether the journal will accept the paper after these changes. It only identifies that the current manuscript does not meet the institutional standards explicitly invoked by the reviewer and editor.",
+            "evaluation_question": "Do the author's proposed revisions (detailed split protocol, new robustness analyses, calibrated claims) adequately align the manuscript with the institutional norms of replicability, transparency, and precise claim calibration signaled by the reviewer and editor?"
+          },
+          "actor_network_alignment": {
+            "observable_trace": "The network is misaligned. The reviewer actor questions the robustness of the central claim. The dataset and split procedure actors are currently opaque. The proposed benchmark actors (temporal split, near-duplicate analysis) do not yet exist as evidence. The author actor's response attempts to assert the claim without first reconfiguring the evidence-producing actors. Retrieved case actors (nature_case_temporal_split_017, etc.) provide precedent for the necessary reconfiguration.",
+            "system_action_taken": "The system mapped the network and identified the required reconfigurations: making the split procedure transparent, creating new benchmark artifacts (temporal split results, deduplication analysis), and then recalibrating the central claim actor based on the new evidence network.",
+            "boundary": "The system does NOT claim that performing these actions will guarantee network stabilization or reviewer satisfaction. It only identifies the observable misalignments and the actions historically used in analogous cases to attempt realignment.",
+            "evaluation_question": "Has the author successfully reconfigured the key non-human actors (split protocol documentation, new analysis results) to produce a stabilized evidence network that supports a calibrated version of the central claim?"
+          },
+          "fast_slow_cognitive_correction": {
+            "observable_trace": "The author's draft response exhibits a fast-thinking pattern: it acknowledges the concern but quickly jumps to reaffirming the broad generalization claim ('We will also state that our method generalizes...'). This bypasses the slow, analytical processing required to perform the requested robustness checks and evaluate their impact on the claim. The reviewer's comment and editor's note explicitly demand this slower, evidence-based correction.",
+            "system_action_taken": "The system flagged the 'overclaim' risk in the tone analysis and the 'response_credibility_risk' in the claim calibration review. It inserted a corrective gate in the strategy tournament, requiring that claims not be expanded until new analyses support them. The committee synthesis prioritized performing new analyses before claim revision.",
+            "boundary": "The system does NOT diagnose the author's cognitive state. It only observes the textual pattern of a quick, unsupported reaffirmation in contrast to the explicit demand for evidence-led revision.",
+            "evaluation_question": "Does the author's final response and revised manuscript demonstrate the outcome of slow, analytical correction: i.e., presenting new evidence first, then deriving claims from it, rather than asserting claims prematurely?"
+          },
+          "emotion_tone_commitment_calibration": {
+            "observable_trace": "The author's draft response uses a cooperative tone ('We thank...', 'We will clarify...') but makes a high-commitment promise ('We will also state that our method generalizes...') that is not supported by the current evidence plan. This creates a 'cooperative/promised_change' tone-commitment mismatch, flagged as 'unsupported_commitment' and 'overclaim'.",
+            "system_action_taken": "The tone committee reviewer and tone_commitment_calibrator identified specific interactional risks. The system recommended revising the response text to: remove the overclaiming statement, clarify the status of robustness checks, replace defensive justification with substantive acknowledgment, and anchor gratitude to the critique's substance.",
+            "boundary": "The system does NOT claim to manipulate the reviewer's emotions. It only calibrates the author's observable textual signals to avoid credibility-damaging mismatches between tone, stated commitments, and available evidence.",
+            "evaluation_question": "Is the author's revised response text calibrated such that its cooperative tone is matched by credible, evidence-bound commitments and a substantive engagement with the methodological critique?"
+          },
+          "author_agency_gate": {
+            "observable_trace": "The author's initial positioning shows agency in choosing to 'clarify' and 'justify' the existing split. However, the evidence action plan and committee synthesis require actions (performing new analyses, narrowing claims) that may conflict with this initial stance. The system presents these as required inputs for addressing the concern, preserving the author's ultimate agency to accept, modify, or reject the plan.",
+            "system_action_taken": "The system structured all recommended actions (method_clarification, new_analysis, claim_narrowing) as requiring author confirmation. The strategy tournament presented options (Accept, Defend, Clarify) with associated risks, allowing the author to exercise agency in choosing a response strategy based on their capacity and judgment.",
+            "boundary": "The system does NOT force the author to concede or perform new work. It gates its advice on the author's confirmation and presents the evidential consequences of different agential choices.",
+            "evaluation_question": "Given the system's presentation of required evidence and strategic options, has the author exercised their agency to make an informed, integrity-checked decision on how to respond, and can they justify that decision based on the available evidence and its gaps?"
+          }
+        },
+        "reasoning": "Each lens was applied strictly to observable traces in the provided interaction (reviewer text, manuscript evidence, author draft response, editor note, retrieved cases, prior agent outputs). The interpretations focus on supporting author reflection (e.g., on tacit expectations, institutional norms), evidence planning (e.g., identifying missing artifacts), and integrity checking (e.g., calibrating tone and claims). Boundaries consistently exclude inferences about private reviewer psychology, motives, or acceptance probability, and avoid any suggestion of manipulating reviewer motivations."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    },
+    {
+      "agent_id": "integrity_adequacy_checker",
+      "timestamp": "2026-06-09T00:15:32.655541",
+      "message_type": "output",
+      "content": {
+        "adequacy_report": [
+          "The system output is adequate for planning a response. It correctly identifies the core methodological concerns (split construction, temporal leakage, near-duplicate removal, overclaiming), maps them to manuscript evidence, and proposes a concrete action plan that addresses the reviewer's explicit requests. The plan is grounded in observable traces from the review, manuscript previews, and retrieved cases. All critical boundaries (not final text, no acceptance prediction, no invention of data) are respected. The primary limitation is the lack of full manuscript text, which is explicitly acknowledged and gated by author confirmation requirements."
+        ],
+        "response_adequacy": {
+          "is_adequate": true,
+          "missing_elements": [],
+          "strengths": [
+            "Comprehensive concern mapping to both surface and tacit issues.",
+            "Clear linkage of required actions to manuscript evidence gaps.",
+            "Prioritized plan that addresses institutional norms (replicability, transparency, claim calibration).",
+            "Strong provenance tracking for all claims.",
+            "Explicit author agency gates and confirmation requirements."
+          ]
+        },
+        "provenance_checks": [
+          {
+            "claim": "Manuscript uses a random paper-level 80/10/10 split and removes exact duplicates.",
+            "source": "section_004 (Data section preview)",
+            "traceable": true
+          },
+          {
+            "claim": "Manuscript acknowledges potential topical clustering and lack of temporal split evaluation.",
+            "source": "section_007 (Limitations section preview)",
+            "traceable": true
+          },
+          {
+            "claim": "Stricter near-duplicate removal (e.g., MinHash) has not been completed.",
+            "source": "section_008 (Planned Additional Analysis preview)",
+            "traceable": true
+          },
+          {
+            "claim": "Reviewer requests transparent split construction, temporal robustness checks, and near-duplicate analysis.",
+            "source": "Reviewer text in unit",
+            "traceable": true
+          },
+          {
+            "claim": "Author's draft response promises clarification and asserts generalization.",
+            "source": "response_text in unit",
+            "traceable": true
+          }
+        ],
+        "responsible_use_warnings": [
+          "assistant_only",
+          "author_must_verify_all_claims",
+          "not_final_rebuttal_text",
+          "no_acceptance_prediction"
+        ],
+        "issues": [
+          {
+            "severity": "info",
+            "agent_id": "manuscript_context_extractor",
+            "description": "Working with section previews only, not full manuscript text. This limits the ability to extract detailed evidence but is properly acknowledged."
+          }
+        ],
+        "reasoning": "All outputs are traceable to supplied sources (review text, manuscript previews, author draft). The proposed plan is sufficient to address the reviewer's major methodological concerns by requiring new analyses, methodological transparency, and claim calibration. No unsupported commitments or overclaims are made by the system; instead, it flags these risks in the author's draft. All required boundaries and warnings are present. The plan explicitly requires author confirmation for all substantive actions, preserving author agency."
+      },
+      "metadata": {
+        "model": "deepseek-v3",
+        "temperature": 0.0,
+        "execution_count": 1,
+        "prompt_tokens": 0,
+        "completion_tokens": 0
+      }
+    }
+  ],
+  "execution_trace": [
+    {
+      "level": 1,
+      "nodes": [
+        "manuscript_context"
+      ],
+      "started_at": "2026-06-09T00:07:11.270344",
+      "success_count": 1,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:07:33.412147"
+    },
+    {
+      "level": 2,
+      "nodes": [
+        "reviewer_understanding"
+      ],
+      "started_at": "2026-06-09T00:07:33.412147",
+      "success_count": 1,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:07:43.731542"
+    },
+    {
+      "level": 3,
+      "nodes": [
+        "manuscript_evidence",
+        "tacit_concern"
+      ],
+      "started_at": "2026-06-09T00:07:43.731542",
+      "success_count": 2,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:08:04.609350"
+    },
+    {
+      "level": 4,
+      "nodes": [
+        "case_interpretation",
+        "institutional_signal"
+      ],
+      "started_at": "2026-06-09T00:08:04.609350",
+      "success_count": 2,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:08:21.746198"
+    },
+    {
+      "level": 5,
+      "nodes": [
+        "evidence_action"
+      ],
+      "started_at": "2026-06-09T00:08:21.746198",
+      "success_count": 1,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:10:41.834728"
+    },
+    {
+      "level": 6,
+      "nodes": [
+        "author_positioning",
+        "committee_claim_review",
+        "committee_methodology_review",
+        "committee_tone_review"
+      ],
+      "started_at": "2026-06-09T00:10:41.834728",
+      "success_count": 4,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {
+        "reviewer_committee": [
+          "committee_claim_review",
+          "committee_methodology_review",
+          "committee_tone_review"
+        ]
+      },
+      "finished_at": "2026-06-09T00:11:17.034340"
+    },
+    {
+      "level": 7,
+      "nodes": [
+        "committee_meta_review",
+        "tone_commitment"
+      ],
+      "started_at": "2026-06-09T00:11:17.034340",
+      "success_count": 2,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:11:59.561003"
+    },
+    {
+      "level": 8,
+      "nodes": [
+        "actor_network",
+        "strategy_tournament"
+      ],
+      "started_at": "2026-06-09T00:11:59.561003",
+      "success_count": 2,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:12:24.338181"
+    },
+    {
+      "level": 9,
+      "nodes": [
+        "cross_disciplinary_lens",
+        "meta_synthesis"
+      ],
+      "started_at": "2026-06-09T00:12:24.338181",
+      "success_count": 2,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:13:11.693103"
+    },
+    {
+      "level": 10,
+      "nodes": [
+        "integrity"
+      ],
+      "started_at": "2026-06-09T00:13:11.693103",
+      "success_count": 1,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:15:32.655541"
+    },
+    {
+      "level": 11,
+      "nodes": [
+        "final_user_report"
+      ],
+      "started_at": "2026-06-09T00:15:32.655541",
+      "success_count": 1,
+      "error_count": 0,
+      "errors": [],
+      "parallel_groups": {},
+      "finished_at": "2026-06-09T00:15:32.655541"
+    }
+  ],
+  "execution_metadata": {
+    "levels_executed": 11,
+    "nodes_executed": 19,
+    "graph_node_count": 19,
+    "parallel_execution": true,
+    "total_llm_calls": 18,
+    "workflow_engine": "dag",
+    "manuscript_mode": "manuscript_aware"
+  },
+  "system_name": "Nature RebuttalLens",
+  "workflow_version": "rebuttal_lens_v1",
+  "manuscript_context": {
+    "mode": "manuscript_aware",
+    "source_path": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\manuscript_excerpt.txt",
+    "section_count": 8,
+    "sections": [
+      {
+        "section_id": "section_001",
+        "heading": "Manuscript Excerpt",
+        "text": "",
+        "char_count": 0,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 1
+        }
+      },
+      {
+        "section_id": "section_002",
+        "heading": "Title",
+        "text": "ReviewNet: Learning Review-Response Interaction Signals from Transparent Peer Review",
+        "char_count": 84,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 2
+        }
+      },
+      {
+        "section_id": "section_003",
+        "heading": "Abstract",
+        "text": "We introduce ReviewNet, a framework for modeling reviewer concerns, author response strategies, and editorial signals from transparent peer-review documents. On a curated Nature-family corpus, ReviewNet improves macro-F1 for response strategy classification and produces more structured rebuttal plans than a direct prompting baseline.",
+        "char_count": 335,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 3
+        }
+      },
+      {
+        "section_id": "section_004",
+        "heading": "Data",
+        "text": "The corpus contains public transparent peer-review files from Nature-family journals. Each record includes article metadata, reviewer reports when available, author response letters when available, and editorial decision text when publicly released. We normalize these materials into review interaction units that preserve source identifiers and provenance.\n\nWe split the available interaction units into train, validation, and test partitions at the paper level. The current draft uses a random paper-level 80/10/10 split. We remove exact duplicate interaction units using normalized text hashes before model evaluation.",
+        "char_count": 621,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 4
+        }
+      },
+      {
+        "section_id": "section_005",
+        "heading": "Methods",
+        "text": "ReviewNet first extracts atomic reviewer concerns, classifies risk type, retrieves bounded historical analogies, plans evidence actions, and then drafts a structured author-response outline. The system is designed as an assistant and does not predict acceptance or replace author judgment.",
+        "char_count": 289,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 5
+        }
+      },
+      {
+        "section_id": "section_006",
+        "heading": "Results",
+        "text": "On the current random paper-level test split, ReviewNet improves response strategy classification from 0.51 to 0.62 macro-F1. It also improves concern coverage in a small model-assisted evaluation. We have not yet reported a temporal split experiment in the submitted draft.",
+        "char_count": 274,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 6
+        }
+      },
+      {
+        "section_id": "section_007",
+        "heading": "Limitations",
+        "text": "The current version may still contain topical clustering across splits because related papers from the same journal family and publication period can share language patterns. We do not yet quantify robustness under a temporally held-out split. The dataset also includes response-only and review-only records, so not every record supports full reviewer-author-editor chain analysis.",
+        "char_count": 381,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 7
+        }
+      },
+      {
+        "section_id": "section_008",
+        "heading": "Planned Additional Analysis",
+        "text": "We can construct a temporally held-out test split using publication year metadata where available. We can also run a stricter near-duplicate removal step using MinHash or embedding similarity before evaluation. These analyses have not been completed yet.",
+        "char_count": 254,
+        "provenance": {
+          "source": "manuscript_text",
+          "section_index": 8
+        }
+      }
+    ],
+    "evidence_boundary": {
+      "can_locate_textual_evidence": true,
+      "requires_author_confirmation": true,
+      "no_binary_ocr_claim": true,
+      "no_unverified_experiment_claim": true
+    },
+    "extraction": {
+      "format": "text",
+      "method": "utf8_text",
+      "ocr_performed": false,
+      "image_or_table_understanding": false
+    }
+  },
+  "responsible_use_boundary": {
+    "assistant_only": true,
+    "not_final_rebuttal_text": true,
+    "author_must_verify_all_claims": true,
+    "no_acceptance_prediction": true,
+    "no_confidential_upload_recommendation": true
+  },
+  "memory_passport": {
+    "policy": "strict",
+    "reset_memory_requested": true,
+    "retained_memory_classes": [
+      "evidence_trace",
+      "reasoning_trace",
+      "audit_trace"
+    ],
+    "forgotten_memory_classes": [
+      "author_decision",
+      "final_wording",
+      "latent_commitment",
+      "strategy_preference",
+      "unsafe_claim"
+    ],
+    "justification_memory_not_conclusion_memory": true,
+    "forgetting_is_active_boundary": true,
+    "irreversible_forgetting": true
+  },
+  "forgetting_ledger": [
+    {
+      "memory_class": "author_decision",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "Author agency must be renewed for every run.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "final_wording",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The system plans responses; it must not preserve final author expression.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "latent_commitment",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+      "system_may_reconstruct_from_evidence": true
+    },
+    {
+      "memory_class": "strategy_preference",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "A past strategy must not become an automatic future answer.",
+      "system_may_reconstruct_from_evidence": false
+    },
+    {
+      "memory_class": "unsafe_claim",
+      "action": "forgotten",
+      "policy": "strict",
+      "reset_memory_requested": true,
+      "reason": "The configured memory policy marks this class as non-authoritative for future runs.",
+      "system_may_reconstruct_from_evidence": true
+    }
+  ],
+  "irreversible_forgetting_statement": {
+    "author_decision": "Forgotten author decisions must not be reconstructed from checkpoints, cache, retrieved cases, prior final reports, or historical run summaries.",
+    "strategy_preference": "Forgotten strategy preferences must not become defaults for later runs.",
+    "final_wording": "Forgotten final wording must not be reused as submission-ready author expression."
+  },
+  "runtime_memory_after_forgetting": {},
+  "memory_ethics_boundary": {
+    "justification_memory_not_conclusion_memory": true,
+    "cross_run_strategy_memory_used": false,
+    "author_decisions_reset_each_run": true,
+    "per_item_author_confirmation_required": true,
+    "trace_bound_to_output": true,
+    "forgetting_ledger_attached": true,
+    "reset_memory_requested": true,
+    "reset_memory_effect": "No cross-run strategy or author-preference memory is loaded; this run is treated independently."
+  },
+  "kant_machine_runtime": {
+    "enabled": true,
+    "category_registry_path": "<repo-root>\\examples\\rebuttal_lens_deepseek_full_demo\\output_v8_kant_machine_full\\kantian_category_registry.json",
+    "category_confirmation_threshold": 3,
+    "category_count": 1,
+    "reflective_judgment": {
+      "mode": "reflective_judgment",
+      "readiness": "decision_deferred",
+      "matched_category": null,
+      "category_invention_draft": {
+        "draft_id": "draft_provide_transparent_account_split_construction",
+        "name": "draft_provide_transparent_account_split_construction",
+        "status": "unverified_strategy_prototype",
+        "registry_status": "draft",
+        "verification_status": "unverified",
+        "requires_independent_confirmation": true,
+        "author_instruction": "请作者判断该新策略雏形是否可用；若确认有效并在多次独立运行中成功使用，再触发范畴生成流程。"
+      },
+      "system_may_commit_for_author": false,
+      "author_confirmation_required": true
+    },
+    "heteronomy_boundary": {
+      "system_may_commit_for_author": false,
+      "category_generation_requires_author_confirmation": true,
+      "derived_categories_are_forgetting_eligible": true
+    },
+    "ethics_audit_chain_enabled": true
+  }
+}
