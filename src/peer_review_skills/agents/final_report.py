@@ -6,9 +6,11 @@ import json
 from pathlib import Path
 from typing import Any
 
+from peer_review_skills.agents.blackbox_transparency import build_blackbox_transparency
 from peer_review_skills.agents.citation_support_checks import grade_citation_support
 from peer_review_skills.agents.data_availability_checks import build_data_availability_check
 from peer_review_skills.agents.ethics_audit_chain import build_ethics_audit_chain
+from peer_review_skills.agents.organic_quality import build_organic_quality
 from peer_review_skills.agents.response_package import (
     build_response_package_cards,
     validate_response_package_cards,
@@ -132,6 +134,45 @@ def compose_final_user_report(trace: dict[str, Any]) -> dict[str, Any]:
         report["ethics_audit_chain"] = build_ethics_audit_chain(trace=trace, report=report)
     else:
         report["ethics_audit_chain"] = {}
+    phase2_report_enabled = bool(kant_runtime.get("phase") == "kant_machine_phase2")
+    self_legislation = _as_dict(kant_runtime.get("self_legislation"))
+    unknowability_ledger = _as_dict(kant_runtime.get("unknowability_ledger"))
+    cognition_loop = _as_dict(kant_runtime.get("cognition_loop"))
+    report["self_legislation"] = (
+        self_legislation
+        if phase2_report_enabled or self_legislation.get("enabled")
+        else {}
+    )
+    report["unknowability_ledger"] = (
+        unknowability_ledger
+        if phase2_report_enabled or unknowability_ledger.get("enabled")
+        else {}
+    )
+    report["cognition_loop"] = cognition_loop if phase2_report_enabled else {}
+    blackbox_transparency = build_blackbox_transparency(
+        trace=trace,
+        report=report,
+        config={
+            "enable_blackbox_transparency": bool(
+                phase2_report_enabled
+                or _as_dict(kant_runtime.get("blackbox_transparency")).get("enabled")
+            )
+        },
+    )
+    report["blackbox_transparency"] = (
+        blackbox_transparency if blackbox_transparency.get("enabled") else {}
+    )
+    organic_quality = build_organic_quality(
+        runtime=kant_runtime,
+        report=report,
+        config={
+            "enable_organic_quality": bool(
+                phase2_report_enabled
+                or _as_dict(kant_runtime.get("organic_quality")).get("enabled")
+            )
+        },
+    )
+    report["organic_quality"] = organic_quality if organic_quality.get("enabled") else {}
     report["package_readiness"] = _overall_package_readiness(comment_cards)
     report["executive_summary"] = _build_executive_summary(comment_cards, unsafe_claims)
     report["response_package_gate_issues"] = validate_response_package_cards(comment_cards)
@@ -347,6 +388,63 @@ def render_final_user_report_markdown(report: dict[str, Any]) -> str:
                 "### 绝对他律下近乎自律证明",
                 "",
                 str(audit_chain.get("heteronomy_transparency_statement", "")),
+            ]
+        )
+    if report.get("self_legislation"):
+        lines.extend(
+            [
+                "",
+                "## 14. 计算域自我立法",
+                "",
+                "```json",
+                json.dumps(report["self_legislation"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("unknowability_ledger"):
+        lines.extend(
+            [
+                "",
+                "## 15. 不可知边界",
+                "",
+                "```json",
+                json.dumps(report["unknowability_ledger"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("blackbox_transparency"):
+        lines.extend(
+            [
+                "",
+                "## 16. 黑箱透明化摘要",
+                "",
+                str(report["blackbox_transparency"].get("summary_zh", "")),
+                "",
+                "```json",
+                json.dumps(report["blackbox_transparency"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("organic_quality"):
+        lines.extend(
+            [
+                "",
+                "## 17. 有机性评估",
+                "",
+                "```json",
+                json.dumps(report["organic_quality"], ensure_ascii=False, indent=2),
+                "```",
+            ]
+        )
+    if report.get("cognition_loop"):
+        lines.extend(
+            [
+                "",
+                "## 18. 机械-经验-范畴三层认知循环",
+                "",
+                "```json",
+                json.dumps(report["cognition_loop"], ensure_ascii=False, indent=2),
+                "```",
             ]
         )
     return "\n".join(lines).rstrip() + "\n"

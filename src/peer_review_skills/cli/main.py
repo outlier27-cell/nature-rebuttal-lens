@@ -188,6 +188,34 @@ def build_parser() -> argparse.ArgumentParser:
     run_rebuttal_lens.add_argument("--enable-universalization-gate", action="store_true")
     run_rebuttal_lens.add_argument("--enable-reflective-judgment", action="store_true")
     run_rebuttal_lens.add_argument(
+        "--enable-kant-phase2",
+        action="store_true",
+        help=(
+            "Enable Kant Machine Phase 2 self-legislation, unknowability, "
+            "transparency, and organic-quality protocol."
+        ),
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-self-legislation",
+        action="store_true",
+        help="Enable computational self-legislation maxims for the run.",
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-unknowability-ledger",
+        action="store_true",
+        help="Enable ledger of claims the assistant must not pretend to know.",
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-blackbox-transparency",
+        action="store_true",
+        help="Enable black-box transparency summary in final report.",
+    )
+    run_rebuttal_lens.add_argument(
+        "--enable-organic-quality",
+        action="store_true",
+        help="Enable organic quality checks for reflective category generation.",
+    )
+    run_rebuttal_lens.add_argument(
         "--disable-ethics-audit-chain",
         action="store_true",
         help="Disable Kant-machine ethics audit chain sections in final reports.",
@@ -579,6 +607,16 @@ def main(argv: list[str] | None = None) -> int:
             workflow_config["enable_universalization_gate"] = True
         if args.enable_reflective_judgment:
             workflow_config["enable_reflective_judgment"] = True
+        if args.enable_kant_phase2:
+            workflow_config["enable_kant_phase2"] = True
+        if args.enable_self_legislation or args.enable_kant_phase2:
+            workflow_config["enable_self_legislation"] = True
+        if args.enable_unknowability_ledger or args.enable_kant_phase2:
+            workflow_config["enable_unknowability_ledger"] = True
+        if args.enable_blackbox_transparency or args.enable_kant_phase2:
+            workflow_config["enable_blackbox_transparency"] = True
+        if args.enable_organic_quality or args.enable_kant_phase2:
+            workflow_config["enable_organic_quality"] = True
         if args.disable_ethics_audit_chain:
             workflow_config["enable_ethics_audit_chain"] = False
         workflow_config["category_confirmation_threshold"] = args.category_confirmation_threshold

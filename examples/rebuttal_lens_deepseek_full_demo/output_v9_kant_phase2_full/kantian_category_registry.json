@@ -1,0 +1,20 @@
+{
+  "categories": [
+    {
+      "category_id": "draft_provide_more_transparent_account_split",
+      "confirmed_run_ids": [
+        "current_run"
+      ],
+      "description": "Provide a more transparent account of the split construction, add robustness checks under at least one temporally held-out split, and clarify whether the reported gains remain when near-duplicate review-response pairs are removed. The manuscript does not explain how temporal leakage was avoided when constructing train, validation, and test splits. It is also unclear whether papers from the same journal issue, topic cluster, or review round can appear across different splits. experimental_design Clarify whether the reported gains remain when near-duplicate review-response pairs are removed. Without this, the central claim that the method generalizes across peer-review contexts is overstated. The central claim that the method generalizes across peer-review contexts is overstated. generalization_scope",
+      "forgetting_eligible": true,
+      "metadata": {
+        "verification_status": "unverified"
+      },
+      "name": "draft_provide_more_transparent_account_split",
+      "source": "manual_seed",
+      "status": "draft",
+      "strategy_family": "",
+      "triggers": []
+    }
+  ]
+}
